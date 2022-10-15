@@ -7,7 +7,7 @@ namespace WebApp_GozenBv.Models
 {
     public class Order
     {
-        public int OrderId { get; set; }
+        public int Id { get; set; }
         public string ProductId { get; set; }
         public Stock Stock { get; set; }
     }

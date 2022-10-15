@@ -7,7 +7,7 @@ namespace WebApp_GozenBv.Models
 {
     public class WagenPark
     {
-        public int WagenId { get; set; }
+        public int Id { get; set; }
         public string LicencePlate { get; set; }
         public string ChassisNumber { get; set; }
         public double Km { get; set; }

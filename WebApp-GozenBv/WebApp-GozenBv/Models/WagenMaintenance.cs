@@ -7,7 +7,7 @@ namespace WebApp_GozenBv.Models
 {
     public class WagenMaintenance
     {
-        public int MaintenanceId { get; set; }
+        public int Id { get; set; }
         public DateTime MaintenanceDate { get; set; }
         public string MaintenanceNotes { get; set; }
         public int WagenId { get; set; }

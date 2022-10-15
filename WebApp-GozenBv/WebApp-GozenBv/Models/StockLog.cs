@@ -7,7 +7,7 @@ namespace WebApp_GozenBv.Models
 {
     public class StockLog
     {
-        public int LogId { get; set; }
+        public int Id { get; set; }
         public DateTime Date { get; set; }
         public string Action { get; set; } //ophalen / terugbrengen
 

@@ -7,7 +7,7 @@ namespace WebApp_GozenBv.Models
 {
     public class Employee
     {
-        public int EmployeeId { get; set; }
+        public int Id { get; set; }
         public string FirmaName { get; set; } //maybe table?
     }
 }
