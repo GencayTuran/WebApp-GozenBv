@@ -5,10 +5,9 @@ using System.Threading.Tasks;
 
 namespace WebApp_GozenBv.Models
 {
-    public class Employee
+    public class Firma
     {
         public int Id { get; set; }
-        public int FirmaId { get; set; }
-        public Firma Firma { get; set; }
+        public string FirmaName { get; set; }
     }
 }

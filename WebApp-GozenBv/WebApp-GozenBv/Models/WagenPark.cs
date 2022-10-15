@@ -10,8 +10,10 @@ namespace WebApp_GozenBv.Models
         public int Id { get; set; }
         public string LicencePlate { get; set; }
         public string ChassisNumber { get; set; }
+        public string Brand { get; set; }
         public double Km { get; set; }
-        public string FirmaName { get; set; }
         public DateTime KeuringDate { get; set; }
+        public int FirmaId{ get; set; }
+        public Firma Firma { get; set; }
     }
 }

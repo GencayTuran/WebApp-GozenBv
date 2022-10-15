@@ -10,18 +10,35 @@ using WebApp_GozenBv.Data;
 namespace WebApp_GozenBv.Migrations
 {
     [DbContext(typeof(DataDbContext))]
-    [Migration("20221015132721_init")]
+    [Migration("20221015142830_init")]
     partial class init
     {
         protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
-                .HasAnnotation("ProductVersion", "3.1.15")
+                .HasAnnotation("ProductVersion", "3.1.30")
                 .HasAnnotation("Relational:MaxIdentifierLength", 128)
                 .HasAnnotation("SqlServer:ValueGenerationStrategy", SqlServerValueGenerationStrategy.IdentityColumn);
 
             modelBuilder.Entity("WebApp_GozenBv.Models.Employee", b =>
+                {
+                    b.Property<int>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("int")
+                        .HasAnnotation("SqlServer:ValueGenerationStrategy", SqlServerValueGenerationStrategy.IdentityColumn);
+
+                    b.Property<int>("FirmaId")
+                        .HasColumnType("int");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("FirmaId");
+
+                    b.ToTable("Employees");
+                });
+
+            modelBuilder.Entity("WebApp_GozenBv.Models.Firma", b =>
                 {
                     b.Property<int>("Id")
                         .ValueGeneratedOnAdd()
@@ -33,7 +50,7 @@ namespace WebApp_GozenBv.Migrations
 
                     b.HasKey("Id");
 
-                    b.ToTable("Employees");
+                    b.ToTable("Firmas");
                 });
 
             modelBuilder.Entity("WebApp_GozenBv.Models.Order", b =>
@@ -65,9 +82,6 @@ namespace WebApp_GozenBv.Migrations
 
                     b.Property<double>("Cost")
                         .HasColumnType("float");
-
-                    b.Property<string>("ProductId")
-                        .HasColumnType("nvarchar(max)");
 
                     b.Property<string>("ProductName")
                         .HasColumnType("nvarchar(max)");
@@ -144,11 +158,14 @@ namespace WebApp_GozenBv.Migrations
                         .HasColumnType("int")
                         .HasAnnotation("SqlServer:ValueGenerationStrategy", SqlServerValueGenerationStrategy.IdentityColumn);
 
+                    b.Property<string>("Brand")
+                        .HasColumnType("nvarchar(max)");
+
                     b.Property<string>("ChassisNumber")
                         .HasColumnType("nvarchar(max)");
 
-                    b.Property<string>("FirmaName")
-                        .HasColumnType("nvarchar(max)");
+                    b.Property<int>("FirmaId")
+                        .HasColumnType("int");
 
                     b.Property<DateTime>("KeuringDate")
                         .HasColumnType("datetime2");
@@ -161,7 +178,18 @@ namespace WebApp_GozenBv.Migrations
 
                     b.HasKey("Id");
 
+                    b.HasIndex("FirmaId");
+
                     b.ToTable("WagenPark");
+                });
+
+            modelBuilder.Entity("WebApp_GozenBv.Models.Employee", b =>
+                {
+                    b.HasOne("WebApp_GozenBv.Models.Firma", "Firma")
+                        .WithMany()
+                        .HasForeignKey("FirmaId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
                 });
 
             modelBuilder.Entity("WebApp_GozenBv.Models.Order", b =>
@@ -189,6 +217,15 @@ namespace WebApp_GozenBv.Migrations
                     b.HasOne("WebApp_GozenBv.Models.WagenPark", "WagenPark")
                         .WithMany()
                         .HasForeignKey("WagenParkId");
+                });
+
+            modelBuilder.Entity("WebApp_GozenBv.Models.WagenPark", b =>
+                {
+                    b.HasOne("WebApp_GozenBv.Models.Firma", "Firma")
+                        .WithMany()
+                        .HasForeignKey("FirmaId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
                 });
 #pragma warning restore 612, 618
         }

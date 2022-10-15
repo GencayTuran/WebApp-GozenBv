@@ -8,7 +8,7 @@ namespace WebApp_GozenBv.Migrations
         protected override void Up(MigrationBuilder migrationBuilder)
         {
             migrationBuilder.CreateTable(
-                name: "Employees",
+                name: "Firmas",
                 columns: table => new
                 {
                     Id = table.Column<int>(nullable: false)
@@ -17,7 +17,7 @@ namespace WebApp_GozenBv.Migrations
                 },
                 constraints: table =>
                 {
-                    table.PrimaryKey("PK_Employees", x => x.Id);
+                    table.PrimaryKey("PK_Firmas", x => x.Id);
                 });
 
             migrationBuilder.CreateTable(
@@ -26,7 +26,6 @@ namespace WebApp_GozenBv.Migrations
                 {
                     Id = table.Column<int>(nullable: false)
                         .Annotation("SqlServer:Identity", "1, 1"),
-                    ProductId = table.Column<string>(nullable: true),
                     ProductName = table.Column<string>(nullable: true),
                     Used = table.Column<bool>(nullable: false),
                     Cost = table.Column<double>(nullable: false)
@@ -37,6 +36,25 @@ namespace WebApp_GozenBv.Migrations
                 });
 
             migrationBuilder.CreateTable(
+                name: "Employees",
+                columns: table => new
+                {
+                    Id = table.Column<int>(nullable: false)
+                        .Annotation("SqlServer:Identity", "1, 1"),
+                    FirmaId = table.Column<int>(nullable: false)
+                },
+                constraints: table =>
+                {
+                    table.PrimaryKey("PK_Employees", x => x.Id);
+                    table.ForeignKey(
+                        name: "FK_Employees_Firmas_FirmaId",
+                        column: x => x.FirmaId,
+                        principalTable: "Firmas",
+                        principalColumn: "Id",
+                        onDelete: ReferentialAction.Cascade);
+                });
+
+            migrationBuilder.CreateTable(
                 name: "WagenPark",
                 columns: table => new
                 {
@@ -44,13 +62,20 @@ namespace WebApp_GozenBv.Migrations
                         .Annotation("SqlServer:Identity", "1, 1"),
                     LicencePlate = table.Column<string>(nullable: true),
                     ChassisNumber = table.Column<string>(nullable: true),
+                    Brand = table.Column<string>(nullable: true),
                     Km = table.Column<double>(nullable: false),
-                    FirmaName = table.Column<string>(nullable: true),
-                    KeuringDate = table.Column<DateTime>(nullable: false)
+                    KeuringDate = table.Column<DateTime>(nullable: false),
+                    FirmaId = table.Column<int>(nullable: false)
                 },
                 constraints: table =>
                 {
                     table.PrimaryKey("PK_WagenPark", x => x.Id);
+                    table.ForeignKey(
+                        name: "FK_WagenPark_Firmas_FirmaId",
+                        column: x => x.FirmaId,
+                        principalTable: "Firmas",
+                        principalColumn: "Id",
+                        onDelete: ReferentialAction.Cascade);
                 });
 
             migrationBuilder.CreateTable(
@@ -125,6 +150,11 @@ namespace WebApp_GozenBv.Migrations
                 });
 
             migrationBuilder.CreateIndex(
+                name: "IX_Employees_FirmaId",
+                table: "Employees",
+                column: "FirmaId");
+
+            migrationBuilder.CreateIndex(
                 name: "IX_Orders_StockId",
                 table: "Orders",
                 column: "StockId");
@@ -143,6 +173,11 @@ namespace WebApp_GozenBv.Migrations
                 name: "IX_WagenMaintenances_WagenParkId",
                 table: "WagenMaintenances",
                 column: "WagenParkId");
+
+            migrationBuilder.CreateIndex(
+                name: "IX_WagenPark_FirmaId",
+                table: "WagenPark",
+                column: "FirmaId");
         }
 
         protected override void Down(MigrationBuilder migrationBuilder)
@@ -164,6 +199,9 @@ namespace WebApp_GozenBv.Migrations
 
             migrationBuilder.DropTable(
                 name: "WagenPark");
+
+            migrationBuilder.DropTable(
+                name: "Firmas");
         }
     }
 }

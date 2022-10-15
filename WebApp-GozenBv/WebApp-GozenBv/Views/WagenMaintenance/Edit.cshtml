@@ -1,0 +1,44 @@
+﻿@model WebApp_GozenBv.Models.WagenMaintenance
+
+@{
+    ViewData["Title"] = "Edit";
+}
+
+<h1>Edit</h1>
+
+<h4>WagenMaintenance</h4>
+<hr />
+<div class="row">
+    <div class="col-md-4">
+        <form asp-action="Edit">
+            <div asp-validation-summary="ModelOnly" class="text-danger"></div>
+            <input type="hidden" asp-for="Id" />
+            <div class="form-group">
+                <label asp-for="MaintenanceDate" class="control-label"></label>
+                <input asp-for="MaintenanceDate" class="form-control" />
+                <span asp-validation-for="MaintenanceDate" class="text-danger"></span>
+            </div>
+            <div class="form-group">
+                <label asp-for="MaintenanceNotes" class="control-label"></label>
+                <input asp-for="MaintenanceNotes" class="form-control" />
+                <span asp-validation-for="MaintenanceNotes" class="text-danger"></span>
+            </div>
+            <div class="form-group">
+                <label asp-for="WagenId" class="control-label"></label>
+                <input asp-for="WagenId" class="form-control" />
+                <span asp-validation-for="WagenId" class="text-danger"></span>
+            </div>
+            <div class="form-group">
+                <input type="submit" value="Save" class="btn btn-primary" />
+            </div>
+        </form>
+    </div>
+</div>
+
+<div>
+    <a asp-action="Index">Back to List</a>
+</div>
+
+@section Scripts {
+    @{await Html.RenderPartialAsync("_ValidationScriptsPartial");}
+}
