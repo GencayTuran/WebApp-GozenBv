@@ -57,7 +57,7 @@ namespace WebApp_GozenBv.Controllers
         // more details, see http://go.microsoft.com/fwlink/?LinkId=317598.
         [HttpPost]
         [ValidateAntiForgeryToken]
-        public async Task<IActionResult> Create([Bind("Id,LicencePlate,ChassisNumber,Brand,Km,KeuringDate,FirmaId")] WagenPark wagenPark)
+        public async Task<IActionResult> Create([Bind("Id,LicencePlate,ChassisNumber,Brand,Model,Km,KeuringDate,FirmaId")] WagenPark wagenPark)
         {
             if (ModelState.IsValid)
             {
@@ -91,7 +91,7 @@ namespace WebApp_GozenBv.Controllers
         // more details, see http://go.microsoft.com/fwlink/?LinkId=317598.
         [HttpPost]
         [ValidateAntiForgeryToken]
-        public async Task<IActionResult> Edit(int id, [Bind("Id,LicencePlate,ChassisNumber,Brand,Km,KeuringDate,FirmaId")] WagenPark wagenPark)
+        public async Task<IActionResult> Edit(int id, [Bind("Id,LicencePlate,ChassisNumber,Brand,Model,Km,KeuringDate,FirmaId")] WagenPark wagenPark)
         {
             if (id != wagenPark.Id)
             {

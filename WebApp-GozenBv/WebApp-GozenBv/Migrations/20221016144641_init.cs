@@ -21,18 +21,16 @@ namespace WebApp_GozenBv.Migrations
                 });
 
             migrationBuilder.CreateTable(
-                name: "Stock",
+                name: "ProductBrands",
                 columns: table => new
                 {
                     Id = table.Column<int>(nullable: false)
                         .Annotation("SqlServer:Identity", "1, 1"),
-                    ProductName = table.Column<string>(nullable: true),
-                    Used = table.Column<bool>(nullable: false),
-                    Cost = table.Column<double>(nullable: false)
+                    Name = table.Column<string>(nullable: true)
                 },
                 constraints: table =>
                 {
-                    table.PrimaryKey("PK_Stock", x => x.Id);
+                    table.PrimaryKey("PK_ProductBrands", x => x.Id);
                 });
 
             migrationBuilder.CreateTable(
@@ -41,6 +39,8 @@ namespace WebApp_GozenBv.Migrations
                 {
                     Id = table.Column<int>(nullable: false)
                         .Annotation("SqlServer:Identity", "1, 1"),
+                    Name = table.Column<string>(nullable: true),
+                    Surname = table.Column<string>(nullable: true),
                     FirmaId = table.Column<int>(nullable: false)
                 },
                 constraints: table =>
@@ -63,6 +63,7 @@ namespace WebApp_GozenBv.Migrations
                     LicencePlate = table.Column<string>(nullable: true),
                     ChassisNumber = table.Column<string>(nullable: true),
                     Brand = table.Column<string>(nullable: true),
+                    Model = table.Column<string>(nullable: true),
                     Km = table.Column<double>(nullable: false),
                     KeuringDate = table.Column<DateTime>(nullable: false),
                     FirmaId = table.Column<int>(nullable: false)
@@ -76,6 +77,51 @@ namespace WebApp_GozenBv.Migrations
                         principalTable: "Firmas",
                         principalColumn: "Id",
                         onDelete: ReferentialAction.Cascade);
+                });
+
+            migrationBuilder.CreateTable(
+                name: "Stock",
+                columns: table => new
+                {
+                    Id = table.Column<int>(nullable: false)
+                        .Annotation("SqlServer:Identity", "1, 1"),
+                    ProductName = table.Column<string>(nullable: true),
+                    Quantity = table.Column<int>(nullable: false),
+                    Used = table.Column<bool>(nullable: false),
+                    Cost = table.Column<double>(nullable: false),
+                    ProductBrandId = table.Column<int>(nullable: false)
+                },
+                constraints: table =>
+                {
+                    table.PrimaryKey("PK_Stock", x => x.Id);
+                    table.ForeignKey(
+                        name: "FK_Stock_ProductBrands_ProductBrandId",
+                        column: x => x.ProductBrandId,
+                        principalTable: "ProductBrands",
+                        principalColumn: "Id",
+                        onDelete: ReferentialAction.Cascade);
+                });
+
+            migrationBuilder.CreateTable(
+                name: "WagenMaintenances",
+                columns: table => new
+                {
+                    Id = table.Column<int>(nullable: false)
+                        .Annotation("SqlServer:Identity", "1, 1"),
+                    MaintenanceDate = table.Column<DateTime>(nullable: false),
+                    MaintenanceNotes = table.Column<string>(nullable: true),
+                    WagenId = table.Column<int>(nullable: false),
+                    WagenParkId = table.Column<int>(nullable: true)
+                },
+                constraints: table =>
+                {
+                    table.PrimaryKey("PK_WagenMaintenances", x => x.Id);
+                    table.ForeignKey(
+                        name: "FK_WagenMaintenances_WagenPark_WagenParkId",
+                        column: x => x.WagenParkId,
+                        principalTable: "WagenPark",
+                        principalColumn: "Id",
+                        onDelete: ReferentialAction.Restrict);
                 });
 
             migrationBuilder.CreateTable(
@@ -127,28 +173,6 @@ namespace WebApp_GozenBv.Migrations
                         onDelete: ReferentialAction.Restrict);
                 });
 
-            migrationBuilder.CreateTable(
-                name: "WagenMaintenances",
-                columns: table => new
-                {
-                    Id = table.Column<int>(nullable: false)
-                        .Annotation("SqlServer:Identity", "1, 1"),
-                    MaintenanceDate = table.Column<DateTime>(nullable: false),
-                    MaintenanceNotes = table.Column<string>(nullable: true),
-                    WagenId = table.Column<int>(nullable: false),
-                    WagenParkId = table.Column<int>(nullable: true)
-                },
-                constraints: table =>
-                {
-                    table.PrimaryKey("PK_WagenMaintenances", x => x.Id);
-                    table.ForeignKey(
-                        name: "FK_WagenMaintenances_WagenPark_WagenParkId",
-                        column: x => x.WagenParkId,
-                        principalTable: "WagenPark",
-                        principalColumn: "Id",
-                        onDelete: ReferentialAction.Restrict);
-                });
-
             migrationBuilder.CreateIndex(
                 name: "IX_Employees_FirmaId",
                 table: "Employees",
@@ -158,6 +182,11 @@ namespace WebApp_GozenBv.Migrations
                 name: "IX_Orders_StockId",
                 table: "Orders",
                 column: "StockId");
+
+            migrationBuilder.CreateIndex(
+                name: "IX_Stock_ProductBrandId",
+                table: "Stock",
+                column: "ProductBrandId");
 
             migrationBuilder.CreateIndex(
                 name: "IX_StockLogs_EmployeeId",
@@ -199,6 +228,9 @@ namespace WebApp_GozenBv.Migrations
 
             migrationBuilder.DropTable(
                 name: "WagenPark");
+
+            migrationBuilder.DropTable(
+                name: "ProductBrands");
 
             migrationBuilder.DropTable(
                 name: "Firmas");

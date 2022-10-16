@@ -10,23 +10,22 @@ using WebApp_GozenBv.Models;
 
 namespace WebApp_GozenBv.Controllers
 {
-    public class StockController : Controller
+    public class ProductBrandController : Controller
     {
         private readonly DataDbContext _context;
 
-        public StockController(DataDbContext context)
+        public ProductBrandController(DataDbContext context)
         {
             _context = context;
         }
 
-        // GET: Stock
+        // GET: ProductBrand
         public async Task<IActionResult> Index()
         {
-            var dataDbContext = _context.Stock.Include(s => s.ProductBrand);
-            return View(await dataDbContext.ToListAsync());
+            return View(await _context.ProductBrands.ToListAsync());
         }
 
-        // GET: Stock/Details/5
+        // GET: ProductBrand/Details/5
         public async Task<IActionResult> Details(int? id)
         {
             if (id == null)
@@ -34,42 +33,39 @@ namespace WebApp_GozenBv.Controllers
                 return NotFound();
             }
 
-            var stock = await _context.Stock
-                .Include(s => s.ProductBrand)
+            var productBrand = await _context.ProductBrands
                 .FirstOrDefaultAsync(m => m.Id == id);
-            if (stock == null)
+            if (productBrand == null)
             {
                 return NotFound();
             }
 
-            return View(stock);
+            return View(productBrand);
         }
 
-        // GET: Stock/Create
+        // GET: ProductBrand/Create
         public IActionResult Create()
         {
-            ViewData["ProductBrandId"] = new SelectList(_context.Set<ProductBrand>(), "Id", "Id");
             return View();
         }
 
-        // POST: Stock/Create
+        // POST: ProductBrand/Create
         // To protect from overposting attacks, enable the specific properties you want to bind to, for 
         // more details, see http://go.microsoft.com/fwlink/?LinkId=317598.
         [HttpPost]
         [ValidateAntiForgeryToken]
-        public async Task<IActionResult> Create([Bind("Id,ProductName,Quantity,Used,Cost,ProductBrandId")] Stock stock)
+        public async Task<IActionResult> Create([Bind("Id,Name")] ProductBrand productBrand)
         {
             if (ModelState.IsValid)
             {
-                _context.Add(stock);
+                _context.Add(productBrand);
                 await _context.SaveChangesAsync();
                 return RedirectToAction(nameof(Index));
             }
-            ViewData["ProductBrandId"] = new SelectList(_context.Set<ProductBrand>(), "Id", "Id", stock.ProductBrandId);
-            return View(stock);
+            return View(productBrand);
         }
 
-        // GET: Stock/Edit/5
+        // GET: ProductBrand/Edit/5
         public async Task<IActionResult> Edit(int? id)
         {
             if (id == null)
@@ -77,23 +73,22 @@ namespace WebApp_GozenBv.Controllers
                 return NotFound();
             }
 
-            var stock = await _context.Stock.FindAsync(id);
-            if (stock == null)
+            var productBrand = await _context.ProductBrands.FindAsync(id);
+            if (productBrand == null)
             {
                 return NotFound();
             }
-            ViewData["ProductBrandId"] = new SelectList(_context.Set<ProductBrand>(), "Id", "Id", stock.ProductBrandId);
-            return View(stock);
+            return View(productBrand);
         }
 
-        // POST: Stock/Edit/5
+        // POST: ProductBrand/Edit/5
         // To protect from overposting attacks, enable the specific properties you want to bind to, for 
         // more details, see http://go.microsoft.com/fwlink/?LinkId=317598.
         [HttpPost]
         [ValidateAntiForgeryToken]
-        public async Task<IActionResult> Edit(int id, [Bind("Id,ProductName,Quantity,Used,Cost,ProductBrandId")] Stock stock)
+        public async Task<IActionResult> Edit(int id, [Bind("Id,Name")] ProductBrand productBrand)
         {
-            if (id != stock.Id)
+            if (id != productBrand.Id)
             {
                 return NotFound();
             }
@@ -102,12 +97,12 @@ namespace WebApp_GozenBv.Controllers
             {
                 try
                 {
-                    _context.Update(stock);
+                    _context.Update(productBrand);
                     await _context.SaveChangesAsync();
                 }
                 catch (DbUpdateConcurrencyException)
                 {
-                    if (!StockExists(stock.Id))
+                    if (!ProductBrandExists(productBrand.Id))
                     {
                         return NotFound();
                     }
@@ -118,11 +113,10 @@ namespace WebApp_GozenBv.Controllers
                 }
                 return RedirectToAction(nameof(Index));
             }
-            ViewData["ProductBrandId"] = new SelectList(_context.Set<ProductBrand>(), "Id", "Id", stock.ProductBrandId);
-            return View(stock);
+            return View(productBrand);
         }
 
-        // GET: Stock/Delete/5
+        // GET: ProductBrand/Delete/5
         public async Task<IActionResult> Delete(int? id)
         {
             if (id == null)
@@ -130,31 +124,30 @@ namespace WebApp_GozenBv.Controllers
                 return NotFound();
             }
 
-            var stock = await _context.Stock
-                .Include(s => s.ProductBrand)
+            var productBrand = await _context.ProductBrands
                 .FirstOrDefaultAsync(m => m.Id == id);
-            if (stock == null)
+            if (productBrand == null)
             {
                 return NotFound();
             }
 
-            return View(stock);
+            return View(productBrand);
         }
 
-        // POST: Stock/Delete/5
+        // POST: ProductBrand/Delete/5
         [HttpPost, ActionName("Delete")]
         [ValidateAntiForgeryToken]
         public async Task<IActionResult> DeleteConfirmed(int id)
         {
-            var stock = await _context.Stock.FindAsync(id);
-            _context.Stock.Remove(stock);
+            var productBrand = await _context.ProductBrands.FindAsync(id);
+            _context.ProductBrands.Remove(productBrand);
             await _context.SaveChangesAsync();
             return RedirectToAction(nameof(Index));
         }
 
-        private bool StockExists(int id)
+        private bool ProductBrandExists(int id)
         {
-            return _context.Stock.Any(e => e.Id == id);
+            return _context.ProductBrands.Any(e => e.Id == id);
         }
     }
 }

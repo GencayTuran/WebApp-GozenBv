@@ -10,7 +10,7 @@ using WebApp_GozenBv.Data;
 namespace WebApp_GozenBv.Migrations
 {
     [DbContext(typeof(DataDbContext))]
-    [Migration("20221015142830_init")]
+    [Migration("20221016144641_init")]
     partial class init
     {
         protected override void BuildTargetModel(ModelBuilder modelBuilder)
@@ -30,6 +30,12 @@ namespace WebApp_GozenBv.Migrations
 
                     b.Property<int>("FirmaId")
                         .HasColumnType("int");
+
+                    b.Property<string>("Name")
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<string>("Surname")
+                        .HasColumnType("nvarchar(max)");
 
                     b.HasKey("Id");
 
@@ -73,6 +79,21 @@ namespace WebApp_GozenBv.Migrations
                     b.ToTable("Orders");
                 });
 
+            modelBuilder.Entity("WebApp_GozenBv.Models.ProductBrand", b =>
+                {
+                    b.Property<int>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("int")
+                        .HasAnnotation("SqlServer:ValueGenerationStrategy", SqlServerValueGenerationStrategy.IdentityColumn);
+
+                    b.Property<string>("Name")
+                        .HasColumnType("nvarchar(max)");
+
+                    b.HasKey("Id");
+
+                    b.ToTable("ProductBrands");
+                });
+
             modelBuilder.Entity("WebApp_GozenBv.Models.Stock", b =>
                 {
                     b.Property<int>("Id")
@@ -83,13 +104,21 @@ namespace WebApp_GozenBv.Migrations
                     b.Property<double>("Cost")
                         .HasColumnType("float");
 
+                    b.Property<int>("ProductBrandId")
+                        .HasColumnType("int");
+
                     b.Property<string>("ProductName")
                         .HasColumnType("nvarchar(max)");
+
+                    b.Property<int>("Quantity")
+                        .HasColumnType("int");
 
                     b.Property<bool>("Used")
                         .HasColumnType("bit");
 
                     b.HasKey("Id");
+
+                    b.HasIndex("ProductBrandId");
 
                     b.ToTable("Stock");
                 });
@@ -176,6 +205,9 @@ namespace WebApp_GozenBv.Migrations
                     b.Property<string>("LicencePlate")
                         .HasColumnType("nvarchar(max)");
 
+                    b.Property<string>("Model")
+                        .HasColumnType("nvarchar(max)");
+
                     b.HasKey("Id");
 
                     b.HasIndex("FirmaId");
@@ -197,6 +229,15 @@ namespace WebApp_GozenBv.Migrations
                     b.HasOne("WebApp_GozenBv.Models.Stock", "Stock")
                         .WithMany()
                         .HasForeignKey("StockId");
+                });
+
+            modelBuilder.Entity("WebApp_GozenBv.Models.Stock", b =>
+                {
+                    b.HasOne("WebApp_GozenBv.Models.ProductBrand", "ProductBrand")
+                        .WithMany()
+                        .HasForeignKey("ProductBrandId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
                 });
 
             modelBuilder.Entity("WebApp_GozenBv.Models.StockLog", b =>

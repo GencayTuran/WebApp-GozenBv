@@ -11,6 +11,7 @@ namespace WebApp_GozenBv.Models
         public string LicencePlate { get; set; }
         public string ChassisNumber { get; set; }
         public string Brand { get; set; }
+        public string Model { get; set; }
         public double Km { get; set; }
         public DateTime KeuringDate { get; set; }
         public int FirmaId{ get; set; }
