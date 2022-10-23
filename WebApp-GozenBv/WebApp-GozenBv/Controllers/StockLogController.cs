@@ -7,6 +7,7 @@ using Microsoft.AspNetCore.Mvc.Rendering;
 using Microsoft.EntityFrameworkCore;
 using WebApp_GozenBv.Data;
 using WebApp_GozenBv.Models;
+using WebApp_GozenBv.ViewModels;
 
 namespace WebApp_GozenBv.Controllers
 {
@@ -48,7 +49,34 @@ namespace WebApp_GozenBv.Controllers
         // GET: StockLog/Create
         public IActionResult Create()
         {
-            ViewData["EmployeeId"] = new SelectList(_context.Employees, "Id", "Id");
+            DateTime dateToday = DateTime.Now;
+            List<string> lstActions = new List<string>();
+
+            Employee emp = new Employee();
+            List<StockLogCreationVM> lstVM = new List<StockLogCreationVM>();
+
+            var result = from e in _context.Employees
+                         join f in _context.Firmas
+                         on e.FirmaId equals f.Id
+                         select new { e.Id, e.Name, e.Surname, f.FirmaName };
+
+            foreach (var employee in result)
+            {
+                lstVM.Add(new StockLogCreationVM
+                {
+                    EmployeeId = employee.Id,
+                    EmployeeFullNameFirma = employee.Id + " " + employee.Name + " " + employee.Surname + " (" + employee.FirmaName + ")",
+                });
+            }
+
+            lstActions.Add("Ophalen");
+            lstActions.Add("Terugbrengen");
+
+            ViewData["employees"] = new SelectList(lstVM, "EmployeeId", "EmployeeFullNameFirma");
+            ViewData["actions"] = new SelectList(lstActions);
+            ViewData["dateToday"] = dateToday;
+            ViewData["stock"] = new SelectList(_context.Stock, "Id", "ProductName");
+
             return View();
         }
 
@@ -57,7 +85,7 @@ namespace WebApp_GozenBv.Controllers
         // more details, see http://go.microsoft.com/fwlink/?LinkId=317598.
         [HttpPost]
         [ValidateAntiForgeryToken]
-        public async Task<IActionResult> Create([Bind("Id,Date,Action,EmployeeId,ProductId")] StockLog stockLog)
+        public async Task<IActionResult> Create([Bind("Id,Date,Action,EmployeeId,OrderId")] StockLog stockLog)
         {
             if (ModelState.IsValid)
             {
@@ -65,7 +93,7 @@ namespace WebApp_GozenBv.Controllers
                 await _context.SaveChangesAsync();
                 return RedirectToAction(nameof(Index));
             }
-            ViewData["EmployeeId"] = new SelectList(_context.Employees, "Id", "Id", stockLog.EmployeeId);
+            //ViewData["EmployeeId"] = new SelectList(_context.Employees, "Id", "Id", stockLog.EmployeeId);
             return View(stockLog);
         }
 
@@ -91,7 +119,7 @@ namespace WebApp_GozenBv.Controllers
         // more details, see http://go.microsoft.com/fwlink/?LinkId=317598.
         [HttpPost]
         [ValidateAntiForgeryToken]
-        public async Task<IActionResult> Edit(int id, [Bind("Id,Date,Action,EmployeeId,ProductId")] StockLog stockLog)
+        public async Task<IActionResult> Edit(int id, [Bind("Id,Date,Action,EmployeeId,OrderId")] StockLog stockLog)
         {
             if (id != stockLog.Id)
             {

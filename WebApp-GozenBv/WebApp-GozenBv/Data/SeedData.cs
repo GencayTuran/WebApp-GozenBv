@@ -17,13 +17,13 @@ namespace WebApp_GozenBv.Data
 
             if (!context.Stock.Any())
             {
-                context.Stock.AddRange(GetStock());
-                context.SaveChanges();
                 context.ProductBrands.AddRange(GetBrands());
                 context.SaveChanges();
-                context.Employees.AddRange(GetEmployees());
+                context.Stock.AddRange(GetStock());
                 context.SaveChanges();
                 context.Firmas.AddRange(GetFirmas());
+                context.SaveChanges();
+                context.Employees.AddRange(GetEmployees());
                 context.SaveChanges();
                 context.WagenPark.AddRange(GetWagenPark());
                 context.SaveChanges();
@@ -100,7 +100,7 @@ namespace WebApp_GozenBv.Data
         }
         private static Firma[] GetFirmas()
         {
-            var firmas = new Firma[2];
+            var firmas = new Firma[4];
             firmas[0] = new Firma
             {
                 FirmaName = "Elektrobel"
@@ -143,7 +143,7 @@ namespace WebApp_GozenBv.Data
                 FirmaId = 3,
                 KeuringDate = DateTime.Parse("05/02/2022")
             };
-            wagenPark[1] = new WagenPark
+            wagenPark[2] = new WagenPark
             {
                 LicencePlate = "1-XYZ-987",
                 ChassisNumber = "QRSTUVXYZA1234567",

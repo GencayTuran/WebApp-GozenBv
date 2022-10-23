@@ -14,7 +14,7 @@ namespace WebApp_GozenBv.Models
         public int EmployeeId { get; set; }
         public Employee Employee { get; set; }
 
-        public int ProductId { get; set; }
-        public Stock Stock { get; set; }
+        public int OrderId { get; set; }
+        public Order Order { get; set; }
     }
 }

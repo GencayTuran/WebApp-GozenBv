@@ -2,9 +2,10 @@
 
 @{
     ViewData["Title"] = "Create";
+
 }
 
-<h1>Create</h1>
+<h1>Formulier</h1>
 
 <h4>StockLog</h4>
 <hr />
@@ -13,27 +14,36 @@
         <form asp-action="Create">
             <div asp-validation-summary="ModelOnly" class="text-danger"></div>
             <div class="form-group">
-                <label asp-for="Date" class="control-label"></label>
+                <label class="control-label">Datum</label>
                 <input asp-for="Date" class="form-control" />
                 <span asp-validation-for="Date" class="text-danger"></span>
             </div>
             <div class="form-group">
-                <label asp-for="Action" class="control-label"></label>
-                <input asp-for="Action" class="form-control" />
-                <span asp-validation-for="Action" class="text-danger"></span>
+                <label class="control-label">Ophalen/Terugbrengen</label>
+                <select asp-for="Action" asp-items="ViewBag.actions" class="form-control"></select>
             </div>
             <div class="form-group">
-                <label asp-for="EmployeeId" class="control-label"></label>
-                <select asp-for="EmployeeId" class ="form-control" asp-items="ViewBag.EmployeeId"></select>
+                <label class="control-label">Werknemer</label>
+                <select class="form-control" asp-for="EmployeeId" asp-items="ViewBag.employees"></select>
             </div>
             <div class="form-group">
-                <label asp-for="ProductId" class="control-label"></label>
-                <input asp-for="ProductId" class="form-control" />
-                <span asp-validation-for="ProductId" class="text-danger"></span>
+                <select id="selectProduct" class="form-control selectpicker" data-live-search="true">
+                    <option id="option" disabled selected>Selecteer producten</option>
+                    @foreach (var product in ViewBag.stock)
+                    {
+                    <option id="optionProduct" value="@product.Value">@product.Text</option>
+                    }
+                </select>
             </div>
-            <div class="form-group">
-                <input type="submit" value="Create" class="btn btn-primary" />
-            </div>
+                <textarea id="txtSelectedProducts"></textarea>
+                @*<div class="form-group">
+                <label asp-for="OrderId" class="control-label"></label>
+                <input asp-for="OrderId" class="form-control" />
+                <span asp-validation-for="OrderId" class="text-danger"></span>
+            </div>*@
+                <div class="form-group">
+                    <input type="submit" onclick="passProduct(1)" value="Create" class="btn btn-primary" />
+                </div>
         </form>
     </div>
 </div>
@@ -41,6 +51,8 @@
 <div>
     <a asp-action="Index">Back to List</a>
 </div>
+
+<script src="~/js/StockLog_Create.js"></script>
 
 @section Scripts {
     @{await Html.RenderPartialAsync("_ValidationScriptsPartial");}

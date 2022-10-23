@@ -2,6 +2,15 @@
     ViewData["Title"] = "Home Page";
 }
 
-<div class="text-center">
-    <h1 class="display-4">Welcome</h1>
+<div class="container align-content-center">
+    <div class="container d-flex justify-content-center" ><p class="display-3">Menu</p></div>
+    <div class="container d-flex flex-column justify-content-center p-5 w-50">
+        <a class="btn" asp-area="" asp-controller="StockLog" asp-action="Create">Formulier</a>
+        <a class="btn" asp-area="" asp-controller="StockLog" asp-action="Index">StockLog</a>
+        <a class="btn" asp-area="" asp-controller="Stock" asp-action="Index">Stock</a>
+        <a class="btn" asp-area="" asp-controller="WagenPark" asp-action="Index">Wagenpark</a>
+    </div>
+    <div>
+        @* target helper here for generating alerts in type p *@
+    </div>
 </div>
