@@ -1,9 +1,9 @@
-﻿    function passProduct(key){
-        console.log(key)
-    }
+﻿function passProduct(key) {
+    console.log(key)
+}
 
-    let select = document.getElementById('selectProduct');
-    select.addEventListener('change', () =>{
-        console.log(select.value)
-        select.value = "Selecteer producten"
-    }) 
+let product = document.getElementById('btnProduct');
+product.addEventListener('click', () => {
+    console.log(id);
+})
+
