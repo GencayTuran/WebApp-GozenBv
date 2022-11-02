@@ -4,13 +4,16 @@
 
 <div class="container align-content-center">
     <div class="container d-flex justify-content-center" ><p class="display-3">Menu</p></div>
-    <div class="container d-flex flex-column justify-content-center p-5 w-50">
+    <div class="container d-flex flex-column justify-content-center p-5 w-75">
         <a class="btn" asp-area="" asp-controller="StockLog" asp-action="Create">Formulier</a>
         <a class="btn" asp-area="" asp-controller="StockLog" asp-action="Index">StockLog</a>
         <a class="btn" asp-area="" asp-controller="Stock" asp-action="Index">Stock</a>
         <a class="btn" asp-area="" asp-controller="WagenPark" asp-action="Index">Wagenpark</a>
     </div>
-    <div>
-        
+    <div class="container d-flex flex-column justify-content-center p-5 w-75">
+        @foreach (var alert in ViewBag.alerts)
+        {
+            <p>@alert</p>
+        }
     </div>
 </div>

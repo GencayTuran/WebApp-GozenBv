@@ -26,16 +26,36 @@ namespace WebApp_GozenBv.Controllers
 
         public IActionResult Index()
         {
-            List<string> lstAlerts = new List<string>();
+            List<string> lstAlertsCar = new List<string>();
             var cars = _context.WagenPark.Include(w => w.Firma);
             foreach (var car in cars)
             {
                 if ( DateTime.Now >= car.KeuringDate.AddMonths(11))
                 {
-                    int daysLeft = (car.KeuringDate - DateTime.Now).Days;
-                    lstAlerts.Add( car.Id + ". " + car.LicencePlate + " (" + car.Brand + " - " + car.Model + ") KEURING BINNEN " + daysLeft + " DAGEN!");
+                    if (DateTime.Now >= car.KeuringDate.AddMonths(12))
+                    {
+                        lstAlertsCar.Add("(" + car.Id + ") "
+                        + car.LicencePlate
+                        + " (" + car.Brand
+                        + " - " + car.Model
+                        + ") KEURING VERLOPEN OP "
+                        + car.KeuringDate.ToShortDateString());
+                    }
+                    else
+                    {
+                    int daysLeft = (car.KeuringDate.AddYears(1) - DateTime.Now).Days;
+                    lstAlertsCar.Add("(" + car.Id + ") " 
+                        + car.LicencePlate 
+                        + " (" + car.Brand 
+                        + " - " + car.Model 
+                        + ") KEURING VERLOOPT BINNEN " 
+                        + daysLeft 
+                        + " DAGEN! (" + car.KeuringDate.ToShortDateString() + ")");
+                    }
                 }
             }
+
+            ViewData["alerts"] = lstAlertsCar;
 
             return View();
         }
