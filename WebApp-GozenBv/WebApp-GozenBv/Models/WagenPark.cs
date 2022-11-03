@@ -16,6 +16,8 @@ namespace WebApp_GozenBv.Models
         public double Km { get; set; }
         [DataType(DataType.Date)]
         public DateTime KeuringDate { get; set; }
+        [DataType(DataType.Date)]
+        public DateTime DeadlineKeuring { get; set; }
         public int FirmaId{ get; set; }
         public Firma Firma { get; set; }
     }
