@@ -48,7 +48,7 @@ namespace WebApp_GozenBv.Controllers
         // GET: Stock/Create
         public IActionResult Create()
         {
-            ViewData["ProductBrandId"] = new SelectList(_context.Set<ProductBrand>(), "Id", "Id");
+            ViewData["ProductBrands"] = new SelectList(_context.Set<ProductBrand>(), "Id", "Name");
             return View();
         }
 
@@ -59,13 +59,14 @@ namespace WebApp_GozenBv.Controllers
         [ValidateAntiForgeryToken]
         public async Task<IActionResult> Create([Bind("Id,ProductName,Quantity,Used,Cost,ProductBrandId")] Stock stock)
         {
+            //first add productbrand to context if not exist
             if (ModelState.IsValid)
             {
                 _context.Add(stock);
                 await _context.SaveChangesAsync();
                 return RedirectToAction(nameof(Index));
             }
-            ViewData["ProductBrandId"] = new SelectList(_context.Set<ProductBrand>(), "Id", "Id", stock.ProductBrandId);
+            ViewData["ProductBrands"] = new SelectList(_context.Set<ProductBrand>(), "Id", "Name", stock.ProductBrandId);
             return View(stock);
         }
 
