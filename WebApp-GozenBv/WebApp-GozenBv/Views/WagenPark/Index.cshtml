@@ -31,6 +31,9 @@
                 @Html.DisplayNameFor(model => model.KeuringDate)
             </th>
             <th>
+                @Html.DisplayNameFor(model => model.DeadlineKeuring)
+            </th>
+            <th>
                 @Html.DisplayNameFor(model => model.Firma)
             </th>
             <th></th>
@@ -56,6 +59,9 @@
             </td>
             <td>
                 @Html.DisplayFor(modelItem => item.KeuringDate)
+            </td>
+            <td>
+                @Html.DisplayFor(modelItem => item.DeadlineKeuring)
             </td>
             <td>
                 @Html.DisplayFor(modelItem => item.Firma.Id)

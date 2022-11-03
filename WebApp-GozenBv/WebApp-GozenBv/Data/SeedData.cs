@@ -37,6 +37,7 @@ namespace WebApp_GozenBv.Data
             {
                 ProductName = "Kniptang",
                 Quantity = 3,
+                MinQuantity = 5,
                 ProductBrandId = 1,
                 Cost = 20
             };
@@ -45,6 +46,7 @@ namespace WebApp_GozenBv.Data
             {
                 ProductName = "Boormachine",
                 Quantity = 5,
+                MinQuantity = 1,
                 ProductBrandId = 2,
                 Cost = 50
             };
@@ -52,6 +54,7 @@ namespace WebApp_GozenBv.Data
             {
                 ProductName = "Slijper",
                 Quantity = 3,
+                MinQuantity = 1,
                 ProductBrandId = 3,
                 Cost = 80
             };
@@ -59,6 +62,7 @@ namespace WebApp_GozenBv.Data
             {
                 ProductName = "Hamer",
                 Quantity = 4,
+                MinQuantity = 1,
                 ProductBrandId = 4,
                 Cost = 20
             };
@@ -66,6 +70,7 @@ namespace WebApp_GozenBv.Data
             {
                 ProductName = "Kniptang",
                 Quantity = 3,
+                MinQuantity = 1,
                 ProductBrandId = 5,
                 Cost = 20
             };
@@ -142,8 +147,8 @@ namespace WebApp_GozenBv.Data
                 Model = "Transit",
                 Km = 30000,
                 FirmaId = 3,
-                KeuringDate = DateTime.Parse("05/02/2022"),
-                DeadlineKeuring = DateTime.Parse("04/02/2023")
+                KeuringDate = DateTime.Parse("05/02/2020"),
+                DeadlineKeuring = DateTime.Parse("04/02/2021")
             };
             wagenPark[2] = new WagenPark
             {
@@ -154,7 +159,7 @@ namespace WebApp_GozenBv.Data
                 Km = 110000,
                 FirmaId = 4,
                 KeuringDate = DateTime.Parse("14/05/2022"),
-                DeadlineKeuring = DateTime.Parse("14/05/2023")
+                DeadlineKeuring = DateTime.Parse("30/11/2022")
             };
             return wagenPark;
         }

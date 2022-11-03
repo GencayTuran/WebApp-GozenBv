@@ -66,6 +66,7 @@ namespace WebApp_GozenBv.Migrations
                     Model = table.Column<string>(nullable: true),
                     Km = table.Column<double>(nullable: false),
                     KeuringDate = table.Column<DateTime>(nullable: false),
+                    DeadlineKeuring = table.Column<DateTime>(nullable: false),
                     FirmaId = table.Column<int>(nullable: false)
                 },
                 constraints: table =>
@@ -85,10 +86,12 @@ namespace WebApp_GozenBv.Migrations
                 {
                     Id = table.Column<int>(nullable: false)
                         .Annotation("SqlServer:Identity", "1, 1"),
+                    ProductCode = table.Column<string>(nullable: true),
                     ProductName = table.Column<string>(nullable: true),
                     Quantity = table.Column<int>(nullable: false),
-                    Used = table.Column<bool>(nullable: false),
+                    MinQuantity = table.Column<int>(nullable: false),
                     Cost = table.Column<double>(nullable: false),
+                    Used = table.Column<bool>(nullable: false),
                     ProductBrandId = table.Column<int>(nullable: false)
                 },
                 constraints: table =>
@@ -130,6 +133,8 @@ namespace WebApp_GozenBv.Migrations
                 {
                     Id = table.Column<int>(nullable: false)
                         .Annotation("SqlServer:Identity", "1, 1"),
+                    OrderCode = table.Column<string>(nullable: true),
+                    Amount = table.Column<int>(nullable: false),
                     ProductId = table.Column<string>(nullable: true),
                     StockId = table.Column<int>(nullable: true)
                 },
@@ -153,8 +158,7 @@ namespace WebApp_GozenBv.Migrations
                     Date = table.Column<DateTime>(nullable: false),
                     Action = table.Column<string>(nullable: true),
                     EmployeeId = table.Column<int>(nullable: false),
-                    ProductId = table.Column<int>(nullable: false),
-                    StockId = table.Column<int>(nullable: true)
+                    OrderId = table.Column<int>(nullable: false)
                 },
                 constraints: table =>
                 {
@@ -166,11 +170,11 @@ namespace WebApp_GozenBv.Migrations
                         principalColumn: "Id",
                         onDelete: ReferentialAction.Cascade);
                     table.ForeignKey(
-                        name: "FK_StockLogs_Stock_StockId",
-                        column: x => x.StockId,
-                        principalTable: "Stock",
+                        name: "FK_StockLogs_Orders_OrderId",
+                        column: x => x.OrderId,
+                        principalTable: "Orders",
                         principalColumn: "Id",
-                        onDelete: ReferentialAction.Restrict);
+                        onDelete: ReferentialAction.Cascade);
                 });
 
             migrationBuilder.CreateIndex(
@@ -194,9 +198,9 @@ namespace WebApp_GozenBv.Migrations
                 column: "EmployeeId");
 
             migrationBuilder.CreateIndex(
-                name: "IX_StockLogs_StockId",
+                name: "IX_StockLogs_OrderId",
                 table: "StockLogs",
-                column: "StockId");
+                column: "OrderId");
 
             migrationBuilder.CreateIndex(
                 name: "IX_WagenMaintenances_WagenParkId",
@@ -212,9 +216,6 @@ namespace WebApp_GozenBv.Migrations
         protected override void Down(MigrationBuilder migrationBuilder)
         {
             migrationBuilder.DropTable(
-                name: "Orders");
-
-            migrationBuilder.DropTable(
                 name: "StockLogs");
 
             migrationBuilder.DropTable(
@@ -224,16 +225,19 @@ namespace WebApp_GozenBv.Migrations
                 name: "Employees");
 
             migrationBuilder.DropTable(
-                name: "Stock");
+                name: "Orders");
 
             migrationBuilder.DropTable(
                 name: "WagenPark");
 
             migrationBuilder.DropTable(
-                name: "ProductBrands");
+                name: "Stock");
 
             migrationBuilder.DropTable(
                 name: "Firmas");
+
+            migrationBuilder.DropTable(
+                name: "ProductBrands");
         }
     }
 }
