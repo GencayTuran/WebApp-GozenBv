@@ -44,7 +44,7 @@ namespace WebApp_GozenBv.Controllers
                     }
                     else
                     {
-                    int daysLeft = (car.KeuringDate.AddYears(1) - DateTime.Now).Days;
+                    int daysLeft = (car.DeadlineKeuring - DateTime.Now).Days + 1;
                     lstAlertsCar.Add("(" + car.Id + ") " 
                         + car.LicencePlate 
                         + " (" + car.Brand 
