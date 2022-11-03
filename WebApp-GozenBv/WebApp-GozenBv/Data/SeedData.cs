@@ -131,7 +131,8 @@ namespace WebApp_GozenBv.Data
                 Model = "Polo",
                 Km = 90000,
                 FirmaId = 3,
-                KeuringDate = DateTime.Parse("01/01/2022")
+                KeuringDate = DateTime.Parse("01/01/2022"),
+                DeadlineKeuring = DateTime.Parse("01/01/2023")
             };
             wagenPark[1] = new WagenPark
             {
@@ -141,7 +142,8 @@ namespace WebApp_GozenBv.Data
                 Model = "Transit",
                 Km = 30000,
                 FirmaId = 3,
-                KeuringDate = DateTime.Parse("05/02/2022")
+                KeuringDate = DateTime.Parse("05/02/2022"),
+                DeadlineKeuring = DateTime.Parse("04/02/2023")
             };
             wagenPark[2] = new WagenPark
             {
@@ -151,7 +153,8 @@ namespace WebApp_GozenBv.Data
                 Model = "Transporter",
                 Km = 110000,
                 FirmaId = 4,
-                KeuringDate = DateTime.Parse("14/05/2022")
+                KeuringDate = DateTime.Parse("14/05/2022"),
+                DeadlineKeuring = DateTime.Parse("14/05/2023")
             };
             return wagenPark;
         }
