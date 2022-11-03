@@ -53,29 +53,49 @@ namespace WebApp_GozenBv.Controllers
             List<string> lstActions = new List<string>();
 
             Employee emp = new Employee();
-            List<StockLogCreationVM> lstVM = new List<StockLogCreationVM>();
+            List<StockLogCreationVM> lstEmp = new List<StockLogCreationVM>();
 
-            var result = from e in _context.Employees
+            var queryEmp = from e in _context.Employees
                          join f in _context.Firmas
                          on e.FirmaId equals f.Id
                          select new { e.Id, e.Name, e.Surname, f.FirmaName };
 
-            foreach (var employee in result)
+            foreach (var employee in queryEmp)
             {
-                lstVM.Add(new StockLogCreationVM
+                lstEmp.Add(new StockLogCreationVM
                 {
                     EmployeeId = employee.Id,
                     EmployeeFullNameFirma = employee.Id + " " + employee.Name + " " + employee.Surname + " (" + employee.FirmaName + ")",
                 });
             }
 
+            //
+
+            Stock stock = new Stock();
+            List<StockLogCreationVM> lstStock = new List<StockLogCreationVM>();
+
+            var queryStock = from s in _context.Stock
+                           join p in _context.ProductBrands
+                           on s.ProductBrandId equals p.Id
+                           select new { s.Id, s.ProductName, p.Name };
+
+            foreach (var product in queryStock)
+            {
+                lstStock.Add(new StockLogCreationVM
+                {
+                    ProductId = product.Id,
+                    ProductNameBrand = product.ProductName + " - " + product.Name
+                });
+            }
+
             lstActions.Add("Ophalen");
             lstActions.Add("Terugbrengen");
 
-            ViewData["employees"] = new SelectList(lstVM, "EmployeeId", "EmployeeFullNameFirma");
+            ViewData["employees"] = new SelectList(lstEmp, "EmployeeId", "EmployeeFullNameFirma");
             ViewData["actions"] = new SelectList(lstActions);
             ViewData["dateToday"] = dateToday;
-            ViewData["stock"] = new SelectList(_context.Stock, "Id", "ProductName");
+            ViewData["stock"] = new SelectList(lstStock, "ProductId", "ProductNameBrand");
+            ViewData["stockQuantity"] = new SelectList(_context.Stock, "Id", "Quantity");
 
             return View();
         }

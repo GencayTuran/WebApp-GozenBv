@@ -11,6 +11,6 @@ namespace WebApp_GozenBv.ViewModels
         public int EmployeeId { get; set; }
         public string EmployeeFullNameFirma { get; set; }
         public int ProductId { get; set; }
-        public string ProductNameAndBrand { get; set; }
+        public string ProductNameBrand { get; set; }
     }
 }

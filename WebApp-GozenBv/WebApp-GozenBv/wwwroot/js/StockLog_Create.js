@@ -1,9 +1,11 @@
-﻿function passProduct(key) {
-    console.log(key)
-}
+﻿////function passProduct(key) {
+////    console.log(key)
+////}
 
-let product = document.getElementById('btnProduct');
-product.addEventListener('click', () => {
-    console.log(id);
-})
+////let product = document.getElementById('btnProduct');
+////product.addEventListener('click', () => {
+////    console.log("clicked");
+////})
+
+
 
