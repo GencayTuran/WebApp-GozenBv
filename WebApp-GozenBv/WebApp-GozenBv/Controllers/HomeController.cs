@@ -28,18 +28,19 @@ namespace WebApp_GozenBv.Controllers
         {
             List<string> lstAlertsCar = new List<string>();
             var cars = _context.WagenPark.Include(w => w.Firma);
+
             foreach (var car in cars)
             {
-                if ( DateTime.Now >= car.KeuringDate.AddMonths(11))
+                if (DateTime.Now >= car.DeadlineKeuring.AddMonths(-1))
                 {
-                    if (DateTime.Now >= car.KeuringDate.AddMonths(12))
+                    if (DateTime.Now >= car.DeadlineKeuring)
                     {
                         lstAlertsCar.Add("(" + car.Id + ") "
                         + car.LicencePlate
                         + " (" + car.Brand
                         + " - " + car.Model
                         + ") KEURING VERLOPEN OP "
-                        + car.KeuringDate.ToShortDateString());
+                        + car.DeadlineKeuring.ToShortDateString());
                     }
                     else
                     {
@@ -50,12 +51,28 @@ namespace WebApp_GozenBv.Controllers
                         + " - " + car.Model 
                         + ") KEURING VERLOOPT BINNEN " 
                         + daysLeft 
-                        + " DAGEN! (" + car.KeuringDate.ToShortDateString() + ")");
+                        + " DAGEN! (" + car.DeadlineKeuring.ToShortDateString() + ")");
                     }
                 }
             }
 
-            ViewData["alerts"] = lstAlertsCar;
+            List<string> lstAlertsStock = new List<string>();
+            var stock = _context.Stock.Include(s => s.ProductBrand);
+
+            foreach (var product in stock)
+            {
+                if (product.Quantity < product.MinQuantity)
+                {
+                    lstAlertsStock.Add("PRODUCTNR " 
+                    + product.Id 
+                    + " " + product.ProductName 
+                    + " - " +  product.ProductBrand.Name 
+                    + " WEINIG IN STOCK! (" + product.Quantity + ")");
+                }
+            }
+
+            ViewData["alertsCar"] = lstAlertsCar;
+            ViewData["alertsStock"] = lstAlertsStock;
 
             return View();
         }
