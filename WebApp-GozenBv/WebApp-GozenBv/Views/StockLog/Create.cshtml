@@ -1,4 +1,4 @@
-﻿@model WebApp_GozenBv.Models.StockLog
+﻿@model WebApp_GozenBv.ViewModels.StockLogVM
 
 @{
     ViewData["Title"] = "Create";
@@ -11,7 +11,7 @@
 <hr />
 <div class="row">
     <div class="col-md-4">
-        <form asp-action="Create">
+        <form asp-action="Create" autocomplete="off">
             <div asp-validation-summary="ModelOnly" class="text-danger"></div>
             <div class="form-group">
                 <label class="control-label">Datum</label>
@@ -26,26 +26,13 @@
                 <label class="control-label">Werknemer</label>
                 <select class="form-control" asp-for="EmployeeId" asp-items="ViewBag.employees"></select>
             </div>
-
-                @*<div class="list-group">
-                    @foreach (var product in ViewBag.stock)
-                    {
-                        <button id="btnProduct" type="button" class="list-group-item list-group-item-action">@product.Text</button>
-                    }
-                </div>*@
-
-            @*<div class="form-group">
-                <label asp-for="OrderId" class="control-label"></label>
-                <input asp-for="OrderId" class="form-control" />
-                <span asp-validation-for="OrderId" class="text-danger"></span>
-                </div>*@
             <div class="form-group">
-                <input type="submit" onclick="passProduct(1)" value="Create" class="btn btn-primary" />
+                <input type="submit" value="Create" class="btn btn-primary" />
             </div>
         </form>
     </div>
     <div class="col-md-6 bg-primary">
-        <div class="d-flex flex-row justify-content-end bg-secondary">
+        @*<div class="d-flex flex-row justify-content-end bg-secondary">
             <div class="col-10">Materiaal</div>
             <div class="col-2">Aantal</div>
         </div>
@@ -55,12 +42,38 @@
                     <option id="option" disabled selected>Selecteer producten</option>
                     @foreach (var product in ViewBag.stock)
                     {
-                        <option id="optionProduct" value="@product.Value">@product.Text</option>
+                        <option id="optionProduct" value="@product.Value">@product.Text</osption>
                     }
                 </select>
                 <input class="col-2" id="inputQuantity" placeholder="Aantal" value="1"/>
             </div>
-        </div>
+        </div>*@
+        <table id="SelectedProducts">
+            <tr class="d-flex flex-row justify-content-end bg-secondary">
+                <th class="col-10">Materiaal</th>
+                <th class="col-2">Aantal</th>
+                <th>
+                    <button id="btnAdd">+</button>
+                </th>
+            </tr>
+            <tr id="trStock" class="d-none">
+                <td class="form-group d-flex justify-content-between">
+                    <select asp-for="" class="col-8 form-control selectpicker" id="selectProduct" data-live-search="true">
+                        <option disabled selected>Selecteer producten</option>
+                        @foreach (var product in ViewBag.stock)
+                        {
+                            <option value="@product.Value">@product.Text</option>
+                        }
+                    </select>
+                </td>
+                <td>
+                    <input class="col-2" id="inputQuantity" placeholder="Aantal" value="1"/>
+                </td>
+                <td>
+                    <button class="btnRemove">Remove</button>
+                </td>
+            </tr>
+        </table>
     </div>
 
 </div>
@@ -70,6 +83,7 @@
 </div>
 
 <script src="~/js/StockLog_Create.js"></script>
+<script>AddNewRow()</script>
 
 @section Scripts {
 @{await Html.RenderPartialAsync("_ValidationScriptsPartial");}

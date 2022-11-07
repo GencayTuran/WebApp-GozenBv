@@ -49,11 +49,15 @@ namespace WebApp_GozenBv.Controllers
         // GET: StockLog/Create
         public IActionResult Create()
         {
+            StockLogVM stockLogVM = new StockLogVM();
+ 
             DateTime dateToday = DateTime.Now;
             List<string> lstActions = new List<string>();
+            lstActions.Add("Ophalen");
+            lstActions.Add("Terugbrengen");
 
             Employee emp = new Employee();
-            List<StockLogCreationVM> lstEmp = new List<StockLogCreationVM>();
+            List<EmployeeVM> lstEmp = new List<EmployeeVM>();
 
             var queryEmp = from e in _context.Employees
                          join f in _context.Firmas
@@ -62,17 +66,16 @@ namespace WebApp_GozenBv.Controllers
 
             foreach (var employee in queryEmp)
             {
-                lstEmp.Add(new StockLogCreationVM
+                lstEmp.Add(new EmployeeVM
                 {
                     EmployeeId = employee.Id,
                     EmployeeFullNameFirma = employee.Id + " " + employee.Name + " " + employee.Surname + " (" + employee.FirmaName + ")",
                 });
             }
 
-            //
 
             Stock stock = new Stock();
-            List<StockLogCreationVM> lstStock = new List<StockLogCreationVM>();
+            List<ProductVM> lstStock = new List<ProductVM>();
 
             var queryStock = from s in _context.Stock
                            join p in _context.ProductBrands
@@ -81,15 +84,12 @@ namespace WebApp_GozenBv.Controllers
 
             foreach (var product in queryStock)
             {
-                lstStock.Add(new StockLogCreationVM
+                lstStock.Add(new ProductVM
                 {
                     ProductId = product.Id,
                     ProductNameBrand = product.ProductName + " - " + product.Name
                 });
             }
-
-            lstActions.Add("Ophalen");
-            lstActions.Add("Terugbrengen");
 
             ViewData["employees"] = new SelectList(lstEmp, "EmployeeId", "EmployeeFullNameFirma");
             ViewData["actions"] = new SelectList(lstActions);
