@@ -78,16 +78,14 @@ namespace WebApp_GozenBv.Controllers
             List<ProductVM> lstStock = new List<ProductVM>();
 
             var queryStock = from s in _context.Stock
-                           join p in _context.ProductBrands
-                           on s.ProductBrandId equals p.Id
-                           select new { s.Id, s.ProductName, p.Name };
+                           select new { s.Id, s.ProductName, s.ProductBrand };
 
             foreach (var product in queryStock)
             {
                 lstStock.Add(new ProductVM
                 {
                     ProductId = product.Id,
-                    ProductNameBrand = product.ProductName + " - " + product.Name
+                    ProductNameBrand = product.ProductName + " - " + product.ProductBrand
                 });
             }
 

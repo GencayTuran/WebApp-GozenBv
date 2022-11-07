@@ -10,7 +10,7 @@ using WebApp_GozenBv.Data;
 namespace WebApp_GozenBv.Migrations
 {
     [DbContext(typeof(DataDbContext))]
-    [Migration("20221103181206_init")]
+    [Migration("20221106170807_init")]
     partial class init
     {
         protected override void BuildTargetModel(ModelBuilder modelBuilder)
@@ -85,21 +85,6 @@ namespace WebApp_GozenBv.Migrations
                     b.ToTable("Orders");
                 });
 
-            modelBuilder.Entity("WebApp_GozenBv.Models.ProductBrand", b =>
-                {
-                    b.Property<int>("Id")
-                        .ValueGeneratedOnAdd()
-                        .HasColumnType("int")
-                        .HasAnnotation("SqlServer:ValueGenerationStrategy", SqlServerValueGenerationStrategy.IdentityColumn);
-
-                    b.Property<string>("Name")
-                        .HasColumnType("nvarchar(max)");
-
-                    b.HasKey("Id");
-
-                    b.ToTable("ProductBrands");
-                });
-
             modelBuilder.Entity("WebApp_GozenBv.Models.Stock", b =>
                 {
                     b.Property<int>("Id")
@@ -113,11 +98,11 @@ namespace WebApp_GozenBv.Migrations
                     b.Property<int>("MinQuantity")
                         .HasColumnType("int");
 
+                    b.Property<string>("ProductBrand")
+                        .HasColumnType("nvarchar(max)");
+
                     b.Property<int>("ProductBrandId")
                         .HasColumnType("int");
-
-                    b.Property<string>("ProductCode")
-                        .HasColumnType("nvarchar(max)");
 
                     b.Property<string>("ProductName")
                         .HasColumnType("nvarchar(max)");
@@ -129,8 +114,6 @@ namespace WebApp_GozenBv.Migrations
                         .HasColumnType("bit");
 
                     b.HasKey("Id");
-
-                    b.HasIndex("ProductBrandId");
 
                     b.ToTable("Stock");
                 });
@@ -241,15 +224,6 @@ namespace WebApp_GozenBv.Migrations
                     b.HasOne("WebApp_GozenBv.Models.Stock", "Stock")
                         .WithMany()
                         .HasForeignKey("StockId");
-                });
-
-            modelBuilder.Entity("WebApp_GozenBv.Models.Stock", b =>
-                {
-                    b.HasOne("WebApp_GozenBv.Models.ProductBrand", "ProductBrand")
-                        .WithMany()
-                        .HasForeignKey("ProductBrandId")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired();
                 });
 
             modelBuilder.Entity("WebApp_GozenBv.Models.StockLog", b =>

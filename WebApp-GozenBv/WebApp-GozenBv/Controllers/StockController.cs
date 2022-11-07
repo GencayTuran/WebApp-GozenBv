@@ -22,7 +22,7 @@ namespace WebApp_GozenBv.Controllers
         // GET: Stock
         public async Task<IActionResult> Index()
         {
-            var dataDbContext = _context.Stock.Include(s => s.ProductBrand);
+            var dataDbContext = _context.Stock.Select(s => s);
             return View(await dataDbContext.ToListAsync());
         }
 
@@ -48,7 +48,8 @@ namespace WebApp_GozenBv.Controllers
         // GET: Stock/Create
         public IActionResult Create()
         {
-            ViewData["ProductBrands"] = new SelectList(_context.Set<ProductBrand>(), "Id", "Name");
+            var productBrands = _context.Stock.Select(p => p.ProductBrand).ToList();
+            ViewData["ProductBrands"] = productBrands;
             return View();
         }
 
@@ -57,16 +58,15 @@ namespace WebApp_GozenBv.Controllers
         // more details, see http://go.microsoft.com/fwlink/?LinkId=317598.
         [HttpPost]
         [ValidateAntiForgeryToken]
-        public async Task<IActionResult> Create([Bind("Id,ProductCode,ProductName,Quantity,MinQuantity,Used,Cost,ProductBrandId")] Stock stock)
+        public async Task<IActionResult> Create([Bind("Id,ProductName,Quantity,MinQuantity,Used,Cost,ProductBrand")] Stock stock)
         {
-            //first add productbrand to context if not exist
             if (ModelState.IsValid)
             {
                 _context.Add(stock);
                 await _context.SaveChangesAsync();
                 return RedirectToAction(nameof(Index));
             }
-            ViewData["ProductBrands"] = new SelectList(_context.Set<ProductBrand>(), "Id", "Name", stock.ProductBrandId);
+            //ViewData["ProductBrands"] = new SelectList(_context.Set<ProductBrand>(), "Id", "Name");
             return View(stock);
         }
 
@@ -83,7 +83,7 @@ namespace WebApp_GozenBv.Controllers
             {
                 return NotFound();
             }
-            ViewData["ProductBrandId"] = new SelectList(_context.Set<ProductBrand>(), "Id", "Id", stock.ProductBrandId);
+            //ViewData["ProductBrands"] = new SelectList(_context.Set<ProductBrand>(), "Id", "Id", stock.ProductBrandId);
             return View(stock);
         }
 
@@ -92,7 +92,7 @@ namespace WebApp_GozenBv.Controllers
         // more details, see http://go.microsoft.com/fwlink/?LinkId=317598.
         [HttpPost]
         [ValidateAntiForgeryToken]
-        public async Task<IActionResult> Edit(int id, [Bind("Id,ProductCode,ProductName,Quantity,MinQuantity,Used,Cost,ProductBrandId")] Stock stock)
+        public async Task<IActionResult> Edit(int id, [Bind("Id,ProductName,Quantity,MinQuantity,Used,Cost,ProductBrand")] Stock stock)
         {
             if (id != stock.Id)
             {
@@ -119,7 +119,7 @@ namespace WebApp_GozenBv.Controllers
                 }
                 return RedirectToAction(nameof(Index));
             }
-            ViewData["ProductBrandId"] = new SelectList(_context.Set<ProductBrand>(), "Id", "Id", stock.ProductBrandId);
+            //ViewData["ProductBrandId"] = new SelectList(_context.Set<ProductBrand>(), "Id", "Id", stock.ProductBrandId);
             return View(stock);
         }
 

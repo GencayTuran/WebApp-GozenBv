@@ -17,8 +17,6 @@ namespace WebApp_GozenBv.Data
 
             if (!context.Stock.Any())
             {
-                context.ProductBrands.AddRange(GetBrands());
-                context.SaveChanges();
                 context.Stock.AddRange(GetStock());
                 context.SaveChanges();
                 context.Firmas.AddRange(GetFirmas());
@@ -38,7 +36,7 @@ namespace WebApp_GozenBv.Data
                 ProductName = "Kniptang",
                 Quantity = 3,
                 MinQuantity = 5,
-                ProductBrandId = 1,
+                ProductBrand = "Knipex",
                 Cost = 20
             };
 
@@ -47,7 +45,7 @@ namespace WebApp_GozenBv.Data
                 ProductName = "Boormachine",
                 Quantity = 5,
                 MinQuantity = 1,
-                ProductBrandId = 2,
+                ProductBrand = "Makita",
                 Cost = 50
             };
             stock[2] = new Stock
@@ -55,7 +53,7 @@ namespace WebApp_GozenBv.Data
                 ProductName = "Slijper",
                 Quantity = 3,
                 MinQuantity = 1,
-                ProductBrandId = 3,
+                ProductBrand = "Bosch",
                 Cost = 80
             };
             stock[3] = new Stock
@@ -63,7 +61,7 @@ namespace WebApp_GozenBv.Data
                 ProductName = "Hamer",
                 Quantity = 4,
                 MinQuantity = 1,
-                ProductBrandId = 4,
+                ProductBrand = "Hitachi",
                 Cost = 20
             };
             stock[4] = new Stock
@@ -71,38 +69,13 @@ namespace WebApp_GozenBv.Data
                 ProductName = "Kniptang",
                 Quantity = 3,
                 MinQuantity = 1,
-                ProductBrandId = 5,
+                ProductBrand = "Andere",
                 Cost = 20
             };
 
             return stock;
         }
-        private static ProductBrand[] GetBrands()
-        {
-            var brands = new ProductBrand[5];
-            brands[0] = new ProductBrand
-            {
-                Name = "Knipex"
-            };
-            brands[1] = new ProductBrand
-            {
-                Name = "Makita"
-            };
-            brands[2] = new ProductBrand
-            {
-                Name = "Bosch"
-            };
-            brands[3] = new ProductBrand
-            {
-                Name = "Hitachi"
-            };
-            brands[4] = new ProductBrand
-            {
-                Name = "Andere"
-            };
 
-            return brands;
-        }
         private static Firma[] GetFirmas()
         {
             var firmas = new Firma[4];

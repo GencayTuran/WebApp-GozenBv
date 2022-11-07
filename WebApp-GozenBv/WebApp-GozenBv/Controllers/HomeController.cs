@@ -57,7 +57,7 @@ namespace WebApp_GozenBv.Controllers
             }
 
             List<string> lstAlertsStock = new List<string>();
-            var stock = _context.Stock.Include(s => s.ProductBrand);
+            var stock = _context.Stock.Select(x => x);
 
             foreach (var product in stock)
             {
@@ -66,7 +66,7 @@ namespace WebApp_GozenBv.Controllers
                     lstAlertsStock.Add("PRODUCTNR " 
                     + product.Id 
                     + " " + product.ProductName 
-                    + " - " +  product.ProductBrand.Name 
+                    + " - " +  product.ProductBrand
                     + " WEINIG IN STOCK! (" + product.Quantity + ")");
                 }
             }

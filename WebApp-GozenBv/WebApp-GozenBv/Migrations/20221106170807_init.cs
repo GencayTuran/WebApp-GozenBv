@@ -21,16 +21,22 @@ namespace WebApp_GozenBv.Migrations
                 });
 
             migrationBuilder.CreateTable(
-                name: "ProductBrands",
+                name: "Stock",
                 columns: table => new
                 {
                     Id = table.Column<int>(nullable: false)
                         .Annotation("SqlServer:Identity", "1, 1"),
-                    Name = table.Column<string>(nullable: true)
+                    ProductName = table.Column<string>(nullable: true),
+                    Quantity = table.Column<int>(nullable: false),
+                    MinQuantity = table.Column<int>(nullable: false),
+                    Cost = table.Column<double>(nullable: false),
+                    Used = table.Column<bool>(nullable: false),
+                    ProductBrandId = table.Column<int>(nullable: false),
+                    ProductBrand = table.Column<string>(nullable: true)
                 },
                 constraints: table =>
                 {
-                    table.PrimaryKey("PK_ProductBrands", x => x.Id);
+                    table.PrimaryKey("PK_Stock", x => x.Id);
                 });
 
             migrationBuilder.CreateTable(
@@ -81,28 +87,25 @@ namespace WebApp_GozenBv.Migrations
                 });
 
             migrationBuilder.CreateTable(
-                name: "Stock",
+                name: "Orders",
                 columns: table => new
                 {
                     Id = table.Column<int>(nullable: false)
                         .Annotation("SqlServer:Identity", "1, 1"),
-                    ProductCode = table.Column<string>(nullable: true),
-                    ProductName = table.Column<string>(nullable: true),
-                    Quantity = table.Column<int>(nullable: false),
-                    MinQuantity = table.Column<int>(nullable: false),
-                    Cost = table.Column<double>(nullable: false),
-                    Used = table.Column<bool>(nullable: false),
-                    ProductBrandId = table.Column<int>(nullable: false)
+                    OrderCode = table.Column<string>(nullable: true),
+                    Amount = table.Column<int>(nullable: false),
+                    ProductId = table.Column<string>(nullable: true),
+                    StockId = table.Column<int>(nullable: true)
                 },
                 constraints: table =>
                 {
-                    table.PrimaryKey("PK_Stock", x => x.Id);
+                    table.PrimaryKey("PK_Orders", x => x.Id);
                     table.ForeignKey(
-                        name: "FK_Stock_ProductBrands_ProductBrandId",
-                        column: x => x.ProductBrandId,
-                        principalTable: "ProductBrands",
+                        name: "FK_Orders_Stock_StockId",
+                        column: x => x.StockId,
+                        principalTable: "Stock",
                         principalColumn: "Id",
-                        onDelete: ReferentialAction.Cascade);
+                        onDelete: ReferentialAction.Restrict);
                 });
 
             migrationBuilder.CreateTable(
@@ -123,28 +126,6 @@ namespace WebApp_GozenBv.Migrations
                         name: "FK_WagenMaintenances_WagenPark_WagenParkId",
                         column: x => x.WagenParkId,
                         principalTable: "WagenPark",
-                        principalColumn: "Id",
-                        onDelete: ReferentialAction.Restrict);
-                });
-
-            migrationBuilder.CreateTable(
-                name: "Orders",
-                columns: table => new
-                {
-                    Id = table.Column<int>(nullable: false)
-                        .Annotation("SqlServer:Identity", "1, 1"),
-                    OrderCode = table.Column<string>(nullable: true),
-                    Amount = table.Column<int>(nullable: false),
-                    ProductId = table.Column<string>(nullable: true),
-                    StockId = table.Column<int>(nullable: true)
-                },
-                constraints: table =>
-                {
-                    table.PrimaryKey("PK_Orders", x => x.Id);
-                    table.ForeignKey(
-                        name: "FK_Orders_Stock_StockId",
-                        column: x => x.StockId,
-                        principalTable: "Stock",
                         principalColumn: "Id",
                         onDelete: ReferentialAction.Restrict);
                 });
@@ -186,11 +167,6 @@ namespace WebApp_GozenBv.Migrations
                 name: "IX_Orders_StockId",
                 table: "Orders",
                 column: "StockId");
-
-            migrationBuilder.CreateIndex(
-                name: "IX_Stock_ProductBrandId",
-                table: "Stock",
-                column: "ProductBrandId");
 
             migrationBuilder.CreateIndex(
                 name: "IX_StockLogs_EmployeeId",
@@ -235,9 +211,6 @@ namespace WebApp_GozenBv.Migrations
 
             migrationBuilder.DropTable(
                 name: "Firmas");
-
-            migrationBuilder.DropTable(
-                name: "ProductBrands");
         }
     }
 }
