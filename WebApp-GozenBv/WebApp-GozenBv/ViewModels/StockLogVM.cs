@@ -11,7 +11,7 @@ namespace WebApp_GozenBv.ViewModels
         {
             SelectedProducts = new List<SelectedProductsVM>();
         }
-
+        public int Id { get; set; }
         [DataType(DataType.Date)]
         public DateTime Date { get; set; }
         public string Action { get; set; }

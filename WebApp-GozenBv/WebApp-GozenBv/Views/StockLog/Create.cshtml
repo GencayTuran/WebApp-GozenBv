@@ -58,7 +58,7 @@
             </tr>
             <tr id="trStock" class="d-none">
                 <td class="form-group d-flex justify-content-between">
-                    <select asp-for="" class="col-8 form-control selectpicker" id="selectProduct" data-live-search="true">
+                    <select asp-for="SelectedProducts" class="col-8 form-control selectpicker" id="selectProduct" data-live-search="true">
                         <option disabled selected>Selecteer producten</option>
                         @foreach (var product in ViewBag.stock)
                         {

@@ -97,12 +97,14 @@ namespace WebApp_GozenBv.Migrations
                         .HasColumnType("int");
 
                     b.Property<string>("ProductBrand")
+                        .IsRequired()
                         .HasColumnType("nvarchar(max)");
 
                     b.Property<int>("ProductBrandId")
                         .HasColumnType("int");
 
                     b.Property<string>("ProductName")
+                        .IsRequired()
                         .HasColumnType("nvarchar(max)");
 
                     b.Property<int>("Quantity")

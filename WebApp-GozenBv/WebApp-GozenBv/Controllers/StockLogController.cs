@@ -23,8 +23,8 @@ namespace WebApp_GozenBv.Controllers
         // GET: StockLog
         public async Task<IActionResult> Index()
         {
-            var dataDbContext = _context.StockLogs.Include(s => s.Employee);
-            return View(await dataDbContext.ToListAsync());
+            var stockLogs = _context.StockLogs.Include(s => s.Employee);
+            return View(await stockLogs.ToListAsync());
         }
 
         // GET: StockLog/Details/5
@@ -103,8 +103,9 @@ namespace WebApp_GozenBv.Controllers
         // more details, see http://go.microsoft.com/fwlink/?LinkId=317598.
         [HttpPost]
         [ValidateAntiForgeryToken]
-        public async Task<IActionResult> Create([Bind("Id,Date,Action,EmployeeId,OrderId")] StockLog stockLog)
+        public async Task<IActionResult> Create([Bind("Id,Date,Action,EmployeeId,OrderId")] StockLogVM stockLog)
         {
+            //foreach product in selectedProducts --> add products to new Order
             if (ModelState.IsValid)
             {
                 _context.Add(stockLog);
