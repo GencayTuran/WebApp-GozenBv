@@ -49,8 +49,6 @@ namespace WebApp_GozenBv.Controllers
         // GET: StockLog/Create
         public IActionResult Create()
         {
-            StockLogVM stockLogVM = new StockLogVM();
- 
             DateTime dateToday = DateTime.Now;
             List<string> lstActions = new List<string>();
             lstActions.Add("Ophalen");
@@ -103,7 +101,7 @@ namespace WebApp_GozenBv.Controllers
         // more details, see http://go.microsoft.com/fwlink/?LinkId=317598.
         [HttpPost]
         [ValidateAntiForgeryToken]
-        public async Task<IActionResult> Create([Bind("Id,Date,Action,EmployeeId,OrderId")] StockLogVM stockLog)
+        public async Task<IActionResult> Create([Bind("Id,Date,Action,EmployeeId,OrderItem.ProductId")] StockLog stockLog)
         {
             //foreach product in selectedProducts --> add products to new Order
             if (ModelState.IsValid)
@@ -138,7 +136,7 @@ namespace WebApp_GozenBv.Controllers
         // more details, see http://go.microsoft.com/fwlink/?LinkId=317598.
         [HttpPost]
         [ValidateAntiForgeryToken]
-        public async Task<IActionResult> Edit(int id, [Bind("Id,Date,Action,EmployeeId,OrderId")] StockLog stockLog)
+        public async Task<IActionResult> Edit(int id, [Bind("Id,Date,Action,EmployeeId,OrderCode")] StockLog stockLog)
         {
             if (id != stockLog.Id)
             {

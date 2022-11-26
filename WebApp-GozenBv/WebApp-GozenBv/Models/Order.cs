@@ -9,8 +9,6 @@ namespace WebApp_GozenBv.Models
     {
         public int Id { get; set; }
         public string OrderCode { get; set; } //GUID
-        public int Amount { get; set; }
-        public string ProductId { get; set; }
-        public Stock Stock { get; set; }
+
     }
 }
