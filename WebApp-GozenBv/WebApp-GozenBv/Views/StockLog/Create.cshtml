@@ -1,4 +1,4 @@
-﻿@model WebApp_GozenBv.ViewModels.StockLogVM
+﻿@model WebApp_GozenBv.Models.StockLog
 
 @{
     ViewData["Title"] = "Create";
@@ -9,9 +9,9 @@
 
 <h4>StockLog</h4>
 <hr />
-<div class="row">
-    <div class="col-md-4">
-        <form asp-action="Create" autocomplete="off">
+<form asp-action="Create" autocomplete="off">
+    <div class="row">
+        <div class="col-md-4">
             <div asp-validation-summary="ModelOnly" class="text-danger"></div>
             <div class="form-group">
                 <label class="control-label">Datum</label>
@@ -29,62 +29,60 @@
             <div class="form-group">
                 <input type="submit" value="Create" class="btn btn-primary" />
             </div>
-        </form>
-    </div>
-    <div class="col-md-6 bg-primary">
-        @*<div class="d-flex flex-row justify-content-end bg-secondary">
-            <div class="col-10">Materiaal</div>
-            <div class="col-2">Aantal</div>
         </div>
-        <div>
-            <div class="form-group d-flex justify-content-between">
-                <select class="col-8 form-control selectpicker" id="selectProduct" data-live-search="true">
-                    <option id="option" disabled selected>Selecteer producten</option>
-                    @foreach (var product in ViewBag.stock)
-                    {
-                        <option id="optionProduct" value="@product.Value">@product.Text</osption>
-                    }
-                </select>
-                <input class="col-2" id="inputQuantity" placeholder="Aantal" value="1"/>
-            </div>
-        </div>*@
-        <table id="SelectedProducts">
-            <tr class="d-flex flex-row justify-content-end bg-secondary">
-                <th class="col-10">Materiaal</th>
-                <th class="col-2">Aantal</th>
-                <th>
-                    <button id="btnAdd">+</button>
-                </th>
-            </tr>
-            <tr id="trStock" class="d-none">
-                <td class="form-group d-flex justify-content-between">
-                    <select asp-for="SelectedProducts" class="col-8 form-control selectpicker" id="selectProduct" data-live-search="true">
-                        <option disabled selected>Selecteer producten</option>
-                        @foreach (var product in ViewBag.stock)
-                        {
-                            <option value="@product.Value">@product.Text</option>
-                        }
-                    </select>
-                </td>
-                <td>
-                    <input class="col-2" id="inputQuantity" placeholder="Aantal" value="1"/>
-                </td>
-                <td>
-                    <button class="btnRemove">Remove</button>
-                </td>
-            </tr>
-        </table>
-    </div>
 
-</div>
+        <div class="col-md-6">
+            <div id="SelectedProducts">
+                <div class="d-flex flex-row justify-content-end bg-secondary">
+                    <div class="col-6">Materiaal</div>
+                    <div class="col-2">Aantal</div>
+                    <div class="col-4">
+                        <button onclick="NewRow()" class="btn btn-primary">Add</button>
+                    </div>
+                </div>
+                <div id="parentRow">
+                    <div id="item0">
+                        <div class="form-group d-flex flex-row justify-content-between">
+                            <div class="col-6">
+                                <select asp-for="OrderItem.ProductId" asp-items="ViewBag.Stock" class="form-control"></select>
+                            </div>
+                            <div class="col-2">
+                                <input class="form-control" id="inputQuantity" placeholder="Aantal" value="1" />
+                            </div>
+                            <div class="col-4" style="visibility: hidden">
+                                <button onclick="RemoveRow(this)" value="Remove" class="btn btn-primary">Remove</button>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</form>
+
 
 <div>
     <a asp-action="Index">Back to List</a>
 </div>
 
-<script src="~/js/StockLog_Create.js"></script>
-<script>AddNewRow()</script>
+<script>
+    let index = 0;
+    const original = document.getElementById("item0")
+
+    function NewRow() {
+        var clone = original.cloneNode(true);
+        index++;
+        clone.id = `item${index}`;
+        clone.firstChild.nextSibling.children[2].removeAttribute("style");
+        original.after(clone);
+    }
+
+    function RemoveRow(obj) {
+        element = obj.parentNode.parentNode.parentNode;
+        document.getElementById("parentRow").removeChild(element);
+    }
+</script>
 
 @section Scripts {
-@{await Html.RenderPartialAsync("_ValidationScriptsPartial");}
+    @{await Html.RenderPartialAsync("_ValidationScriptsPartial");}
 }
