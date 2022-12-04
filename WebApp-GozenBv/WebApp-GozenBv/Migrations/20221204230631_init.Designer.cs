@@ -10,7 +10,7 @@ using WebApp_GozenBv.Data;
 namespace WebApp_GozenBv.Migrations
 {
     [DbContext(typeof(DataDbContext))]
-    [Migration("20221126175636_init")]
+    [Migration("20221204230631_init")]
     partial class init
     {
         protected override void BuildTargetModel(ModelBuilder modelBuilder)
@@ -90,13 +90,10 @@ namespace WebApp_GozenBv.Migrations
                     b.Property<int?>("OrderId")
                         .HasColumnType("int");
 
-                    b.Property<string>("ProductId")
-                        .HasColumnType("nvarchar(max)");
-
-                    b.Property<int?>("StockId")
+                    b.Property<int>("ProductId")
                         .HasColumnType("int");
 
-                    b.Property<int?>("StockLogId")
+                    b.Property<int?>("StockId")
                         .HasColumnType("int");
 
                     b.HasKey("Id");
@@ -104,8 +101,6 @@ namespace WebApp_GozenBv.Migrations
                     b.HasIndex("OrderId");
 
                     b.HasIndex("StockId");
-
-                    b.HasIndex("StockLogId");
 
                     b.ToTable("OrderItem");
                 });
@@ -164,14 +159,9 @@ namespace WebApp_GozenBv.Migrations
                     b.Property<string>("OrderCode")
                         .HasColumnType("nvarchar(max)");
 
-                    b.Property<int?>("OrderItemId")
-                        .HasColumnType("int");
-
                     b.HasKey("Id");
 
                     b.HasIndex("EmployeeId");
-
-                    b.HasIndex("OrderItemId");
 
                     b.ToTable("StockLogs");
                 });
@@ -258,10 +248,6 @@ namespace WebApp_GozenBv.Migrations
                     b.HasOne("WebApp_GozenBv.Models.Stock", "Stock")
                         .WithMany()
                         .HasForeignKey("StockId");
-
-                    b.HasOne("WebApp_GozenBv.Models.StockLog", null)
-                        .WithMany("OrderItems")
-                        .HasForeignKey("StockLogId");
                 });
 
             modelBuilder.Entity("WebApp_GozenBv.Models.StockLog", b =>
@@ -271,10 +257,6 @@ namespace WebApp_GozenBv.Migrations
                         .HasForeignKey("EmployeeId")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
-
-                    b.HasOne("WebApp_GozenBv.Models.OrderItem", "OrderItem")
-                        .WithMany()
-                        .HasForeignKey("OrderItemId");
                 });
 
             modelBuilder.Entity("WebApp_GozenBv.Models.WagenMaintenance", b =>

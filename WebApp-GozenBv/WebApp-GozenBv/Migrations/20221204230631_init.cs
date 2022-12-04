@@ -100,6 +100,57 @@ namespace WebApp_GozenBv.Migrations
                 });
 
             migrationBuilder.CreateTable(
+                name: "OrderItem",
+                columns: table => new
+                {
+                    Id = table.Column<int>(nullable: false)
+                        .Annotation("SqlServer:Identity", "1, 1"),
+                    OrderCode = table.Column<string>(nullable: true),
+                    Amount = table.Column<int>(nullable: false),
+                    ProductId = table.Column<int>(nullable: false),
+                    StockId = table.Column<int>(nullable: true),
+                    OrderId = table.Column<int>(nullable: true)
+                },
+                constraints: table =>
+                {
+                    table.PrimaryKey("PK_OrderItem", x => x.Id);
+                    table.ForeignKey(
+                        name: "FK_OrderItem_Orders_OrderId",
+                        column: x => x.OrderId,
+                        principalTable: "Orders",
+                        principalColumn: "Id",
+                        onDelete: ReferentialAction.Restrict);
+                    table.ForeignKey(
+                        name: "FK_OrderItem_Stock_StockId",
+                        column: x => x.StockId,
+                        principalTable: "Stock",
+                        principalColumn: "Id",
+                        onDelete: ReferentialAction.Restrict);
+                });
+
+            migrationBuilder.CreateTable(
+                name: "StockLogs",
+                columns: table => new
+                {
+                    Id = table.Column<int>(nullable: false)
+                        .Annotation("SqlServer:Identity", "1, 1"),
+                    Date = table.Column<DateTime>(nullable: false),
+                    Action = table.Column<string>(nullable: true),
+                    EmployeeId = table.Column<int>(nullable: false),
+                    OrderCode = table.Column<string>(nullable: true)
+                },
+                constraints: table =>
+                {
+                    table.PrimaryKey("PK_StockLogs", x => x.Id);
+                    table.ForeignKey(
+                        name: "FK_StockLogs_Employees_EmployeeId",
+                        column: x => x.EmployeeId,
+                        principalTable: "Employees",
+                        principalColumn: "Id",
+                        onDelete: ReferentialAction.Cascade);
+                });
+
+            migrationBuilder.CreateTable(
                 name: "WagenMaintenances",
                 columns: table => new
                 {
@@ -121,65 +172,6 @@ namespace WebApp_GozenBv.Migrations
                         onDelete: ReferentialAction.Restrict);
                 });
 
-            migrationBuilder.CreateTable(
-                name: "StockLogs",
-                columns: table => new
-                {
-                    Id = table.Column<int>(nullable: false)
-                        .Annotation("SqlServer:Identity", "1, 1"),
-                    Date = table.Column<DateTime>(nullable: false),
-                    Action = table.Column<string>(nullable: true),
-                    EmployeeId = table.Column<int>(nullable: false),
-                    OrderCode = table.Column<string>(nullable: true),
-                    OrderItemId = table.Column<int>(nullable: true)
-                },
-                constraints: table =>
-                {
-                    table.PrimaryKey("PK_StockLogs", x => x.Id);
-                    table.ForeignKey(
-                        name: "FK_StockLogs_Employees_EmployeeId",
-                        column: x => x.EmployeeId,
-                        principalTable: "Employees",
-                        principalColumn: "Id",
-                        onDelete: ReferentialAction.Cascade);
-                });
-
-            migrationBuilder.CreateTable(
-                name: "OrderItem",
-                columns: table => new
-                {
-                    Id = table.Column<int>(nullable: false)
-                        .Annotation("SqlServer:Identity", "1, 1"),
-                    Amount = table.Column<int>(nullable: false),
-                    ProductId = table.Column<string>(nullable: true),
-                    StockId = table.Column<int>(nullable: true),
-                    OrderCode = table.Column<string>(nullable: true),
-                    OrderId = table.Column<int>(nullable: true),
-                    StockLogId = table.Column<int>(nullable: true)
-                },
-                constraints: table =>
-                {
-                    table.PrimaryKey("PK_OrderItem", x => x.Id);
-                    table.ForeignKey(
-                        name: "FK_OrderItem_Orders_OrderId",
-                        column: x => x.OrderId,
-                        principalTable: "Orders",
-                        principalColumn: "Id",
-                        onDelete: ReferentialAction.Restrict);
-                    table.ForeignKey(
-                        name: "FK_OrderItem_Stock_StockId",
-                        column: x => x.StockId,
-                        principalTable: "Stock",
-                        principalColumn: "Id",
-                        onDelete: ReferentialAction.Restrict);
-                    table.ForeignKey(
-                        name: "FK_OrderItem_StockLogs_StockLogId",
-                        column: x => x.StockLogId,
-                        principalTable: "StockLogs",
-                        principalColumn: "Id",
-                        onDelete: ReferentialAction.Restrict);
-                });
-
             migrationBuilder.CreateIndex(
                 name: "IX_Employees_FirmaId",
                 table: "Employees",
@@ -196,19 +188,9 @@ namespace WebApp_GozenBv.Migrations
                 column: "StockId");
 
             migrationBuilder.CreateIndex(
-                name: "IX_OrderItem_StockLogId",
-                table: "OrderItem",
-                column: "StockLogId");
-
-            migrationBuilder.CreateIndex(
                 name: "IX_StockLogs_EmployeeId",
                 table: "StockLogs",
                 column: "EmployeeId");
-
-            migrationBuilder.CreateIndex(
-                name: "IX_StockLogs_OrderItemId",
-                table: "StockLogs",
-                column: "OrderItemId");
 
             migrationBuilder.CreateIndex(
                 name: "IX_WagenMaintenances_WagenParkId",
@@ -219,42 +201,18 @@ namespace WebApp_GozenBv.Migrations
                 name: "IX_WagenPark_FirmaId",
                 table: "WagenPark",
                 column: "FirmaId");
-
-            migrationBuilder.AddForeignKey(
-                name: "FK_StockLogs_OrderItem_OrderItemId",
-                table: "StockLogs",
-                column: "OrderItemId",
-                principalTable: "OrderItem",
-                principalColumn: "Id",
-                onDelete: ReferentialAction.Restrict);
         }
 
         protected override void Down(MigrationBuilder migrationBuilder)
         {
-            migrationBuilder.DropForeignKey(
-                name: "FK_Employees_Firmas_FirmaId",
-                table: "Employees");
+            migrationBuilder.DropTable(
+                name: "OrderItem");
 
-            migrationBuilder.DropForeignKey(
-                name: "FK_OrderItem_Orders_OrderId",
-                table: "OrderItem");
-
-            migrationBuilder.DropForeignKey(
-                name: "FK_OrderItem_Stock_StockId",
-                table: "OrderItem");
-
-            migrationBuilder.DropForeignKey(
-                name: "FK_OrderItem_StockLogs_StockLogId",
-                table: "OrderItem");
+            migrationBuilder.DropTable(
+                name: "StockLogs");
 
             migrationBuilder.DropTable(
                 name: "WagenMaintenances");
-
-            migrationBuilder.DropTable(
-                name: "WagenPark");
-
-            migrationBuilder.DropTable(
-                name: "Firmas");
 
             migrationBuilder.DropTable(
                 name: "Orders");
@@ -263,13 +221,13 @@ namespace WebApp_GozenBv.Migrations
                 name: "Stock");
 
             migrationBuilder.DropTable(
-                name: "StockLogs");
-
-            migrationBuilder.DropTable(
                 name: "Employees");
 
             migrationBuilder.DropTable(
-                name: "OrderItem");
+                name: "WagenPark");
+
+            migrationBuilder.DropTable(
+                name: "Firmas");
         }
     }
 }
