@@ -9,10 +9,6 @@ namespace WebApp_GozenBv.Models
 {
     public class StockLog
     {
-        public StockLog()
-        {
-            //OrderItems = new List<Order>();
-        }
         public int Id { get; set; }
         [DataType(DataType.Date)]
         public DateTime Date { get; set; }
@@ -20,10 +16,7 @@ namespace WebApp_GozenBv.Models
 
         public int EmployeeId { get; set; }
         public Employee Employee { get; set; }
-
-        public string OrderCode { get; set; } //GUID
-        public List<OrderItem> OrderItems { get; set; }
-        public OrderItem OrderItem { get; set; }
+        public string OrderCode { get; set; } 
 
     }
 }

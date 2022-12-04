@@ -91,6 +91,7 @@ namespace WebApp_GozenBv.Controllers
             ViewData["actions"] = new SelectList(lstActions);
             ViewData["dateToday"] = dateToday;
             ViewData["stock"] = new SelectList(lstStock, "ProductId", "ProductNameBrand");
+            ViewData["stockx"] = lstStock;
             ViewData["stockQuantity"] = new SelectList(_context.Stock, "Id", "Quantity");
 
             return View();
@@ -101,17 +102,46 @@ namespace WebApp_GozenBv.Controllers
         // more details, see http://go.microsoft.com/fwlink/?LinkId=317598.
         [HttpPost]
         [ValidateAntiForgeryToken]
-        public async Task<IActionResult> Create([Bind("Id,Date,Action,EmployeeId,OrderItem.ProductId")] StockLog stockLog)
+        //[Bind("Id,Date,Action,EmployeeId,OrderItem.ProductId")]
+        public async Task<IActionResult> Create(StockLogVM stockLogVM)
         {
-            //foreach product in selectedProducts --> add products to new Order
+
             if (ModelState.IsValid)
             {
+                string[] data = stockLogVM.SelectedProducts.Split(","); //id, amount 
+                int[] products = Array.ConvertAll(data, d => int.Parse(d));
+                Guid guid = Guid.NewGuid();
+                string orderCode = guid.ToString();
+                StockLog stockLog = new StockLog();
+
+                //TODO: check here if stock/amount exists ==> else return view
+
+                //new order
+                _context.Add(new Order { OrderCode = orderCode });
+
+                //new orderitem
+                for (int x = 0; x < data.Length; x++)
+                {
+                    OrderItem orderItem = new OrderItem
+                    {
+                        OrderCode = orderCode,
+                        ProductId = products[x]
+                    };
+                    x++;
+                    orderItem.Amount = products[x];
+
+                    _context.Add(orderItem);
+                }
+
+                //new stocklog
+                stockLogVM.OrderCode = orderCode;
+                stockLog = stockLogVM;
                 _context.Add(stockLog);
                 await _context.SaveChangesAsync();
                 return RedirectToAction(nameof(Index));
             }
             //ViewData["EmployeeId"] = new SelectList(_context.Employees, "Id", "Id", stockLog.EmployeeId);
-            return View(stockLog);
+            return View(stockLogVM);
         }
 
         // GET: StockLog/Edit/5

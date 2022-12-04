@@ -1,30 +1,31 @@
-﻿////let btnAdd = document.getElementById('btnAdd');
-////let btnRemove = document.querySelector('.btnRemove');
-////let row = document.querySelector('#trStock');
-////let clone = row.cloneNode(true); //true means to clone the nested elements as well.
-
-////function AddNewRow {
-////    clone.ClassName = 'productRow';
-////    row.after(clone);
-////}
-
-////function RemoveRow{
-////    //remove selected button its tr head
-////    btnRemove.parentElement.parentElement.remove();
-////}
-
-////btnAdd.addEventListener('click', AddNewRow);
-////btnRemove.addEventListener('click', RemoveRow);
+﻿const row = document.querySelector(".productRow");
+const parentNode = document.getElementById("rowCollection");
+var result = document.getElementById("productsResult");
 
 
-//////get view data to controller
-////let selectedProducts = [];
-//////let countCells = document.querySelectorAll'productRow').length;
-//////let x = document.getElementById('SelectedProducts').rows[]
+function NewRow() {
+    var clone = row.cloneNode(true);
+    clone.firstChild.nextSibling.children[0].firstChild.nextElementSibling.value = "";
+    parentNode.appendChild(clone);
+}
 
+function RemoveRow(obj) {
+    element = obj.parentNode.parentNode.parentNode;
+    document.getElementById("rowCollection").removeChild(element);
+}
 
+function PassProducts() {
+    var products = [];
+    var inputProducts = document.querySelectorAll(".inputProduct");
+    var inputAmounts = document.querySelectorAll(".inputAmount");
 
-////selectedProducts.forEach()
+    for (var i = 0; i < inputProducts.length; i++) {
+        products.push([inputProducts[i].value, inputAmounts[i].value]); //id, amount
+    }
 
+    result.value = products;
+}
 
+function Test() {
 
+}

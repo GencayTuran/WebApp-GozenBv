@@ -44,14 +44,14 @@ namespace WebApp_GozenBv.Controllers
                     }
                     else
                     {
-                    int daysLeft = (car.DeadlineKeuring - DateTime.Now).Days + 1;
-                    lstAlertsCar.Add("(" + car.Id + ") " 
-                        + car.LicencePlate 
-                        + " (" + car.Brand 
-                        + " - " + car.Model 
-                        + ") KEURING VERLOOPT BINNEN " 
-                        + daysLeft 
-                        + " DAGEN! (" + car.DeadlineKeuring.ToShortDateString() + ")");
+                        int daysLeft = (car.DeadlineKeuring - DateTime.Now).Days + 1;
+                        lstAlertsCar.Add("(" + car.Id + ") "
+                            + car.LicencePlate
+                            + " (" + car.Brand
+                            + " - " + car.Model
+                            + ") KEURING VERLOOPT BINNEN "
+                            + daysLeft
+                            + " DAGEN! (" + car.DeadlineKeuring.ToShortDateString() + ")");
                     }
                 }
             }
@@ -63,10 +63,10 @@ namespace WebApp_GozenBv.Controllers
             {
                 if (product.Quantity < product.MinQuantity)
                 {
-                    lstAlertsStock.Add("PRODUCTNR " 
-                    + product.Id 
-                    + " " + product.ProductName 
-                    + " - " +  product.ProductBrand
+                    lstAlertsStock.Add("PRODUCTNR "
+                    + product.Id
+                    + " " + product.ProductName
+                    + " - " + product.ProductBrand
                     + " WEINIG IN STOCK! (" + product.Quantity + ")");
                 }
             }

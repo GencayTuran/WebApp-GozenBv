@@ -54,7 +54,7 @@ namespace WebApp_GozenBv.Controllers
         // more details, see http://go.microsoft.com/fwlink/?LinkId=317598.
         [HttpPost]
         [ValidateAntiForgeryToken]
-        public async Task<IActionResult> Create([Bind("Id,Amount,ProductId,OrderCode")] OrderItem orderItem)
+        public async Task<IActionResult> Create([Bind("Id,OrderCode,Amount,ProductId")] OrderItem orderItem)
         {
             if (ModelState.IsValid)
             {
@@ -86,7 +86,7 @@ namespace WebApp_GozenBv.Controllers
         // more details, see http://go.microsoft.com/fwlink/?LinkId=317598.
         [HttpPost]
         [ValidateAntiForgeryToken]
-        public async Task<IActionResult> Edit(int id, [Bind("Id,Amount,ProductId,OrderCode")] OrderItem orderItem)
+        public async Task<IActionResult> Edit(int id, [Bind("Id,OrderCode,Amount,ProductId")] OrderItem orderItem)
         {
             if (id != orderItem.Id)
             {
