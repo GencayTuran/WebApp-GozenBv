@@ -57,52 +57,6 @@ namespace WebApp_GozenBv.Migrations
                     b.ToTable("Firmas");
                 });
 
-            modelBuilder.Entity("WebApp_GozenBv.Models.Order", b =>
-                {
-                    b.Property<int>("Id")
-                        .ValueGeneratedOnAdd()
-                        .HasColumnType("int")
-                        .HasAnnotation("SqlServer:ValueGenerationStrategy", SqlServerValueGenerationStrategy.IdentityColumn);
-
-                    b.Property<string>("OrderCode")
-                        .HasColumnType("nvarchar(max)");
-
-                    b.HasKey("Id");
-
-                    b.ToTable("Orders");
-                });
-
-            modelBuilder.Entity("WebApp_GozenBv.Models.OrderItem", b =>
-                {
-                    b.Property<int>("Id")
-                        .ValueGeneratedOnAdd()
-                        .HasColumnType("int")
-                        .HasAnnotation("SqlServer:ValueGenerationStrategy", SqlServerValueGenerationStrategy.IdentityColumn);
-
-                    b.Property<int>("Amount")
-                        .HasColumnType("int");
-
-                    b.Property<string>("OrderCode")
-                        .HasColumnType("nvarchar(max)");
-
-                    b.Property<int?>("OrderId")
-                        .HasColumnType("int");
-
-                    b.Property<int>("ProductId")
-                        .HasColumnType("int");
-
-                    b.Property<int?>("StockId")
-                        .HasColumnType("int");
-
-                    b.HasKey("Id");
-
-                    b.HasIndex("OrderId");
-
-                    b.HasIndex("StockId");
-
-                    b.ToTable("OrderItem");
-                });
-
             modelBuilder.Entity("WebApp_GozenBv.Models.Stock", b =>
                 {
                     b.Property<int>("Id")
@@ -119,9 +73,6 @@ namespace WebApp_GozenBv.Migrations
                     b.Property<string>("ProductBrand")
                         .IsRequired()
                         .HasColumnType("nvarchar(max)");
-
-                    b.Property<int>("ProductBrandId")
-                        .HasColumnType("int");
 
                     b.Property<string>("ProductName")
                         .IsRequired()
@@ -145,23 +96,46 @@ namespace WebApp_GozenBv.Migrations
                         .HasColumnType("int")
                         .HasAnnotation("SqlServer:ValueGenerationStrategy", SqlServerValueGenerationStrategy.IdentityColumn);
 
-                    b.Property<string>("Action")
-                        .HasColumnType("nvarchar(max)");
-
-                    b.Property<DateTime>("Date")
+                    b.Property<DateTime?>("ConfirmDate")
                         .HasColumnType("datetime2");
 
                     b.Property<int>("EmployeeId")
                         .HasColumnType("int");
 
-                    b.Property<string>("OrderCode")
+                    b.Property<string>("LogCode")
                         .HasColumnType("nvarchar(max)");
+
+                    b.Property<DateTime>("StockLogDate")
+                        .HasColumnType("datetime2");
 
                     b.HasKey("Id");
 
                     b.HasIndex("EmployeeId");
 
                     b.ToTable("StockLogs");
+                });
+
+            modelBuilder.Entity("WebApp_GozenBv.Models.StockLogItem", b =>
+                {
+                    b.Property<int>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("int")
+                        .HasAnnotation("SqlServer:ValueGenerationStrategy", SqlServerValueGenerationStrategy.IdentityColumn);
+
+                    b.Property<int>("Amount")
+                        .HasColumnType("int");
+
+                    b.Property<string>("LogCode")
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<int>("StockId")
+                        .HasColumnType("int");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("StockId");
+
+                    b.ToTable("StockLogItems");
                 });
 
             modelBuilder.Entity("WebApp_GozenBv.Models.WagenMaintenance", b =>
@@ -237,22 +211,20 @@ namespace WebApp_GozenBv.Migrations
                         .IsRequired();
                 });
 
-            modelBuilder.Entity("WebApp_GozenBv.Models.OrderItem", b =>
-                {
-                    b.HasOne("WebApp_GozenBv.Models.Order", "Order")
-                        .WithMany()
-                        .HasForeignKey("OrderId");
-
-                    b.HasOne("WebApp_GozenBv.Models.Stock", "Stock")
-                        .WithMany()
-                        .HasForeignKey("StockId");
-                });
-
             modelBuilder.Entity("WebApp_GozenBv.Models.StockLog", b =>
                 {
                     b.HasOne("WebApp_GozenBv.Models.Employee", "Employee")
                         .WithMany()
                         .HasForeignKey("EmployeeId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+                });
+
+            modelBuilder.Entity("WebApp_GozenBv.Models.StockLogItem", b =>
+                {
+                    b.HasOne("WebApp_GozenBv.Models.Stock", "Stock")
+                        .WithMany()
+                        .HasForeignKey("StockId")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
                 });

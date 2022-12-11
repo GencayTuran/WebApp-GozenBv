@@ -21,31 +21,17 @@ namespace WebApp_GozenBv.Migrations
                 });
 
             migrationBuilder.CreateTable(
-                name: "Orders",
-                columns: table => new
-                {
-                    Id = table.Column<int>(nullable: false)
-                        .Annotation("SqlServer:Identity", "1, 1"),
-                    OrderCode = table.Column<string>(nullable: true)
-                },
-                constraints: table =>
-                {
-                    table.PrimaryKey("PK_Orders", x => x.Id);
-                });
-
-            migrationBuilder.CreateTable(
                 name: "Stock",
                 columns: table => new
                 {
                     Id = table.Column<int>(nullable: false)
                         .Annotation("SqlServer:Identity", "1, 1"),
                     ProductName = table.Column<string>(nullable: false),
+                    ProductBrand = table.Column<string>(nullable: false),
                     Quantity = table.Column<int>(nullable: false),
                     MinQuantity = table.Column<int>(nullable: false),
                     Cost = table.Column<double>(nullable: false),
-                    Used = table.Column<bool>(nullable: false),
-                    ProductBrandId = table.Column<int>(nullable: false),
-                    ProductBrand = table.Column<string>(nullable: false)
+                    Used = table.Column<bool>(nullable: false)
                 },
                 constraints: table =>
                 {
@@ -100,32 +86,24 @@ namespace WebApp_GozenBv.Migrations
                 });
 
             migrationBuilder.CreateTable(
-                name: "OrderItem",
+                name: "StockLogItems",
                 columns: table => new
                 {
                     Id = table.Column<int>(nullable: false)
                         .Annotation("SqlServer:Identity", "1, 1"),
-                    OrderCode = table.Column<string>(nullable: true),
+                    LogCode = table.Column<string>(nullable: true),
                     Amount = table.Column<int>(nullable: false),
-                    ProductId = table.Column<int>(nullable: false),
-                    StockId = table.Column<int>(nullable: true),
-                    OrderId = table.Column<int>(nullable: true)
+                    StockId = table.Column<int>(nullable: false)
                 },
                 constraints: table =>
                 {
-                    table.PrimaryKey("PK_OrderItem", x => x.Id);
+                    table.PrimaryKey("PK_StockLogItems", x => x.Id);
                     table.ForeignKey(
-                        name: "FK_OrderItem_Orders_OrderId",
-                        column: x => x.OrderId,
-                        principalTable: "Orders",
-                        principalColumn: "Id",
-                        onDelete: ReferentialAction.Restrict);
-                    table.ForeignKey(
-                        name: "FK_OrderItem_Stock_StockId",
+                        name: "FK_StockLogItems_Stock_StockId",
                         column: x => x.StockId,
                         principalTable: "Stock",
                         principalColumn: "Id",
-                        onDelete: ReferentialAction.Restrict);
+                        onDelete: ReferentialAction.Cascade);
                 });
 
             migrationBuilder.CreateTable(
@@ -134,10 +112,10 @@ namespace WebApp_GozenBv.Migrations
                 {
                     Id = table.Column<int>(nullable: false)
                         .Annotation("SqlServer:Identity", "1, 1"),
-                    Date = table.Column<DateTime>(nullable: false),
-                    Action = table.Column<string>(nullable: true),
+                    StockLogDate = table.Column<DateTime>(nullable: false),
                     EmployeeId = table.Column<int>(nullable: false),
-                    OrderCode = table.Column<string>(nullable: true)
+                    LogCode = table.Column<string>(nullable: true),
+                    ConfirmDate = table.Column<DateTime>(nullable: true)
                 },
                 constraints: table =>
                 {
@@ -178,13 +156,8 @@ namespace WebApp_GozenBv.Migrations
                 column: "FirmaId");
 
             migrationBuilder.CreateIndex(
-                name: "IX_OrderItem_OrderId",
-                table: "OrderItem",
-                column: "OrderId");
-
-            migrationBuilder.CreateIndex(
-                name: "IX_OrderItem_StockId",
-                table: "OrderItem",
+                name: "IX_StockLogItems_StockId",
+                table: "StockLogItems",
                 column: "StockId");
 
             migrationBuilder.CreateIndex(
@@ -206,16 +179,13 @@ namespace WebApp_GozenBv.Migrations
         protected override void Down(MigrationBuilder migrationBuilder)
         {
             migrationBuilder.DropTable(
-                name: "OrderItem");
+                name: "StockLogItems");
 
             migrationBuilder.DropTable(
                 name: "StockLogs");
 
             migrationBuilder.DropTable(
                 name: "WagenMaintenances");
-
-            migrationBuilder.DropTable(
-                name: "Orders");
 
             migrationBuilder.DropTable(
                 name: "Stock");
