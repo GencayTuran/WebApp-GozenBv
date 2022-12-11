@@ -48,7 +48,10 @@ namespace WebApp_GozenBv.Controllers
         // GET: Stock/Create
         public IActionResult Create()
         {
-            var productBrands = _context.Stock.Select(p => p.ProductBrand).ToList();
+            var productBrands = _context.Stock
+                .Select(p => p.ProductBrand)
+                .Distinct().ToList();
+
             ViewData["ProductBrands"] = productBrands;
             return View();
         }
