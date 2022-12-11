@@ -12,6 +12,7 @@
     <table class="table">
         <thead>
             <tr>
+                <th scope="col">@Html.DisplayNameFor(model => model.ConfirmDate)</th>
                 <th scope="col">@Html.DisplayNameFor(model => model.StockLogDate)</th>
                 <th scope="col">@Html.DisplayNameFor(model => model.StockLog.Employee)</th>
                 <th scope="col">@Html.DisplayNameFor(model => model.LogCode)</th>
@@ -19,6 +20,7 @@
         </thead>
         <tbody>
             <tr>
+                <td>@Html.DisplayFor(model => model.ConfirmDate)</td>
                 <td>@Html.DisplayFor(model => model.StockLogDate)</td>
                 <td>@Html.DisplayFor(model => model.EmployeeFullNameFirma)</td>
                 <td>@Html.DisplayFor(model => model.LogCode)</td>
@@ -36,7 +38,7 @@
         </thead>
         <tbody>
             @foreach (var item in Model.StockLogItems)
-            { 
+            {
                 <tr>
                     <td>@item.StockId</td>
                     <td>@item.ProductNameBrand</td>
@@ -45,7 +47,7 @@
             }
         </tbody>
     </table>
-<div>
-    @*<a asp-action="Edit" asp-route-id="@Model.Id">Edit</a>*@ |
-    <a asp-action="Index">Back to List</a>
-</div>
+    <div>
+        @*<a asp-action="Edit" asp-route-id="@Model.Id">Edit</a>*@ |
+        <a asp-action="Index">Back to List</a>
+    </div>

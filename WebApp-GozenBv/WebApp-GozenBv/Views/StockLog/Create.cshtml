@@ -16,12 +16,8 @@
                 <div asp-validation-summary="ModelOnly" class="text-danger"></div>
                 <div class="form-group">
                     <label class="control-label">Datum</label>
-                    <input asp-for="Date" class="form-control" />
-                    <span asp-validation-for="Date" class="text-danger"></span>
-                </div>
-                <div class="form-group">
-                    <label class="control-label">Ophalen/Terugbrengen</label>
-                    <select asp-for="Action" asp-items="ViewBag.actions" class="form-control"></select>
+                    <input asp-for="StockLogDate" class="form-control" />
+                    <span asp-validation-for="StockLogDate" class="text-danger"></span>
                 </div>
                 <div class="form-group">
                     <label class="control-label">Werknemer</label>

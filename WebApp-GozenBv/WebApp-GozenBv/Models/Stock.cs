@@ -12,6 +12,8 @@ namespace WebApp_GozenBv.Models
         [Required]
         public string ProductName { get; set; }
         [Required]
+        public string ProductBrand { get; set; }
+        [Required]
         public int Quantity { get; set; }
         [Required]
         public int MinQuantity { get; set; }
@@ -19,10 +21,6 @@ namespace WebApp_GozenBv.Models
         public double Cost { get; set; }
         [Required]
         public bool Used { get; set; }
-        [Required]
-        public int ProductBrandId { get; set; }
-        [Required]
-        public string ProductBrand { get; set; }
 
         private string _productCode;
         public string ProductCode

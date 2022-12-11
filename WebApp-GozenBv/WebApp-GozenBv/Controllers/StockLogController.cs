@@ -23,36 +23,34 @@ namespace WebApp_GozenBv.Controllers
         // GET: StockLog
         public async Task<IActionResult> Index()
         {
-            var stockLogs = _context.StockLogs.Include(s => s.Employee);
-            return View(await stockLogs.ToListAsync());
+            var stockLogs = await _context.StockLogs
+                .Include(s => s.Employee)
+                .Where(s => s.ConfirmDate == null)
+                .ToListAsync();
+
+            return View(stockLogs);
         }
 
         // GET: StockLog/Details/5
-        public async Task<IActionResult> Details(int? id)
+        [HttpGet]
+        public async Task<IActionResult> Details(string id)
         {
-            if (id == null)
+            string logCode = id;
+
+            if (logCode == null)
             {
                 return NotFound();
             }
 
-            var stockLog = await _context.StockLogs
-                .Include(s => s.Employee)
-                .FirstOrDefaultAsync(m => m.Id == id);
-            if (stockLog == null)
-            {
-                return NotFound();
-            }
+            var stockLogDetailVM = GetDetails(logCode, null);
 
-            return View(stockLog);
+            return View(stockLogDetailVM);
         }
 
         // GET: StockLog/Create
         public IActionResult Create()
         {
             DateTime dateToday = DateTime.Now;
-            List<string> lstActions = new List<string>();
-            lstActions.Add("Ophalen");
-            lstActions.Add("Terugbrengen");
 
             Employee emp = new Employee();
             List<EmployeeVM> lstEmp = new List<EmployeeVM>();
@@ -82,15 +80,14 @@ namespace WebApp_GozenBv.Controllers
             {
                 lstStock.Add(new ProductVM
                 {
-                    ProductId = product.Id,
+                    StockId = product.Id,
                     ProductNameBrand = product.ProductName + " - " + product.ProductBrand
                 });
             }
 
             ViewData["employees"] = new SelectList(lstEmp, "EmployeeId", "EmployeeFullNameFirma");
-            ViewData["actions"] = new SelectList(lstActions);
             ViewData["dateToday"] = dateToday;
-            ViewData["stock"] = new SelectList(lstStock, "ProductId", "ProductNameBrand");
+            ViewData["stock"] = new SelectList(lstStock, "StockId", "ProductNameBrand");
             ViewData["stockx"] = lstStock;
             ViewData["stockQuantity"] = new SelectList(_context.Stock, "Id", "Quantity");
 
@@ -102,7 +99,7 @@ namespace WebApp_GozenBv.Controllers
         // more details, see http://go.microsoft.com/fwlink/?LinkId=317598.
         [HttpPost]
         [ValidateAntiForgeryToken]
-        //[Bind("Id,Date,Action,EmployeeId,OrderItem.ProductId")]
+        //[Bind("Id,Date,Action,EmployeeId,OrderItem.StockId")]
         public async Task<IActionResult> Create(StockLogVM stockLogVM)
         {
 
@@ -111,30 +108,27 @@ namespace WebApp_GozenBv.Controllers
                 string[] data = stockLogVM.SelectedProducts.Split(","); //id, amount 
                 int[] products = Array.ConvertAll(data, d => int.Parse(d));
                 Guid guid = Guid.NewGuid();
-                string orderCode = guid.ToString();
+                string logCode = guid.ToString();
                 StockLog stockLog = new StockLog();
 
                 //TODO: check here if stock/amount exists ==> else return view
 
-                //new order
-                _context.Add(new Order { OrderCode = orderCode });
-
-                //new orderitem
+                //new StockLogItem
                 for (int x = 0; x < data.Length; x++)
                 {
-                    OrderItem orderItem = new OrderItem
+                    StockLogItem stockLogItem = new StockLogItem
                     {
-                        OrderCode = orderCode,
-                        ProductId = products[x]
+                        LogCode = logCode,
+                        StockId = products[x]
                     };
                     x++;
-                    orderItem.Amount = products[x];
+                    stockLogItem.Amount = products[x];
 
-                    _context.Add(orderItem);
+                    _context.Add(stockLogItem);
                 }
 
                 //new stocklog
-                stockLogVM.OrderCode = orderCode;
+                stockLogVM.LogCode = logCode;
                 stockLog = stockLogVM;
                 _context.Add(stockLog);
                 await _context.SaveChangesAsync();
@@ -166,7 +160,7 @@ namespace WebApp_GozenBv.Controllers
         // more details, see http://go.microsoft.com/fwlink/?LinkId=317598.
         [HttpPost]
         [ValidateAntiForgeryToken]
-        public async Task<IActionResult> Edit(int id, [Bind("Id,Date,Action,EmployeeId,OrderCode")] StockLog stockLog)
+        public async Task<IActionResult> Edit(int id, [Bind("Id,StockLogDate,Action,EmployeeId,OrderCode")] StockLog stockLog)
         {
             if (id != stockLog.Id)
             {
@@ -198,7 +192,8 @@ namespace WebApp_GozenBv.Controllers
         }
 
         // GET: StockLog/Delete/5
-        public async Task<IActionResult> Delete(int? id)
+        [HttpGet]
+        public async Task<IActionResult> ToConfirm(int? id)
         {
             if (id == null)
             {
@@ -208,6 +203,7 @@ namespace WebApp_GozenBv.Controllers
             var stockLog = await _context.StockLogs
                 .Include(s => s.Employee)
                 .FirstOrDefaultAsync(m => m.Id == id);
+
             if (stockLog == null)
             {
                 return NotFound();
@@ -217,13 +213,17 @@ namespace WebApp_GozenBv.Controllers
         }
 
         // POST: StockLog/Delete/5
-        [HttpPost, ActionName("Delete")]
+        [HttpPost]
         [ValidateAntiForgeryToken]
-        public async Task<IActionResult> DeleteConfirmed(int id)
+        public async Task<IActionResult> ToConfirm(int id)
         {
             var stockLog = await _context.StockLogs.FindAsync(id);
-            _context.StockLogs.Remove(stockLog);
-            await _context.SaveChangesAsync();
+
+            stockLog.ConfirmDate = DateTime.Now;
+
+            _context.StockLogs.Update(stockLog);
+            _context.SaveChanges();
+
             return RedirectToAction(nameof(Index));
         }
 
@@ -231,5 +231,70 @@ namespace WebApp_GozenBv.Controllers
         {
             return _context.StockLogs.Any(e => e.Id == id);
         }
+
+        private StockLogDetailVM GetDetails(string logCode, DateTime? confirmDate)
+        {
+            StockLog stockLog = _context.StockLogs
+                .Include(s => s.Employee)
+                .Include(s => s.Employee.Firma)
+                .FirstOrDefault(s => s.LogCode == logCode);
+
+            List<StockLogItem> stockLogItems = _context.StockLogItems
+                .Include(s => s.Stock)
+                .Where(s => s.LogCode == logCode).ToList();
+
+            List<StockLogItemVM> stockLogItemsVM = new List<StockLogItemVM>();
+
+            foreach (var item in stockLogItems)
+            {
+                stockLogItemsVM.Add(new StockLogItemVM
+                {
+                    Id = item.Id,
+                    LogCode = item.LogCode,
+                    Amount = item.Amount,
+                    StockId = item.StockId,
+                    Stock = item.Stock,
+                    ProductNameBrand = (item.Stock.ProductName + " " + item.Stock.ProductBrand).ToUpper()
+                });
+            }
+
+            StockLogDetailVM stockLogDetailVM = new StockLogDetailVM
+            {
+                StockLogDate = stockLog.StockLogDate,
+                EmployeeFullNameFirma = (stockLog.Employee.Name + " " + stockLog.Employee.Surname + " - " + stockLog.Employee.Firma.FirmaName).ToUpper(),
+                LogCode = stockLog.LogCode, //need to show?
+                StockLogItems = stockLogItemsVM,
+                ConfirmDate = confirmDate
+            };
+
+            return stockLogDetailVM;
+        }
+
+        [HttpGet]
+        public async Task<IActionResult> ConfirmedList()
+        {
+            var confirmedStockLogs = await _context.StockLogs
+                .Include(s => s.Employee)
+                .Where(s => s.ConfirmDate.HasValue)
+                .ToListAsync();
+
+            return View(confirmedStockLogs);
+        }
+
+        [HttpGet]
+        public async Task<IActionResult> ConfirmedDetails(string id)
+        {
+            string logCode = id;
+
+            if (logCode == null)
+            {
+                return NotFound();
+            }
+
+            var stockLogDetailVM = GetDetails(logCode, DateTime.Now);
+
+            return View(stockLogDetailVM);
+        }
+
     }
 }

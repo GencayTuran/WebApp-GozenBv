@@ -11,12 +11,15 @@ namespace WebApp_GozenBv.Models
     {
         public int Id { get; set; }
         [DataType(DataType.Date)]
-        public DateTime Date { get; set; }
-        public string Action { get; set; } //ophalen / terugbrengen
-
+        public DateTime StockLogDate { get; set; }
         public int EmployeeId { get; set; }
         public Employee Employee { get; set; }
-        public string OrderCode { get; set; } 
+        public string LogCode { get; set; }
+        
+        //Confirm section
+        //public bool Confirmed { get; set; }
+        [DataType(DataType.Date)]
+        public DateTime? ConfirmDate { get; set; } //null when not confirmed
 
     }
 }

@@ -5,13 +5,12 @@ using System.Threading.Tasks;
 
 namespace WebApp_GozenBv.Models
 {
-    public class OrderItem
+    public class StockLogItem
     {
         public int Id { get; set; }
-        public string OrderCode { get; set; }
+        public string LogCode { get; set; }
         public int Amount { get; set; }
-        public int ProductId { get; set; } 
+        public int StockId { get; set; } 
         public Stock Stock { get; set; }
-        public Order Order { get; set; }
     }
 }

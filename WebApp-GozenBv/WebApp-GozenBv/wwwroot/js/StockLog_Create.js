@@ -2,7 +2,6 @@
 const parentNode = document.getElementById("rowCollection");
 var result = document.getElementById("productsResult");
 
-
 function NewRow() {
     var clone = row.cloneNode(true);
     clone.firstChild.nextSibling.children[0].firstChild.nextElementSibling.value = "";
@@ -24,8 +23,4 @@ function PassProducts() {
     }
 
     result.value = products;
-}
-
-function Test() {
-
 }

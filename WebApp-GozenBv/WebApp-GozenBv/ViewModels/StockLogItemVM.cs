@@ -6,8 +6,9 @@ using WebApp_GozenBv.Models;
 
 namespace WebApp_GozenBv.ViewModels
 {
-    public class StockLogVM : StockLog
+    public class StockLogItemVM : StockLogItem
     {
-        public string SelectedProducts { get; set; } //JSON
+        public string ProductNameBrand { get; set; }
+
     }
 }

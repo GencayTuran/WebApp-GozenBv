@@ -1,22 +1,17 @@
 ﻿@model IEnumerable<WebApp_GozenBv.Models.StockLog>
 
 @{
-    ViewData["Title"] = "Index";
+    ViewData["Title"] = "Confirmed List";
 }
 
 <h1>Index</h1>
 
-<div>
-    <a asp-action="ConfirmedList">Confirmed List</a>
-</div>
-
-<p>
-    <a asp-action="Create">Create New</a>
-</p>
-
 <table class="table">
     <thead>
         <tr>
+            <th>
+                @Html.DisplayNameFor(model => model.ConfirmDate)
+            </th>
             <th>
                 @Html.DisplayNameFor(model => model.StockLogDate)
             </th>
@@ -26,12 +21,15 @@
             <th>
                 @Html.DisplayNameFor(model => model.LogCode)
             </th>
-            <th></th>
         </tr>
     </thead>
     <tbody>
-@foreach (var item in Model) {
+        @foreach (var item in Model)
+        {
         <tr>
+            <td>
+                @Html.DisplayFor(modelItem => item.ConfirmDate)
+            </td>
             <td>
                 @Html.DisplayFor(modelItem => item.StockLogDate)
             </td>
@@ -43,11 +41,9 @@
                 @Html.DisplayFor(modelItem => item.LogCode)
             </td>
             <td>
-                <a asp-action="Edit" asp-route-id="@item.Id">Edit</a> |
-                <a asp-action="Details" asp-route-id="@item.LogCode">Details</a> |
-                <a asp-action="ToConfirm" asp-route-id="@item.Id">Bevestig</a>
+                <a asp-action="ConfirmedDetails" asp-route-id="@item.LogCode">Details</a> |
             </td>
         </tr>
-}
+        }
     </tbody>
 </table>
