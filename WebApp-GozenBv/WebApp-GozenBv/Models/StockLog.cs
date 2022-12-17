@@ -19,7 +19,7 @@ namespace WebApp_GozenBv.Models
         //Confirm section
         //public bool Confirmed { get; set; }
         [DataType(DataType.Date)]
-        public DateTime? ConfirmDate { get; set; } //null when not confirmed
+        public DateTime? CompletionDate { get; set; } //null when not confirmed
 
     }
 }

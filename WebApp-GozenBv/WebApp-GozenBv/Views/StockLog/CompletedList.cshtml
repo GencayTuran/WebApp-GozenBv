@@ -1,7 +1,7 @@
 ﻿@model IEnumerable<WebApp_GozenBv.Models.StockLog>
 
 @{
-    ViewData["Title"] = "Confirmed List";
+    ViewData["Title"] = "Compeleted List";
 }
 
 <h1>Index</h1>
@@ -10,7 +10,7 @@
     <thead>
         <tr>
             <th>
-                @Html.DisplayNameFor(model => model.ConfirmDate)
+                @Html.DisplayNameFor(model => model.CompletionDate)
             </th>
             <th>
                 @Html.DisplayNameFor(model => model.StockLogDate)
@@ -28,7 +28,7 @@
         {
         <tr>
             <td>
-                @Html.DisplayFor(modelItem => item.ConfirmDate)
+                @Html.DisplayFor(modelItem => item.CompletionDate)
             </td>
             <td>
                 @Html.DisplayFor(modelItem => item.StockLogDate)
@@ -41,7 +41,7 @@
                 @Html.DisplayFor(modelItem => item.LogCode)
             </td>
             <td>
-                <a asp-action="ConfirmedDetails" asp-route-id="@item.LogCode">Details</a> |
+                <a asp-action="CompletedDetails" asp-route-id="@item.LogCode">Details</a> |
             </td>
         </tr>
         }

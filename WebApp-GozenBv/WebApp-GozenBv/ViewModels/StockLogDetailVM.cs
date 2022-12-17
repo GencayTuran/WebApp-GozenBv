@@ -13,7 +13,7 @@ namespace WebApp_GozenBv.ViewModels
         public StockLogItem StockLogItem { get; set; }
 
         [DataType(DataType.Date)]
-        public DateTime? ConfirmDate { get; set; }
+        public DateTime? CompletionDate { get; set; }
 
         [DataType(DataType.Date)]
         public DateTime StockLogDate { get; set; }

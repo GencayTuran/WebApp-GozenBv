@@ -25,7 +25,7 @@ namespace WebApp_GozenBv.Controllers
         {
             var stockLogs = await _context.StockLogs
                 .Include(s => s.Employee)
-                .Where(s => s.ConfirmDate == null)
+                .Where(s => s.CompletionDate == null)
                 .ToListAsync();
 
             return View(stockLogs);
@@ -193,7 +193,7 @@ namespace WebApp_GozenBv.Controllers
 
         // GET: StockLog/Delete/5
         [HttpGet]
-        public async Task<IActionResult> ToConfirm(int? id)
+        public async Task<IActionResult> ToComplete(int? id)
         {
             if (id == null)
             {
@@ -215,11 +215,11 @@ namespace WebApp_GozenBv.Controllers
         // POST: StockLog/Delete/5
         [HttpPost]
         [ValidateAntiForgeryToken]
-        public async Task<IActionResult> ToConfirm(int id)
+        public async Task<IActionResult> ToComplete(int id)
         {
             var stockLog = await _context.StockLogs.FindAsync(id);
 
-            stockLog.ConfirmDate = DateTime.Now;
+            stockLog.CompletionDate = DateTime.Now;
 
             _context.StockLogs.Update(stockLog);
             _context.SaveChanges();
@@ -232,7 +232,7 @@ namespace WebApp_GozenBv.Controllers
             return _context.StockLogs.Any(e => e.Id == id);
         }
 
-        private StockLogDetailVM GetDetails(string logCode, DateTime? confirmDate)
+        private StockLogDetailVM GetDetails(string logCode, DateTime? completionDate)
         {
             StockLog stockLog = _context.StockLogs
                 .Include(s => s.Employee)
@@ -264,25 +264,25 @@ namespace WebApp_GozenBv.Controllers
                 EmployeeFullNameFirma = (stockLog.Employee.Name + " " + stockLog.Employee.Surname + " - " + stockLog.Employee.Firma.FirmaName).ToUpper(),
                 LogCode = stockLog.LogCode, //need to show?
                 StockLogItems = stockLogItemsVM,
-                ConfirmDate = confirmDate
+                CompletionDate = completionDate
             };
 
             return stockLogDetailVM;
         }
 
         [HttpGet]
-        public async Task<IActionResult> ConfirmedList()
+        public async Task<IActionResult> CompletedList()
         {
             var confirmedStockLogs = await _context.StockLogs
                 .Include(s => s.Employee)
-                .Where(s => s.ConfirmDate.HasValue)
+                .Where(s => s.CompletionDate.HasValue)
                 .ToListAsync();
 
             return View(confirmedStockLogs);
         }
 
         [HttpGet]
-        public async Task<IActionResult> ConfirmedDetails(string id)
+        public async Task<IActionResult> CompletedDetails(string id)
         {
             string logCode = id;
 
