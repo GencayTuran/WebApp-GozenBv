@@ -1,0 +1,82 @@
+﻿@model WebApp_GozenBv.ViewModels.StockLogDamagedVM
+
+@{
+    ViewData["Title"] = "DamagedStock";
+}
+
+<h1>DamagedStock</h1>
+
+<h3>Which products are damaged?</h3>
+<div>
+    <h4>StockLog</h4>
+    <hr />
+    <table class="table">
+        <thead>
+            <tr>
+                <th scope="col">@Html.DisplayNameFor(model => model.StockLogDate)</th>
+                <th scope="col">@Html.DisplayNameFor(model => model.StockLog.Employee)</th>
+                <th scope="col">@Html.DisplayNameFor(model => model.LogCode)</th>
+            </tr>
+        </thead>
+        <tbody>
+            <tr>
+                <td>@Html.DisplayFor(model => model.StockLogDate)</td>
+                <td>@Html.DisplayFor(model => model.EmployeeFullNameFirma)</td>
+                <td>@Html.DisplayFor(model => model.LogCode)</td>
+            </tr>
+        </tbody>
+        <thead>
+            <tr>
+                <th scope="col">@Html.DisplayNameFor(model => model.StockLogItems)</th>
+            </tr>
+            <tr>
+                <th>@Html.DisplayNameFor(model => model.StockLogItem.StockId)</th>
+                <th>@Html.DisplayNameFor(model => model.StockLogItem.Stock)</th>
+                <th>@Html.DisplayNameFor(model => model.StockLogItem.Amount)</th>
+                <th>Damaged?</th>
+            </tr>
+        </thead>
+        <tbody>
+            @foreach (var item in Model.StockLogItems)
+            {
+                <tr class="stockLogItemRow">
+                    <td>@item.StockId</td>
+                    <td>@item.ProductNameBrand</td>
+                    <td><input type="number" value="@item.Amount" /></td>
+                    <td><input type="checkbox" /></td>
+                </tr>
+            }
+        </tbody>
+    </table>
+
+    <form asp-action="ToCompleteDamaged">
+        <input type="hidden" asp-for="LogCode" />
+        <input id="damagedStockResult" type="hidden" asp-for="DamagedStock" />
+        <input type="submit" value="Complete" onclick="PassDamagedItems()" class="btn btn-danger" /> |
+        <a asp-action="Index">Back to List</a>
+    </form>
+
+    <script>
+        function PassDamagedItems() {
+
+            var damagedStock = [];
+            var result = document.getElementById("damagedStockResult");
+            var rows = document.querySelectorAll(".stockLogItemRow")
+
+            rows.forEach(row => {
+                var damaged = row.children[3].firstChild.checked;
+
+                if (damaged) {
+                    var stockId = row.children[0].innerHTML;
+                    var stockAmount = row.children[2].firstChild.value;
+
+                    damagedStock.push([stockId, stockAmount]);
+                }
+            });
+
+            result.value = damagedStock;
+        }
+    </script>
+
+
+</div>

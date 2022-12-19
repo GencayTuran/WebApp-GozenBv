@@ -2,12 +2,12 @@
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
-using WebApp_GozenBv.Models;
 
 namespace WebApp_GozenBv.ViewModels
 {
-    public class StockLogVM : StockLog
+    public class StockLogDamagedVM : StockLogDetailVM
     {
-        public string SelectedProducts { get; set; } //JSON
+        public string DamagedStock { get; set; }
+
     }
 }

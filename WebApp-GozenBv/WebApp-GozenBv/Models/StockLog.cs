@@ -21,5 +21,7 @@ namespace WebApp_GozenBv.Models
         [DataType(DataType.Date)]
         public DateTime? CompletionDate { get; set; } //null when not confirmed
 
+        public bool Damaged { get; set; }
+
     }
 }
