@@ -116,19 +116,22 @@ namespace WebApp_GozenBv.Controllers
                 //new StockLogItem
                 for (int x = 0; x < data.Length; x++)
                 {
-                    StockLogItem stockLogItem = new StockLogItem
-                    {
-                        LogCode = logCode,
-                        StockId = products[x]
-                    };
+                    StockLogItem stockLogItem = new StockLogItem();
+                    stockLogItem.LogCode = logCode;
+                    stockLogItem.StockId = products[x];
                     x++;
                     stockLogItem.Amount = products[x];
 
                     _context.Add(stockLogItem);
                 }
 
-                //TODO: update stock amount (check Repair)
-
+                //update stock amount
+                for (int s = 0; s < data.Length; s++)
+                {
+                    var stock = await StockHelper.UpdateStockQty(products[s], -products[s + 1], _context);
+                    _context.Update(stock);
+                    s++;
+                }
 
                 //new stocklog
                 stockLogCreateVM.LogCode = logCode;
@@ -164,7 +167,7 @@ namespace WebApp_GozenBv.Controllers
         // more details, see http://go.microsoft.com/fwlink/?LinkId=317598.
         [HttpPost]
         [ValidateAntiForgeryToken]
-        public async Task<IActionResult> Edit(int id, [Bind("Id,StockLogDate,Action,EmployeeId,OrderCode")] StockLog stockLog)
+        public async Task<IActionResult> Edit(int id, [Bind("Id,StockLogDate,Action,EmployeeId,LogCode")] StockLog stockLog)
         {
             if (id != stockLog.Id)
             {
@@ -175,6 +178,8 @@ namespace WebApp_GozenBv.Controllers
             {
                 try
                 {
+                    var stockLogItems = GetItemsForStockLog(stockLog);
+
                     _context.Update(stockLog);
                     await _context.SaveChangesAsync();
                 }
@@ -222,10 +227,18 @@ namespace WebApp_GozenBv.Controllers
         public async Task<IActionResult> ToComplete(int id)
         {
             var stockLog = await _context.StockLogs.FindAsync(id);
+            
+            //TODO: group this into a method 
+            var stockLogItems = GetItemsForStockLog(stockLog);
+
+            //update stock amount for each stocklogitems
+            foreach (var item in stockLogItems)
+            {
+                var stock = StockHelper.UpdateStockQty(item.StockId, item.Amount, _context);
+            }
 
             stockLog.CompletionDate = DateTime.Now;
-
-            _context.StockLogs.Update(stockLog);
+            _context.Update(stockLog);
             _context.SaveChanges();
 
             return RedirectToAction(nameof(Index));
@@ -328,6 +341,15 @@ namespace WebApp_GozenBv.Controllers
         {
             var stockLog = await _context.StockLogs.FindAsync(id);
 
+            //TODO: group this into a method 
+            var stockLogItems = GetItemsForStockLog(stockLog);
+
+            //update stock amount for each stocklogitems
+            foreach (var item in stockLogItems)
+            {
+                var stock = StockHelper.UpdateStockQty(item.StockId, item.Amount, _context);
+            }
+
             _context.StockLogs.Remove(stockLog);
             _context.SaveChanges();
 
@@ -382,7 +404,7 @@ namespace WebApp_GozenBv.Controllers
                     //complete by completionDate
                     stockLog.CompletionDate = DateTime.Now;
                     stockLog.Damaged = true;
-                    _context.StockLogs.Update(stockLog);
+                    _context.Update(stockLog);
                     _context.SaveChanges();
 
                     string[] data = stockLogDamagedVM.DamagedStock.Split(","); //id, amount 
@@ -459,6 +481,7 @@ namespace WebApp_GozenBv.Controllers
             {
                 damagedItemsVM.Add(new StockDamagedVM
                 {
+                    Id = item.Id,
                     LogCode = item.LogCode,
                     StockAmount = item.StockAmount,
                     StockId = item.StockId,
@@ -483,16 +506,25 @@ namespace WebApp_GozenBv.Controllers
             //update stock qty
 
             var damagedStock = await _context.StockDamaged.FindAsync(damagedStockId);
-            var stock = await _context.Stock.FindAsync(stockId);
-            stock = await StockHelper.UpdateStockQty(stockId, stockAmount, stock);
+            var stock = await StockHelper.UpdateStockQty(stockId, stockAmount, _context);
+
             //check stock?
 
-            _context.Stock.Update(stock);
+            _context.Update(stock);
             _context.StockDamaged.Remove(damagedStock);
             await _context.SaveChangesAsync();
-                
 
-            return View();
+
+            return RedirectToAction(nameof(DamagedList));
+        }
+
+        private IQueryable<StockLogItem> GetItemsForStockLog(StockLog stockLog)
+        {
+            //get stocklogitems that link with current stocklog
+            var stockLogItems = _context.StockLogItems
+                .Where(s => s.LogCode == stockLog.LogCode);
+
+            return stockLogItems;            
         }
     }
 }
