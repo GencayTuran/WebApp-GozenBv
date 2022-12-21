@@ -28,8 +28,8 @@ namespace WebApp_GozenBv
             services.AddControllersWithViews();
             services.AddDbContext<DataDbContext>(opts =>
             {
-                opts.UseSqlServer(Configuration["ConnectionStrings:DbConnection"]);
-                //opts.UseSqlServer(Configuration.GetConnectionString("AZURE_SQL_CONNECTIONSTRING"));
+                //opts.UseSqlServer(Configuration["ConnectionStrings:DbConnection"]);
+                opts.UseSqlServer(Configuration.GetConnectionString("AZURE_SQL_CONNECTIONSTRING"));
             });
         }
 
