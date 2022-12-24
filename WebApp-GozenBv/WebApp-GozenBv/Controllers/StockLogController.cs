@@ -234,7 +234,7 @@ namespace WebApp_GozenBv.Controllers
             //update stock amount for each stocklogitems
             foreach (var item in stockLogItems)
             {
-                var stock = StockHelper.UpdateStockQty(item.StockId, item.Amount, _context);
+                var stock = await StockHelper.UpdateStockQty(item.StockId, item.Amount, _context);
             }
 
             stockLog.CompletionDate = DateTime.Now;
