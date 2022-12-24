@@ -347,7 +347,7 @@ namespace WebApp_GozenBv.Controllers
             //update stock amount for each stocklogitems
             foreach (var item in stockLogItems)
             {
-                var stock = StockHelper.UpdateStockQty(item.StockId, item.Amount, _context);
+                var stock = await StockHelper.UpdateStockQty(item.StockId, item.Amount, _context);
             }
 
             _context.StockLogs.Remove(stockLog);
@@ -357,7 +357,7 @@ namespace WebApp_GozenBv.Controllers
         }
 
         [HttpGet]
-        public async Task<IActionResult> ToCompleteDamaged(string id)
+        public async Task<IActionResult> ToDamaged(string id)
         {
             string logCode = id;
 
@@ -391,7 +391,7 @@ namespace WebApp_GozenBv.Controllers
 
         [HttpPost]
         [ValidateAntiForgeryToken]
-        public async Task<IActionResult> ToCompleteDamaged(StockLogDamagedVM stockLogDamagedVM)
+        public async Task<IActionResult> ToDamaged(StockLogDamagedVM stockLogDamagedVM)
         {
             if (ModelState.IsValid)
             {
