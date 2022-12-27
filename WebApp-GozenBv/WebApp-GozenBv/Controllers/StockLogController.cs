@@ -5,6 +5,7 @@ using System.Threading.Tasks;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.Rendering;
 using Microsoft.EntityFrameworkCore;
+using WebApp_GozenBv.Constants;
 using WebApp_GozenBv.Data;
 using WebApp_GozenBv.Helpers;
 using WebApp_GozenBv.Models;
@@ -26,7 +27,6 @@ namespace WebApp_GozenBv.Controllers
         {
             var stockLogs = await _context.StockLogs
                 .Include(s => s.Employee)
-                .Where(s => s.CompletionDate == null)
                 .ToListAsync();
 
             return View(stockLogs);
@@ -43,7 +43,7 @@ namespace WebApp_GozenBv.Controllers
                 return NotFound();
             }
 
-            var stockLogDetailVM = GetDetails(logCode, null);
+            var stockLogDetailVM = GetStockLogDetails(logCode, null);
 
             return View(stockLogDetailVM);
         }
@@ -136,12 +136,13 @@ namespace WebApp_GozenBv.Controllers
                 //new stocklog
                 stockLogCreateVM.LogCode = logCode;
                 stockLog = stockLogCreateVM;
+                stockLog.Status = StockLogStatusConst.AwaitingReturn;
+
                 _context.Add(stockLog);
                 await _context.SaveChangesAsync();
 
                 return RedirectToAction(nameof(Index));
             }
-            //ViewData["EmployeeId"] = new SelectList(_context.Employees, "Id", "Id", stockLog.EmployeeId);
             return View(stockLogCreateVM);
         }
 
@@ -202,46 +203,97 @@ namespace WebApp_GozenBv.Controllers
 
         // GET: StockLog/Delete/5
         [HttpGet]
-        public async Task<IActionResult> ToComplete(int? id)
+        public async Task<IActionResult> ToComplete(string id)
         {
-            if (id == null)
+            string logCode = id;
+
+            if (logCode == null)
             {
                 return NotFound();
             }
 
             var stockLog = await _context.StockLogs
-                .Include(s => s.Employee)
-                .FirstOrDefaultAsync(m => m.Id == id);
+                .FirstOrDefaultAsync(m => m.LogCode == logCode);
 
             if (stockLog == null)
             {
                 return NotFound();
             }
 
-            return View(stockLog);
+            var stockLogDetailVM = GetStockLogDetails(logCode, null);
+
+            //StockLogDetailVM stockLogDetailVM = new StockLogDetailVM
+            //{
+            //    StockLogDate = stockLogDetails.StockLogDate,
+            //    EmployeeFullNameFirma = stockLogDetails.EmployeeFullNameFirma,
+            //    LogCode = stockLogDetails.LogCode, //TODO: need to show?
+            //    StockLogItems = stockLogDetails.StockLogItems
+            //};
+
+
+            return View(stockLogDetailVM);
         }
 
         // POST: StockLog/Delete/5
         [HttpPost]
         [ValidateAntiForgeryToken]
-        public async Task<IActionResult> ToComplete(int id)
+        public async Task<IActionResult> ToComplete(StockLogDetailVM stockLogDetailVM)
         {
-            var stockLog = await _context.StockLogs.FindAsync(id);
-            
-            //TODO: group this into a method 
-            var stockLogItems = GetItemsForStockLog(stockLog);
+            //TODO: alternative modelstate valid check needed
+                if (stockLogDetailVM.DamagedStock == null)
+                {
+                    var stockLog = await _context.StockLogs
+                    .Where(s => s.LogCode == stockLogDetailVM.LogCode)
+                    .FirstOrDefaultAsync();
+                    var stockLogItems = GetItemsForStockLog(stockLog);
 
-            //update stock amount for each stocklogitems
-            foreach (var item in stockLogItems)
-            {
-                var stock = await StockHelper.UpdateStockQty(item.StockId, item.Amount, _context);
-            }
+                    //update stock amount for each stocklogitems
+                    foreach (var item in stockLogItems)
+                    {
+                        var stock = await StockHelper.UpdateStockQty(item.StockId, item.Amount, _context);
+                        _context.Update(stock);
+                    }
 
-            stockLog.CompletionDate = DateTime.Now;
-            _context.Update(stockLog);
-            _context.SaveChanges();
+                    stockLog.CompletionDate = DateTime.Now;
+                    stockLog.Status = StockLogStatusConst.Complete;
+                    _context.Update(stockLog);
+                    _context.SaveChanges();
 
-            return RedirectToAction(nameof(Index));
+                    return RedirectToAction(nameof(Index));
+                }
+                else
+                {
+                    StockLog stockLog = _context.StockLogs
+                            .FirstOrDefault(s => s.LogCode == stockLogDetailVM.LogCode);
+
+                    if (stockLog == null)
+                    {
+                        return NotFound();
+                    }
+
+                    stockLog.Status = StockLogStatusConst.DamagedAwaitingAction;
+                    stockLog.Damaged = true;
+                    _context.Update(stockLog);
+                    _context.SaveChanges();
+
+                    string[] data = stockLogDetailVM.DamagedStock.Split(","); //id, amount 
+                    int[] damagedStock = Array.ConvertAll(data, d => int.Parse(d));
+
+                    //new StockLogItemDamaged
+                    for (int x = 0; x < data.Length; x++)
+                    {
+                        StockLogItemDamaged stockLogItemDamaged = new StockLogItemDamaged();
+                        stockLogItemDamaged.LogCode = stockLogDetailVM.LogCode;
+                        stockLogItemDamaged.StockId = damagedStock[x];
+                        x++;
+                        stockLogItemDamaged.StockAmount = damagedStock[x];
+
+                        _context.Add(stockLogItemDamaged);
+                    }
+                    await _context.SaveChangesAsync();
+
+                    return RedirectToAction(nameof(Index));
+                }
         }
 
         private bool StockLogExists(int id)
@@ -249,7 +301,7 @@ namespace WebApp_GozenBv.Controllers
             return _context.StockLogs.Any(e => e.Id == id);
         }
 
-        private StockLogDetailVM GetDetails(string logCode, DateTime? completionDate)
+        private StockLogDetailVM GetStockLogDetails(string logCode, DateTime? completionDate)
         {
             StockLog stockLog = _context.StockLogs
                 .Include(s => s.Employee)
@@ -260,8 +312,8 @@ namespace WebApp_GozenBv.Controllers
                 .Include(s => s.Stock)
                 .Where(s => s.LogCode == logCode).ToList();
 
+            //adds ProductNameBrand to StockLogItems (= StockLogItemVM)
             List<StockLogItemVM> stockLogItemsVM = new List<StockLogItemVM>();
-
             foreach (var item in stockLogItems)
             {
                 stockLogItemsVM.Add(new StockLogItemVM
@@ -287,31 +339,31 @@ namespace WebApp_GozenBv.Controllers
             return stockLogDetailVM;
         }
 
-        [HttpGet]
-        public async Task<IActionResult> CompletedList()
-        {
-            var confirmedStockLogs = await _context.StockLogs
-                .Include(s => s.Employee)
-                .Where(s => s.CompletionDate.HasValue)
-                .ToListAsync();
+        //[HttpGet]
+        //public async Task<IActionResult> CompletedList()
+        //{
+        //    var confirmedStockLogs = await _context.StockLogs
+        //        .Include(s => s.Employee)
+        //        .Where(s => s.CompletionDate.HasValue)
+        //        .ToListAsync();
 
-            return View(confirmedStockLogs);
-        }
+        //    return View(confirmedStockLogs);
+        //}
 
-        [HttpGet]
-        public async Task<IActionResult> CompletedDetails(string id)
-        {
-            string logCode = id;
+        //[HttpGet]
+        //public async Task<IActionResult> CompletedDetails(string id)
+        //{
+        //    string logCode = id;
 
-            if (logCode == null)
-            {
-                return NotFound();
-            }
+        //    if (logCode == null)
+        //    {
+        //        return NotFound();
+        //    }
+        //    // ??
+        //    var stockLogDetailVM = GetStockLogDetails(logCode, DateTime.Now);
 
-            var stockLogDetailVM = GetDetails(logCode, DateTime.Now);
-
-            return View(stockLogDetailVM);
-        }
+        //    return View(stockLogDetailVM);
+        //}
 
         // GET: StockLog/Delete/5
         [HttpGet]
@@ -356,112 +408,6 @@ namespace WebApp_GozenBv.Controllers
             return RedirectToAction(nameof(Index));
         }
 
-        [HttpGet]
-        public async Task<IActionResult> ToDamaged(string id)
-        {
-            string logCode = id;
-
-            if (logCode == null)
-            {
-                return NotFound();
-            }
-
-            var stockLog = await _context.StockLogs
-                .Include(s => s.Employee)
-                .FirstOrDefaultAsync(m => m.LogCode == logCode);
-
-            if (stockLog == null)
-            {
-                return NotFound();
-            }
-
-            var stockLogDetails = GetDetails(logCode, null);
-
-            StockLogDamagedVM stockLogDamagedVM = new StockLogDamagedVM
-            {
-                StockLogDate = stockLogDetails.StockLogDate,
-                EmployeeFullNameFirma = stockLogDetails.EmployeeFullNameFirma,
-                LogCode = stockLogDetails.LogCode, //TODO: need to show?
-                StockLogItems = stockLogDetails.StockLogItems
-            };
-
-
-            return View(stockLogDamagedVM);
-        }
-
-        [HttpPost]
-        [ValidateAntiForgeryToken]
-        public async Task<IActionResult> ToDamaged(StockLogDamagedVM stockLogDamagedVM)
-        {
-            if (ModelState.IsValid)
-            {
-                StockLog stockLog = _context.StockLogs
-                        .FirstOrDefault(s => s.LogCode == stockLogDamagedVM.LogCode);
-
-                //TODO: is this check necessary?
-                if (stockLogDamagedVM.DamagedStock != "")
-                {
-                    //complete by completionDate
-                    stockLog.CompletionDate = DateTime.Now;
-                    stockLog.Damaged = true;
-                    _context.Update(stockLog);
-                    _context.SaveChanges();
-
-                    string[] data = stockLogDamagedVM.DamagedStock.Split(","); //id, amount 
-                    int[] damagedStock = Array.ConvertAll(data, d => int.Parse(d));
-
-                    //new StockDamaged
-                    for (int x = 0; x < data.Length; x++)
-                    {
-                        StockDamaged stockDamaged = new StockDamaged();
-                        stockDamaged.LogCode = stockLogDamagedVM.LogCode;
-                        stockDamaged.StockId = damagedStock[x];
-                        x++;
-                        stockDamaged.StockAmount = damagedStock[x];
-
-                        _context.Add(stockDamaged);
-                    }
-                    await _context.SaveChangesAsync();
-
-                    return RedirectToAction(nameof(DamagedList));
-                }
-                return View(stockLogDamagedVM);
-            }
-            return View(stockLogDamagedVM);
-        }
-
-        [HttpGet]
-        public async Task<IActionResult> DamagedList()
-        {
-            var stockLog = await _context.StockLogs
-                .Include(s => s.Employee)
-                .Where(s => s.Damaged == true)
-                .ToListAsync();
-
-            //TODO: change DamagedList viewpage to Model: DamagedListVM to add extra props to list (instead of using stocklog)
-            //DamagedListVM damagedList = new DamagedListVM
-            //{
-
-            //};
-
-            return View(stockLog);
-        }
-
-        [HttpGet]
-        public async Task<IActionResult> DamagedDetails(string id)
-        {
-            string logCode = id;
-
-            if (logCode == null)
-            {
-                return NotFound();
-            }
-
-            var damagedDetails = GetDamagedDetails(logCode);
-
-            return View(damagedDetails);
-        }
-
         private DamagedDetailVM GetDamagedDetails(string logCode)
         {
             StockLog stockLog = _context.StockLogs
@@ -470,7 +416,7 @@ namespace WebApp_GozenBv.Controllers
                         .FirstOrDefault(s => s.LogCode == logCode);
 
             //get list damageditems
-            List<StockDamaged> damagedItems = new List<StockDamaged>();
+            List<StockLogItemDamaged> damagedItems = new List<StockLogItemDamaged>();
             List<StockDamagedVM> damagedItemsVM = new List<StockDamagedVM>();
 
             damagedItems = _context.StockDamaged
@@ -515,7 +461,7 @@ namespace WebApp_GozenBv.Controllers
             await _context.SaveChangesAsync();
 
 
-            return RedirectToAction(nameof(DamagedList));
+            return RedirectToAction(nameof(Index));
         }
 
         private IQueryable<StockLogItem> GetItemsForStockLog(StockLog stockLog)
@@ -524,7 +470,7 @@ namespace WebApp_GozenBv.Controllers
             var stockLogItems = _context.StockLogItems
                 .Where(s => s.LogCode == stockLog.LogCode);
 
-            return stockLogItems;            
+            return stockLogItems;
         }
     }
 }

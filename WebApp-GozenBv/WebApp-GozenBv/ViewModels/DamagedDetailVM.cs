@@ -9,7 +9,7 @@ namespace WebApp_GozenBv.ViewModels
     public class DamagedDetailVM
     {
         public StockLog StockLog { get; set; }
-        public StockDamaged StockDamaged { get; set; }
+        public StockLogItemDamaged StockDamaged { get; set; }
         public List<StockDamagedVM> DamagedItemsVM { get; set; }
         public string EmployeeFullNameFirma { get; set; }
     }

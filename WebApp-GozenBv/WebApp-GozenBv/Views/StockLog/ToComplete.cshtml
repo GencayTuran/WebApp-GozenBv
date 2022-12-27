@@ -1,39 +1,70 @@
-﻿@model WebApp_GozenBv.Models.StockLog
+﻿@model WebApp_GozenBv.ViewModels.StockLogDetailVM
 
 @{
     ViewData["Title"] = "Complete?";
 }
 
-<h1>Bevestig</h1>
+<h1>Complete?</h1>
 
-<h3>Are you sure you want to complete this?</h3>
+@*<h3>Which products are damaged?</h3>*@
+<h4>Complete StockLog</h4>
+<hr />
+<table class="table">
+    <thead>
+        <tr>
+            <th scope="col">@Html.DisplayNameFor(model => model.StockLogDate)</th>
+            <th scope="col">@Html.DisplayNameFor(model => model.StockLog.Employee)</th>
+            <th scope="col">@Html.DisplayNameFor(model => model.LogCode)</th>
+        </tr>
+    </thead>
+    <tbody>
+        <tr>
+            <td>@Html.DisplayFor(model => model.StockLogDate)</td>
+            <td>@Html.DisplayFor(model => model.EmployeeFullNameFirma)</td>
+            <td>@Html.DisplayFor(model => model.LogCode)</td>
+        </tr>
+    </tbody>
+    <thead>
+        <tr>
+            <th scope="col">@Html.DisplayNameFor(model => model.StockLogItems)</th>
+        </tr>
+        <tr>
+            <th>@Html.DisplayNameFor(model => model.StockLogItem.StockId)</th>
+            <th>@Html.DisplayNameFor(model => model.StockLogItem.Stock)</th>
+            <th>@Html.DisplayNameFor(model => model.StockLogItem.Amount)</th>
+            <th class="damagedView">Damaged?</th>
+        </tr>
+    </thead>
+    <tbody>
+        @foreach (var item in Model.StockLogItems)
+        {
+            <tr class="stockLogItemRow">
+                <td>
+                    <p class="labelStockId">
+                        @item.StockId
+                    </p>
+                </td>
+                <td>@item.ProductNameBrand</td>
+                <td>
+                    <p class="labelAmount">@item.Amount</p>
+                    <input class="inputAmount damagedView" type="number" value="@item.Amount" />
+                </td>
+                <td class="damagedView"><input class="checkRow" type="checkbox" /></td>
+            </tr>
+        }
+    </tbody>
+</table>
+
 <div>
-    <h4>StockLog</h4>
-    <hr />
-    <dl class="row">
-        <dt class = "col-sm-2">
-            @Html.DisplayNameFor(model => model.StockLogDate)
-        </dt>
-        <dd class = "col-sm-10">
-            @Html.DisplayFor(model => model.StockLogDate)
-        </dd>
-        <dt class = "col-sm-2">
-            @Html.DisplayNameFor(model => model.Employee)
-        </dt>
-        <dd class = "col-sm-10">
-            @Html.DisplayFor(model => model.Employee.Id)
-        </dd class>
-        <dt class = "col-sm-2">
-            @Html.DisplayNameFor(model => model.LogCode)
-        </dt>
-        <dd class = "col-sm-10">
-            @Html.DisplayFor(model => model.LogCode)
-        </dd>
-    </dl>
-    
-    <form asp-action="ToComplete">
-        <input type="hidden" asp-for="Id" />
-        <input type="submit" value="Bevestig" class="btn btn-success" /> |
-        <a asp-action="Index">Back to List</a>
-    </form>
+    <input id="chkDamaged" type="checkbox" />
+    <p>Damaged items?</p>
 </div>
+
+<form asp-action="ToComplete">
+    <input type="hidden" asp-for="LogCode" />
+    <input id="damagedStockResult" type="hidden" asp-for="DamagedStock" />
+    <input id="btnSubmit" type="submit" value="Complete" class="btn btn-primary" /> |
+    <a asp-action="Index">Back to List</a>
+</form>
+
+<script src="~/js/StockLog_ToComplete.js" />

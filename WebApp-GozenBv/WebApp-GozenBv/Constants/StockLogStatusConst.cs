@@ -1,10 +1,10 @@
 ﻿namespace WebApp_GozenBv.Constants
 {
-    public class StockLogStatusConst
+    public static class StockLogStatusConst
     {
-        public int Complete = 1;
-        public int Incomplete = 0;
-        public int Damaged = 00;
+        public const int Complete = 1;
+        public const int AwaitingReturn = 0;
+        public const int DamagedAwaitingAction = 2;
 
     }
 }

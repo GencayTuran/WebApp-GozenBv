@@ -1,6 +1,8 @@
 ﻿using System;
 using Microsoft.EntityFrameworkCore.Migrations;
 
+#nullable disable
+
 namespace WebApp_GozenBv.Migrations
 {
     public partial class init : Migration
@@ -11,9 +13,9 @@ namespace WebApp_GozenBv.Migrations
                 name: "Firmas",
                 columns: table => new
                 {
-                    Id = table.Column<int>(nullable: false)
+                    Id = table.Column<int>(type: "int", nullable: false)
                         .Annotation("SqlServer:Identity", "1, 1"),
-                    FirmaName = table.Column<string>(nullable: true)
+                    FirmaName = table.Column<string>(type: "nvarchar(max)", nullable: true)
                 },
                 constraints: table =>
                 {
@@ -24,14 +26,14 @@ namespace WebApp_GozenBv.Migrations
                 name: "Stock",
                 columns: table => new
                 {
-                    Id = table.Column<int>(nullable: false)
+                    Id = table.Column<int>(type: "int", nullable: false)
                         .Annotation("SqlServer:Identity", "1, 1"),
-                    ProductName = table.Column<string>(nullable: false),
-                    ProductBrand = table.Column<string>(nullable: false),
-                    Quantity = table.Column<int>(nullable: false),
-                    MinQuantity = table.Column<int>(nullable: false),
-                    Cost = table.Column<double>(nullable: false),
-                    Used = table.Column<bool>(nullable: false)
+                    ProductName = table.Column<string>(type: "nvarchar(max)", nullable: false),
+                    ProductBrand = table.Column<string>(type: "nvarchar(max)", nullable: false),
+                    Quantity = table.Column<int>(type: "int", nullable: false),
+                    MinQuantity = table.Column<int>(type: "int", nullable: false),
+                    Cost = table.Column<double>(type: "float", nullable: false),
+                    Used = table.Column<bool>(type: "bit", nullable: false)
                 },
                 constraints: table =>
                 {
@@ -42,11 +44,11 @@ namespace WebApp_GozenBv.Migrations
                 name: "Employees",
                 columns: table => new
                 {
-                    Id = table.Column<int>(nullable: false)
+                    Id = table.Column<int>(type: "int", nullable: false)
                         .Annotation("SqlServer:Identity", "1, 1"),
-                    Name = table.Column<string>(nullable: true),
-                    Surname = table.Column<string>(nullable: true),
-                    FirmaId = table.Column<int>(nullable: false)
+                    Name = table.Column<string>(type: "nvarchar(max)", nullable: true),
+                    Surname = table.Column<string>(type: "nvarchar(max)", nullable: true),
+                    FirmaId = table.Column<int>(type: "int", nullable: false)
                 },
                 constraints: table =>
                 {
@@ -63,16 +65,16 @@ namespace WebApp_GozenBv.Migrations
                 name: "WagenPark",
                 columns: table => new
                 {
-                    Id = table.Column<int>(nullable: false)
+                    Id = table.Column<int>(type: "int", nullable: false)
                         .Annotation("SqlServer:Identity", "1, 1"),
-                    LicencePlate = table.Column<string>(nullable: true),
-                    ChassisNumber = table.Column<string>(nullable: true),
-                    Brand = table.Column<string>(nullable: true),
-                    Model = table.Column<string>(nullable: true),
-                    Km = table.Column<double>(nullable: false),
-                    KeuringDate = table.Column<DateTime>(nullable: false),
-                    DeadlineKeuring = table.Column<DateTime>(nullable: false),
-                    FirmaId = table.Column<int>(nullable: false)
+                    LicencePlate = table.Column<string>(type: "nvarchar(max)", nullable: true),
+                    ChassisNumber = table.Column<string>(type: "nvarchar(max)", nullable: true),
+                    Brand = table.Column<string>(type: "nvarchar(max)", nullable: true),
+                    Model = table.Column<string>(type: "nvarchar(max)", nullable: true),
+                    Km = table.Column<double>(type: "float", nullable: false),
+                    KeuringDate = table.Column<DateTime>(type: "datetime2", nullable: false),
+                    DeadlineKeuring = table.Column<DateTime>(type: "datetime2", nullable: false),
+                    FirmaId = table.Column<int>(type: "int", nullable: false)
                 },
                 constraints: table =>
                 {
@@ -89,11 +91,12 @@ namespace WebApp_GozenBv.Migrations
                 name: "StockDamaged",
                 columns: table => new
                 {
-                    Id = table.Column<int>(nullable: false)
+                    Id = table.Column<int>(type: "int", nullable: false)
                         .Annotation("SqlServer:Identity", "1, 1"),
-                    LogCode = table.Column<string>(nullable: true),
-                    StockId = table.Column<int>(nullable: false),
-                    StockAmount = table.Column<int>(nullable: false)
+                    LogCode = table.Column<string>(type: "nvarchar(max)", nullable: true),
+                    StockId = table.Column<int>(type: "int", nullable: false),
+                    StockAmount = table.Column<int>(type: "int", nullable: false),
+                    Status = table.Column<int>(type: "int", nullable: false)
                 },
                 constraints: table =>
                 {
@@ -110,11 +113,11 @@ namespace WebApp_GozenBv.Migrations
                 name: "StockLogItems",
                 columns: table => new
                 {
-                    Id = table.Column<int>(nullable: false)
+                    Id = table.Column<int>(type: "int", nullable: false)
                         .Annotation("SqlServer:Identity", "1, 1"),
-                    LogCode = table.Column<string>(nullable: true),
-                    Amount = table.Column<int>(nullable: false),
-                    StockId = table.Column<int>(nullable: false)
+                    LogCode = table.Column<string>(type: "nvarchar(max)", nullable: true),
+                    Amount = table.Column<int>(type: "int", nullable: false),
+                    StockId = table.Column<int>(type: "int", nullable: false)
                 },
                 constraints: table =>
                 {
@@ -131,13 +134,15 @@ namespace WebApp_GozenBv.Migrations
                 name: "StockLogs",
                 columns: table => new
                 {
-                    Id = table.Column<int>(nullable: false)
+                    Id = table.Column<int>(type: "int", nullable: false)
                         .Annotation("SqlServer:Identity", "1, 1"),
-                    StockLogDate = table.Column<DateTime>(nullable: false),
-                    EmployeeId = table.Column<int>(nullable: false),
-                    LogCode = table.Column<string>(nullable: true),
-                    CompletionDate = table.Column<DateTime>(nullable: true),
-                    Damaged = table.Column<bool>(nullable: false)
+                    StockLogDate = table.Column<DateTime>(type: "datetime2", nullable: false),
+                    EmployeeId = table.Column<int>(type: "int", nullable: false),
+                    LogCode = table.Column<string>(type: "nvarchar(max)", nullable: true),
+                    CompletionDate = table.Column<DateTime>(type: "datetime2", nullable: true),
+                    ReturnDate = table.Column<DateTime>(type: "datetime2", nullable: true),
+                    Damaged = table.Column<bool>(type: "bit", nullable: false),
+                    Status = table.Column<int>(type: "int", nullable: false)
                 },
                 constraints: table =>
                 {
@@ -154,12 +159,12 @@ namespace WebApp_GozenBv.Migrations
                 name: "WagenMaintenances",
                 columns: table => new
                 {
-                    Id = table.Column<int>(nullable: false)
+                    Id = table.Column<int>(type: "int", nullable: false)
                         .Annotation("SqlServer:Identity", "1, 1"),
-                    MaintenanceDate = table.Column<DateTime>(nullable: false),
-                    MaintenanceNotes = table.Column<string>(nullable: true),
-                    WagenId = table.Column<int>(nullable: false),
-                    WagenParkId = table.Column<int>(nullable: true)
+                    MaintenanceDate = table.Column<DateTime>(type: "datetime2", nullable: false),
+                    MaintenanceNotes = table.Column<string>(type: "nvarchar(max)", nullable: true),
+                    WagenId = table.Column<int>(type: "int", nullable: false),
+                    WagenParkId = table.Column<int>(type: "int", nullable: true)
                 },
                 constraints: table =>
                 {
@@ -168,8 +173,7 @@ namespace WebApp_GozenBv.Migrations
                         name: "FK_WagenMaintenances_WagenPark_WagenParkId",
                         column: x => x.WagenParkId,
                         principalTable: "WagenPark",
-                        principalColumn: "Id",
-                        onDelete: ReferentialAction.Restrict);
+                        principalColumn: "Id");
                 });
 
             migrationBuilder.CreateIndex(

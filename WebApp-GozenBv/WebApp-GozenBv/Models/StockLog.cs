@@ -15,13 +15,15 @@ namespace WebApp_GozenBv.Models
         public int EmployeeId { get; set; }
         public Employee Employee { get; set; }
         public string LogCode { get; set; }
-        
-        //Confirm section
-        //public bool Confirmed { get; set; }
+
         [DataType(DataType.Date)]
-        public DateTime? CompletionDate { get; set; } //null when not confirmed
+        public DateTime? CompletionDate { get; set; }
+
+        [DataType(DataType.Date)]
+        public DateTime? ReturnDate { get; set; }
 
         public bool Damaged { get; set; }
+        public int Status { get; set; }
 
     }
 }

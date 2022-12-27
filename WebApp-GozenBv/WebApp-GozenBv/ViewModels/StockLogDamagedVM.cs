@@ -5,9 +5,9 @@ using System.Threading.Tasks;
 
 namespace WebApp_GozenBv.ViewModels
 {
-    public class StockLogDamagedVM : StockLogDetailVM
-    {
-        public string DamagedStock { get; set; }
+    //public class StockLogDamagedVM : StockLogDetailVM
+    //{
+    //    //public string DamagedStock { get; set; }
 
-    }
+    //}
 }
