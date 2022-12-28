@@ -47,7 +47,7 @@
                             <select class="inputProduct form-control" asp-items="ViewBag.stock"></select>
                         </div>
                         <div class="col-2">
-                            <input class="form-control inputAmount" placeholder="Aantal" value="1" />
+                            <input class="form-control inputAmount" type="number" value="1" min="1" placeholder="Aantal" />
                         </div>
                         <div class="col-4">
                             <button onclick="RemoveRow(this)" value="Remove" class="btn btn-primary">Remove</button>
@@ -61,13 +61,13 @@
     </div>
 </div>
 
+<select id="selectQty" hidden asp-items="@ViewBag.stockQuantity"></select>
 
 <div>
     <a asp-action="Index">Back to List</a>
 </div>
 
-<script src="~/js/StockLog_Create.js">
-</script>
+<script src="~/js/StockLog_Create.js"></script>
 
 @section Scripts {
     @{await Html.RenderPartialAsync("_ValidationScriptsPartial");}

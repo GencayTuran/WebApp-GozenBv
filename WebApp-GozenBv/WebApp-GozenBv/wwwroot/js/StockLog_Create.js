@@ -2,9 +2,17 @@
 const parentNode = document.getElementById("rowCollection");
 var result = document.getElementById("productsResult");
 
+let selectQty = document.getElementById("selectQty");
+let selectChildren = selectQty.querySelectorAll("option");
+let stockQty = [];
+selectChildren.forEach(option => {
+    stockQty.push([parseInt(option.value), parseInt(option.innerHTML)]); //stock, qty
+})
+console.log(stockQty);
+
 function NewRow() {
     var clone = row.cloneNode(true);
-    clone.firstChild.nextSibling.children[0].firstChild.nextElementSibling.value = "";
+    clone.querySelector(".inputProduct").value = "";
     parentNode.appendChild(clone);
 }
 
