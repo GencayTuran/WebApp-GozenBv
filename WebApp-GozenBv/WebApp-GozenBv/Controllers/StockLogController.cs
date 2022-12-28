@@ -89,7 +89,7 @@ namespace WebApp_GozenBv.Controllers
             ViewData["employees"] = new SelectList(lstEmp, "EmployeeId", "EmployeeFullNameFirma");
             ViewData["dateToday"] = dateToday;
             ViewData["stock"] = new SelectList(lstStock, "StockId", "ProductNameBrand");
-            ViewData["stockx"] = lstStock;
+            //ViewData["stockx"] = lstStock;
             ViewData["stockQuantity"] = new SelectList(_context.Stock, "Id", "Quantity");
 
             return View();
@@ -338,32 +338,6 @@ namespace WebApp_GozenBv.Controllers
 
             return stockLogDetailVM;
         }
-
-        //[HttpGet]
-        //public async Task<IActionResult> CompletedList()
-        //{
-        //    var confirmedStockLogs = await _context.StockLogs
-        //        .Include(s => s.Employee)
-        //        .Where(s => s.CompletionDate.HasValue)
-        //        .ToListAsync();
-
-        //    return View(confirmedStockLogs);
-        //}
-
-        //[HttpGet]
-        //public async Task<IActionResult> CompletedDetails(string id)
-        //{
-        //    string logCode = id;
-
-        //    if (logCode == null)
-        //    {
-        //        return NotFound();
-        //    }
-        //    // ??
-        //    var stockLogDetailVM = GetStockLogDetails(logCode, DateTime.Now);
-
-        //    return View(stockLogDetailVM);
-        //}
 
         // GET: StockLog/Delete/5
         [HttpGet]
