@@ -89,7 +89,7 @@ namespace WebApp_GozenBv.Controllers
             ViewData["employees"] = new SelectList(lstEmp, "EmployeeId", "EmployeeFullNameFirma");
             ViewData["dateToday"] = dateToday;
             ViewData["stock"] = new SelectList(lstStock, "StockId", "ProductNameBrand");
-            ViewData["stockQuantity"] = new SelectList(_context.Stock, "Id", "Quantity");
+            //ViewData["stockQuantity"] = new SelectList(_context.Stock, "Id", "Quantity");
 
             return View();
         }
