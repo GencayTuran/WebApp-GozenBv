@@ -2,13 +2,14 @@
 const parentNode = document.getElementById("rowCollection");
 var result = document.getElementById("productsResult");
 
-let selectQty = document.getElementById("selectQty");
-let selectChildren = selectQty.querySelectorAll("option");
-let stockQty = [];
+let stockQty = document.getElementById("selectQty");
+let selectChildren = stockQty.querySelectorAll("option");
+let stockQtyData = [];
 selectChildren.forEach(option => {
-    stockQty.push([parseInt(option.value), parseInt(option.innerHTML)]); //stock, qty
+    stockQtyData.push([parseInt(option.value), parseInt(option.innerHTML)]); //stock, qty
 })
-console.log(stockQty);
+
+
 
 function NewRow() {
     var clone = row.cloneNode(true);
@@ -26,9 +27,24 @@ function PassProducts() {
     var inputProducts = document.querySelectorAll(".inputProduct");
     var inputAmounts = document.querySelectorAll(".inputAmount");
 
+    CheckQuantity(inputProducts, inputAmounts, inputProducts.length);
+
     for (var i = 0; i < inputProducts.length; i++) {
         products.push([inputProducts[i].value, inputAmounts[i].value]); //id, amount
     }
 
     result.value = products;
+}
+
+function CheckQuantity(stock, amount, length)
+{
+    let maxQuantityData = [];
+    stock.forEach(s => {
+       stockQtyData.forEach(qtyData => {
+        if (s.value == qtyData[0]) {
+            //if amount[i] > qtyData[1] --> set max limit or validation? 
+        }
+       })
+    })
+
 }
