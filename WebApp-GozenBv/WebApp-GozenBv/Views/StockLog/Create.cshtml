@@ -11,7 +11,7 @@
 <hr />
 <div class="row">
     <div class="col-md-6">
-        <form asp-action="Create" autocomplete="off">
+        <form asp-action="Create" onsubmit="ValidateForm(event)" autocomplete="off">
             <div>
                 <div asp-validation-summary="ModelOnly" class="text-danger"></div>
                 <div class="form-group">
@@ -24,13 +24,13 @@
                     <select class="form-control" asp-for="EmployeeId" asp-items="ViewBag.employees"></select>
                 </div>
                 <div class="form-group">
-                    <input type="submit" value="Create" onclick="PassProducts()" class="btn btn-primary" />
+                    <input type="submit" value="Create" class="btn btn-primary" />
                 </div>
                 <input class="d-none" id="productsResult" asp-for="SelectedProducts" />
             </div>
         </form>
     </div>
-    <div class="col-md-6">
+    <div class="col-md-8">
         <div id="SelectedProducts">
             <div class="d-flex flex-row justify-content-end bg-secondary">
                 <div class="col-6">Materiaal</div>
@@ -48,8 +48,9 @@
                                 <option value="">Selecteer materiaal</option>
                             </select>
                         </div>
-                        <div class="col-2">
-                            <input-amount class="form-control inputAmount" type="number" placeholder="Aantal" />
+                        <div class="col-2 d-flex flex-row">
+                            <input class="form-control inputAmount" type="number" placeholder="Aantal" />
+                            <p class="labelAlert display-4" style="color: red;"></p>
                         </div>
                         <div class="col-4">
                             <button onclick="RemoveRow(this)" value="Remove" class="btn btn-primary">Remove</button>
@@ -63,14 +64,16 @@
     </div>
 </div>
 
-<select id="selectQty" hidden asp-items="@ViewBag.stockQuantity"></select>
-
 <div>
     <a asp-action="Index">Back to List</a>
 </div>
 
+
+<script>
+    var stockQtyAndNames = @Html.Raw(Json.Serialize(ViewBag.stockQuantity));
+</script>
 <script src="~/js/StockLog_Create.js"></script>
 
 @section Scripts {
-    @{await Html.RenderPartialAsync("_ValidationScriptsPartial");}
+@{await Html.RenderPartialAsync("_ValidationScriptsPartial");}
 }

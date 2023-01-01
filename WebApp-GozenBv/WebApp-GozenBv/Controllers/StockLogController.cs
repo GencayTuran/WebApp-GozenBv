@@ -4,6 +4,7 @@ using System.Linq;
 using System.Threading.Tasks;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.Rendering;
+using Microsoft.AspNetCore.Mvc.TagHelpers;
 using Microsoft.EntityFrameworkCore;
 using WebApp_GozenBv.Constants;
 using WebApp_GozenBv.Data;
@@ -16,7 +17,6 @@ namespace WebApp_GozenBv.Controllers
     public class StockLogController : Controller
     {
         private readonly DataDbContext _context;
-
         public StockLogController(DataDbContext context)
         {
             _context = context;
@@ -48,14 +48,22 @@ namespace WebApp_GozenBv.Controllers
             return View(stockLogDetailVM);
         }
 
-        // GET: StockLog/Create
+        private readonly List<EmployeeVM> lstEmp = new List<EmployeeVM>();
+        private readonly List<StockQuantityVM> lstStock = new();
         public IActionResult Create()
         {
-            DateTime dateToday = DateTime.Now;
+            GetCreateViewData();
 
-            Employee emp = new Employee();
-            List<EmployeeVM> lstEmp = new List<EmployeeVM>();
+            ViewData["employees"] = new SelectList(lstEmp, "EmployeeId", "EmployeeFullNameFirma");
+            ViewData["stock"] = new SelectList(lstStock, "StockId", "ProductNameBrand");
+            ViewData["stockQuantity"] = lstStock;
 
+            return View();
+        }
+
+        private void GetCreateViewData()
+        {
+            //employees
             var queryEmp = from e in _context.Employees
                            join f in _context.Firmas
                            on e.FirmaId equals f.Id
@@ -70,28 +78,21 @@ namespace WebApp_GozenBv.Controllers
                 });
             }
 
-
-            Stock stock = new Stock();
-            List<ProductVM> lstStock = new List<ProductVM>();
+            //stock
 
             var queryStock = from s in _context.Stock
-                             select new { s.Id, s.ProductName, s.ProductBrand };
+                             select new { s.Id, s.ProductName, s.ProductBrand, s.Quantity };
 
             foreach (var product in queryStock)
             {
-                lstStock.Add(new ProductVM
+                lstStock.Add(new StockQuantityVM
                 {
                     StockId = product.Id,
+                    Quantity = product.Quantity,
                     ProductNameBrand = product.ProductName + " - " + product.ProductBrand
                 });
             }
 
-            ViewData["employees"] = new SelectList(lstEmp, "EmployeeId", "EmployeeFullNameFirma");
-            ViewData["dateToday"] = dateToday;
-            ViewData["stock"] = new SelectList(lstStock, "StockId", "ProductNameBrand");
-            //ViewData["stockQuantity"] = new SelectList(_context.Stock, "Id", "Quantity");
-
-            return View();
         }
 
         // POST: StockLog/Create
@@ -102,47 +103,57 @@ namespace WebApp_GozenBv.Controllers
         public async Task<IActionResult> Create(StockLogCreateVM stockLogCreateVM)
         {
 
-            if (ModelState.IsValid)
+            if (ModelState.IsValid && stockLogCreateVM.SelectedProducts != null)
             {
-                string[] data = stockLogCreateVM.SelectedProducts.Split(","); //id, amount 
-                int[] products = Array.ConvertAll(data, d => int.Parse(d));
-                Guid guid = Guid.NewGuid();
-                string logCode = guid.ToString();
-                StockLog stockLog = new StockLog();
 
-                //TODO: check here if stock/amount exists ==> else return view
+                    string[] data = stockLogCreateVM.SelectedProducts.Split(","); //id, amount 
+                    int[] products = Array.ConvertAll(data, d => int.Parse(d));
 
-                //new StockLogItem
-                for (int x = 0; x < data.Length; x++)
-                {
-                    StockLogItem stockLogItem = new StockLogItem();
-                    stockLogItem.LogCode = logCode;
-                    stockLogItem.StockId = products[x];
-                    x++;
-                    stockLogItem.Amount = products[x];
+                    Guid guid = Guid.NewGuid();
+                    string logCode = guid.ToString();
 
-                    _context.Add(stockLogItem);
-                }
+                    //TODO: check here if stock/amount exists ==> else return view
 
-                //update stock amount
-                for (int s = 0; s < data.Length; s++)
-                {
-                    var stock = await StockHelper.UpdateStockQty(products[s], -products[s + 1], _context);
-                    _context.Update(stock);
-                    s++;
-                }
+                    //new StockLogItem
+                    for (int x = 0; x < data.Length; x++)
+                    {
+                        StockLogItem stockLogItem = new StockLogItem();
+                        stockLogItem.LogCode = logCode;
+                        stockLogItem.StockId = products[x];
+                        x++;
+                        stockLogItem.Amount = products[x];
 
-                //new stocklog
-                stockLogCreateVM.LogCode = logCode;
-                stockLog = stockLogCreateVM;
-                stockLog.Status = StockLogStatusConst.AwaitingReturn;
+                        _context.Add(stockLogItem);
+                    }
 
-                _context.Add(stockLog);
-                await _context.SaveChangesAsync();
+                    //update stock amount
+                    for (int s = 0; s < data.Length; s++)
+                    {
+                        var stock = await StockHelper.UpdateStockQty(products[s], -products[s + 1], _context);
+                        _context.Update(stock);
+                        s++;
+                    }
 
-                return RedirectToAction(nameof(Index));
+                    //new stocklog
+                    stockLogCreateVM.LogCode = logCode;
+                    StockLog stockLog = stockLogCreateVM;
+                    stockLog.Status = StockLogStatusConst.AwaitingReturn;
+
+                    _context.Add(stockLog);
+                    await _context.SaveChangesAsync();
+
+                    return RedirectToAction(nameof(Index));
             }
-            return View(stockLogCreateVM);
+            else
+            {
+                GetCreateViewData();
+
+                ViewData["employees"] = new SelectList(lstEmp, "EmployeeId", "EmployeeFullNameFirma");
+                ViewData["stock"] = new SelectList(lstStock, "StockId", "ProductNameBrand");
+                ViewData["stockQuantity"] = lstStock;
+
+                return View();
+            }
         }
 
         // GET: StockLog/Edit/5
