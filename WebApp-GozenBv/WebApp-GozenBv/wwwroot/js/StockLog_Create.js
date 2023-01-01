@@ -26,28 +26,43 @@ Init();
 
 function Init(){
     inputProduct.value = "";
+    SetMinValue();
 }
 
 let alerts = [];
 function ValidateForm(event) {    
     
-
-    if (!CheckInputs())
+    if (BothFalse())
     {
-        window.alert("Not all inputs have a value!");
-        event.preventDefault();
-    }
-    else if (!CheckQuantity())
-    {
-        let strAlerts;
+        alerts.push("Not all inputs have a value!");       
+        
+        let strAlerts = "";
         alerts.forEach(alert => {
             strAlerts += alert + "\n";
         });
         window.alert(strAlerts);
-        alerts = [];
+
         event.preventDefault();
     }
 
+    if (QtyFalseOnly()) {
+        let strAlerts = "";
+        alerts.forEach(alert => {
+            strAlerts += alert + "\n";
+        });
+        window.alert(strAlerts);
+
+        event.preventDefault();
+    }
+    
+    if (InputFalseOnly()) {
+        window.alert("Not all inputs have a value!");
+        event.preventDefault();
+    }
+
+    if (Succes()) {
+        PassProducts();
+    }
 }
 
 function PassProducts() {
@@ -65,6 +80,7 @@ function CheckQuantity()
 {
     GetElements();
     check = true;
+    alerts = [];
 
    for (let i = 0; i < rows.length; i++) {
     stockQtyAndNames.forEach(data => {
@@ -108,10 +124,36 @@ function NewRow() {
     clone.querySelector(".inputProduct").value = "";
     clone.querySelector(".inputAmount").value = "";
     clone.style.backgroundColor = "transparent";
+    clone.querySelector(".labelAlert").innerHTML = "";
     parentNode.appendChild(clone);
 }
 
 function RemoveRow(obj) {
     element = obj.parentNode.parentNode.parentNode;
     document.getElementById("rowCollection").removeChild(element);
+}
+
+
+function BothFalse() {
+    return !CheckInputs() && !CheckQuantity();
+}
+
+function InputFalseOnly() {
+    return !CheckInputs() && CheckQuantity();
+}
+
+function QtyFalseOnly() {
+    return CheckInputs() && !CheckQuantity();
+}
+
+function Succes() {
+    return CheckInputs() && CheckQuantity();
+}
+
+function SetMinValue() {   
+    inputAmount.addEventListener("change", () => {
+        if (inputAmount.value <= 0) {
+            inputAmount.value = 1;
+        }
+    })
 }
