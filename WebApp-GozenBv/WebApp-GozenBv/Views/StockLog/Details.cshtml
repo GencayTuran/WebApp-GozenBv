@@ -6,45 +6,44 @@
 
 <h1>Details</h1>
 
-<div>
-    <h4>StockLog</h4>
-    <hr />
-    <table class="table">
-        <thead>
+<h4>StockLog</h4>
+<hr />
+<table class="table">
+    <thead>
+        <tr>
+            <th scope="col">@Html.DisplayNameFor(model => model.StockLogDate)</th>
+            <th scope="col">@Html.DisplayNameFor(model => model.StockLog.Employee)</th>
+            <th scope="col">@Html.DisplayNameFor(model => model.LogCode)</th>
+        </tr>
+    </thead>
+    <tbody>
+        <tr>
+            <td>@Html.DisplayFor(model => model.StockLogDate)</td>
+            <td>@Html.DisplayFor(model => model.EmployeeFullNameFirma)</td>
+            <td>@Html.DisplayFor(model => model.LogCode)</td>
+        </tr>
+    </tbody>
+    <thead>
+        <tr>
+            <th scope="col">@Html.DisplayNameFor(model => model.StockLogItems)</th>
+        </tr>
+        <tr>
+            <th>@Html.DisplayNameFor(model => model.StockLogItem.StockId)</th>
+            <th>@Html.DisplayNameFor(model => model.StockLogItem)</th>
+            <th>@Html.DisplayNameFor(model => model.StockLogItem.Amount)</th>
+        </tr>
+    </thead>
+    <tbody>
+        @foreach (var item in Model.StockLogItems)
+        { 
             <tr>
-                <th scope="col">@Html.DisplayNameFor(model => model.StockLogDate)</th>
-                <th scope="col">@Html.DisplayNameFor(model => model.StockLog.Employee)</th>
-                <th scope="col">@Html.DisplayNameFor(model => model.LogCode)</th>
+                <td>@item.StockId</td>
+                <td>@item.ProductNameBrand</td>
+                <td>@item.Amount</td>
             </tr>
-        </thead>
-        <tbody>
-            <tr>
-                <td>@Html.DisplayFor(model => model.StockLogDate)</td>
-                <td>@Html.DisplayFor(model => model.EmployeeFullNameFirma)</td>
-                <td>@Html.DisplayFor(model => model.LogCode)</td>
-            </tr>
-        </tbody>
-        <thead>
-            <tr>
-                <th scope="col">@Html.DisplayNameFor(model => model.StockLogItems)</th>
-            </tr>
-            <tr>
-                <th>@Html.DisplayNameFor(model => model.StockLogItem.StockId)</th>
-                <th>@Html.DisplayNameFor(model => model.StockLogItem.Stock)</th>
-                <th>@Html.DisplayNameFor(model => model.StockLogItem.Amount)</th>
-            </tr>
-        </thead>
-        <tbody>
-            @foreach (var item in Model.StockLogItems)
-            { 
-                <tr>
-                    <td>@item.StockId</td>
-                    <td>@item.ProductNameBrand</td>
-                    <td>@item.Amount</td>
-                </tr>
-            }
-        </tbody>
-    </table>
+        }
+    </tbody>
+</table>
 <div>
     @*<a asp-action="Edit" asp-route-id="@Model.Id">Edit</a>*@ |
     <a asp-action="Index">Back to List</a>

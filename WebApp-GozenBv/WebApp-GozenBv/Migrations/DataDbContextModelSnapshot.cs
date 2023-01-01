@@ -145,12 +145,13 @@ namespace WebApp_GozenBv.Migrations
                     b.Property<string>("LogCode")
                         .HasColumnType("nvarchar(max)");
 
+                    b.Property<string>("ProductNameBrand")
+                        .HasColumnType("nvarchar(max)");
+
                     b.Property<int>("StockId")
                         .HasColumnType("int");
 
                     b.HasKey("Id");
-
-                    b.HasIndex("StockId");
 
                     b.ToTable("StockLogItems");
                 });
@@ -268,17 +269,6 @@ namespace WebApp_GozenBv.Migrations
                         .IsRequired();
 
                     b.Navigation("Employee");
-                });
-
-            modelBuilder.Entity("WebApp_GozenBv.Models.StockLogItem", b =>
-                {
-                    b.HasOne("WebApp_GozenBv.Models.Stock", "Stock")
-                        .WithMany()
-                        .HasForeignKey("StockId")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired();
-
-                    b.Navigation("Stock");
                 });
 
             modelBuilder.Entity("WebApp_GozenBv.Models.StockLogItemDamaged", b =>

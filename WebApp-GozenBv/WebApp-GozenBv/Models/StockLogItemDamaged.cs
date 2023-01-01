@@ -12,7 +12,7 @@ namespace WebApp_GozenBv.Models
         public string LogCode { get; set; }
         public int StockId { get; set; }
         public int StockAmount { get; set; }
+        public string ProductNameBrand { get; set; }
         public int Status { get; set; }
-        public Stock Stock { get; set; }
     }
 }

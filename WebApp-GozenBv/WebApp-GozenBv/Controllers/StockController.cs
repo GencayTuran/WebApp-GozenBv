@@ -135,8 +135,8 @@ namespace WebApp_GozenBv.Controllers
             }
 
             var stock = await _context.Stock
-                .Include(s => s.ProductBrand)
                 .FirstOrDefaultAsync(m => m.Id == id);
+
             if (stock == null)
             {
                 return NotFound();

@@ -112,16 +112,16 @@ namespace WebApp_GozenBv.Controllers
                     Guid guid = Guid.NewGuid();
                     string logCode = guid.ToString();
 
-                    //TODO: check here if stock/amount exists ==> else return view
-
                     //new StockLogItem
                     for (int x = 0; x < data.Length; x++)
                     {
                         StockLogItem stockLogItem = new StockLogItem();
+                        var stock = _context.Stock.Where(s => s.Id == products[x]).FirstOrDefault();
                         stockLogItem.LogCode = logCode;
                         stockLogItem.StockId = products[x];
                         x++;
                         stockLogItem.Amount = products[x];
+                        stockLogItem.ProductNameBrand = (stock.ProductName + " " + stock.ProductBrand).ToUpper();
 
                         _context.Add(stockLogItem);
                     }
@@ -295,6 +295,8 @@ namespace WebApp_GozenBv.Controllers
                         StockLogItemDamaged stockLogItemDamaged = new StockLogItemDamaged();
                         stockLogItemDamaged.LogCode = stockLogDetailVM.LogCode;
                         stockLogItemDamaged.StockId = damagedStock[x];
+                        var stock = _context.Stock.Where(s => s.Id == damagedStock[x]).FirstOrDefault();
+                        stockLogItemDamaged.ProductNameBrand = (stock.ProductName + " " + stock.ProductBrand).ToUpper();
                         x++;
                         stockLogItemDamaged.StockAmount = damagedStock[x];
 
@@ -319,21 +321,19 @@ namespace WebApp_GozenBv.Controllers
                 .FirstOrDefault(s => s.LogCode == logCode);
 
             List<StockLogItem> stockLogItems = _context.StockLogItems
-                .Include(s => s.Stock)
+                //.Include(s => s.Stock)
                 .Where(s => s.LogCode == logCode).ToList();
 
-            //adds ProductNameBrand to StockLogItems (= StockLogItemVM)
-            List<StockLogItemVM> stockLogItemsVM = new List<StockLogItemVM>();
+            List<StockLogItem> lstStockLogItems = new List<StockLogItem>();
             foreach (var item in stockLogItems)
             {
-                stockLogItemsVM.Add(new StockLogItemVM
+                lstStockLogItems.Add(new StockLogItem
                 {
                     Id = item.Id,
                     LogCode = item.LogCode,
                     Amount = item.Amount,
                     StockId = item.StockId,
-                    Stock = item.Stock,
-                    ProductNameBrand = (item.Stock.ProductName + " " + item.Stock.ProductBrand).ToUpper()
+                    ProductNameBrand = item.ProductNameBrand,
                 });
             }
 
@@ -342,7 +342,7 @@ namespace WebApp_GozenBv.Controllers
                 StockLogDate = stockLog.StockLogDate,
                 EmployeeFullNameFirma = (stockLog.Employee.Name + " " + stockLog.Employee.Surname + " - " + stockLog.Employee.Firma.FirmaName).ToUpper(),
                 LogCode = stockLog.LogCode, //need to show?
-                StockLogItems = stockLogItemsVM,
+                StockLogItems = stockLogItems,
                 CompletionDate = completionDate
             };
 
@@ -404,7 +404,6 @@ namespace WebApp_GozenBv.Controllers
             List<StockDamagedVM> damagedItemsVM = new List<StockDamagedVM>();
 
             damagedItems = _context.StockDamaged
-                .Include(d => d.Stock)
                 .Where(s => s.LogCode == logCode).ToList();
 
             foreach (var item in damagedItems)
@@ -415,8 +414,7 @@ namespace WebApp_GozenBv.Controllers
                     LogCode = item.LogCode,
                     StockAmount = item.StockAmount,
                     StockId = item.StockId,
-                    Stock = item.Stock,
-                    ProductNameBrand = (item.Stock.ProductName + " " + item.Stock.ProductBrand).ToUpper()
+                    ProductNameBrand = item.ProductNameBrand
                 });
             }
 
