@@ -29,13 +29,13 @@ namespace WebApp_GozenBv.TagHelpers
             switch (Status)
             {
                 case StockLogStatusConst.Complete:
-                    output.Content.SetHtmlContent(actionsStatusComplete);
+                    output.PostContent.SetHtmlContent(actionsStatusComplete);
                     break;
                 case StockLogStatusConst.AwaitingReturn:
-                    output.Content.SetHtmlContent(actionsStatusAwaitingReturn);
+                    output.PostContent.SetHtmlContent(actionsStatusAwaitingReturn);
                     break;
                 case StockLogStatusConst.DamagedAwaitingAction:
-                    output.Content.SetHtmlContent(actionsStatusDamaged);
+                    output.PostContent.SetHtmlContent(actionsStatusDamaged);
 
                     break;
                 default:
