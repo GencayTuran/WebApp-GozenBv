@@ -28,7 +28,7 @@
     <tbody>
         @foreach (var item in Model)
         {
-            <stocklog status="item.Status">
+            <stocklog status="@item.Status">
                 <td>
                     @Html.DisplayFor(modelItem => item.StockLogDate)
                 </td>
@@ -39,7 +39,9 @@
                 <td>
                     @Html.DisplayFor(modelItem => item.LogCode)
                 </td>
-                <actions status="item.Status" ></actions>
+                <td>
+                    <vc:actions status="@item.Status" id="@item.Id" log-code="@item.LogCode"></vc:actions>
+                </td>
             </stocklog>
         }
     </tbody>
