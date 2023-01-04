@@ -139,7 +139,10 @@ namespace WebApp_GozenBv.Migrations
 
                     SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"), 1L, 1);
 
-                    b.Property<int>("Amount")
+                    b.Property<int?>("DamagedAmount")
+                        .HasColumnType("int");
+
+                    b.Property<int?>("DeletedAmount")
                         .HasColumnType("int");
 
                     b.Property<string>("LogCode")
@@ -148,26 +151,7 @@ namespace WebApp_GozenBv.Migrations
                     b.Property<string>("ProductNameBrand")
                         .HasColumnType("nvarchar(max)");
 
-                    b.Property<int>("StockId")
-                        .HasColumnType("int");
-
-                    b.HasKey("Id");
-
-                    b.ToTable("StockLogItems");
-                });
-
-            modelBuilder.Entity("WebApp_GozenBv.Models.StockLogItemDamaged", b =>
-                {
-                    b.Property<int>("Id")
-                        .ValueGeneratedOnAdd()
-                        .HasColumnType("int");
-
-                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"), 1L, 1);
-
-                    b.Property<string>("LogCode")
-                        .HasColumnType("nvarchar(max)");
-
-                    b.Property<int>("Status")
+                    b.Property<int?>("RepairedAmount")
                         .HasColumnType("int");
 
                     b.Property<int>("StockAmount")
@@ -178,9 +162,7 @@ namespace WebApp_GozenBv.Migrations
 
                     b.HasKey("Id");
 
-                    b.HasIndex("StockId");
-
-                    b.ToTable("StockDamaged");
+                    b.ToTable("StockLogItems");
                 });
 
             modelBuilder.Entity("WebApp_GozenBv.Models.WagenMaintenance", b =>
@@ -269,17 +251,6 @@ namespace WebApp_GozenBv.Migrations
                         .IsRequired();
 
                     b.Navigation("Employee");
-                });
-
-            modelBuilder.Entity("WebApp_GozenBv.Models.StockLogItemDamaged", b =>
-                {
-                    b.HasOne("WebApp_GozenBv.Models.Stock", "Stock")
-                        .WithMany()
-                        .HasForeignKey("StockId")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired();
-
-                    b.Navigation("Stock");
                 });
 
             modelBuilder.Entity("WebApp_GozenBv.Models.WagenMaintenance", b =>

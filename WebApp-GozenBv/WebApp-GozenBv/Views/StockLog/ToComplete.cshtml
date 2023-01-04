@@ -31,7 +31,7 @@
         <tr>
             <th>@Html.DisplayNameFor(model => model.StockLogItem.StockId)</th>
             <th>@Html.DisplayNameFor(model => model.StockLogItem)</th>
-            <th>@Html.DisplayNameFor(model => model.StockLogItem.Amount)</th>
+            <th>@Html.DisplayNameFor(model => model.StockLogItem.StockAmount)</th>
             <th class="damagedView">Damaged?</th>
         </tr>
     </thead>
@@ -46,8 +46,8 @@
                 </td>
                 <td>@item.ProductNameBrand</td>
                 <td>
-                    <p class="labelAmount">@item.Amount</p>
-                    <input class="inputAmount damagedView" type="number" value="@item.Amount" />
+                    <p class="labelAmount">@item.StockAmount</p>
+                    <input class="inputAmount damagedView" type="number" value="@item.StockAmount" />
                 </td>
                 <td class="damagedView"><input class="checkRow" type="checkbox" /></td>
             </tr>
@@ -61,6 +61,7 @@
 </div>
 
 <form asp-action="ToComplete">
+    @*<input type="hidden" asp-for=""/>*@
     <input type="hidden" asp-for="LogCode" />
     <input id="damagedStockResult" type="hidden" asp-for="DamagedStock" />
     <input id="btnSubmit" type="submit" value="Complete" class="btn btn-primary" /> |
