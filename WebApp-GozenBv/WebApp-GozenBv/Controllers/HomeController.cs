@@ -10,9 +10,11 @@ using Microsoft.EntityFrameworkCore;
 using WebApp_GozenBv.Models;
 using WebApp_GozenBv.Data;
 using WebApp_GozenBv.ViewModels;
+using Microsoft.AspNetCore.Authorization;
 
 namespace WebApp_GozenBv.Controllers
 {
+    [Authorize]
     public class HomeController : Controller
     {
         private readonly ILogger<HomeController> _logger;

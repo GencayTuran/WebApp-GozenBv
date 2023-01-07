@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.Rendering;
 using Microsoft.AspNetCore.Mvc.TagHelpers;
@@ -14,6 +15,7 @@ using WebApp_GozenBv.ViewModels;
 
 namespace WebApp_GozenBv.Controllers
 {
+    [Authorize]
     public class StockLogController : Controller
     {
         private readonly DataDbContext _context;
