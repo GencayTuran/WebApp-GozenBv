@@ -2,6 +2,7 @@ using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.AspNetCore.HttpsPolicy;
 using Microsoft.AspNetCore.Identity;
+using Microsoft.AspNetCore.Mvc.ActionConstraints;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
@@ -11,6 +12,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
 using WebApp_GozenBv.Data;
+using WebApp_GozenBv.Services;
 
 namespace WebApp_GozenBv
 {
@@ -35,6 +37,8 @@ namespace WebApp_GozenBv
                 //opts.UseSqlServer(Configuration["ConnectionStrings:DbConnection"]);
                 opts.UseSqlServer(Configuration.GetConnectionString("AZURE_SQL_CONNECTIONSTRING"));
             });
+
+            services.AddTransient<IActionService, ActionService>();
         }
 
         // This method gets called by the runtime. Use this method to configure the HTTP request pipeline.

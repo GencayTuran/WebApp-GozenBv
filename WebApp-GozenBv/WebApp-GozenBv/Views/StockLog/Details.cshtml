@@ -30,7 +30,10 @@
         <tr>
             <th>@Html.DisplayNameFor(model => model.StockLogItem.StockId)</th>
             <th>@Html.DisplayNameFor(model => model.StockLogItem)</th>
-            <th>@Html.DisplayNameFor(model => model.StockLogItem.Amount)</th>
+            <th>@Html.DisplayNameFor(model => model.StockLogItem.StockAmount)</th>
+            <th>@Html.DisplayNameFor(model => model.StockLogItem.DamagedAmount)</th>
+            <th>@Html.DisplayNameFor(model => model.StockLogItem.DeletedAmount)</th>
+            <th>@Html.DisplayNameFor(model => model.StockLogItem.RepairedAmount)</th>
         </tr>
     </thead>
     <tbody>
@@ -39,7 +42,10 @@
             <tr>
                 <td>@item.StockId</td>
                 <td>@item.ProductNameBrand</td>
-                <td>@item.Amount</td>
+                <td>@item.StockAmount</td>
+                <td>@item.DamagedAmount</td>
+                <td>@item.DeletedAmount</td>
+                <td>@item.RepairedAmount</td>
             </tr>
         }
     </tbody>
