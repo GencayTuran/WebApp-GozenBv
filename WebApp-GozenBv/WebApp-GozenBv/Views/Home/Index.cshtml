@@ -1,11 +1,6 @@
 ﻿@{
     ViewData["Title"] = "Home Page";
 }
-<p>
-    <a asp-controller="Account" asp-action="Logout">Logout</a>
-</p>
-<div><a asp-controller="Account" asp-action="Register">Registreer een nieuwe gebruiker</a></div>
-
 
 <div class="container align-content-center">
     <div class="container d-flex justify-content-center" ><p class="display-3">Menu</p></div>
@@ -27,4 +22,6 @@
             <p>@alert</p>
         }*@
     </div>
+    <div>Api result</div>
+    <div>@ViewData["ApiResult"]</div>
 </div>

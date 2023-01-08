@@ -31,7 +31,6 @@ namespace WebApp_GozenBv.Controllers
             _logger = logger;
             _context = context;
             _graphServiceClient = graphServiceClient;
-
         }
 
         [AuthorizeForScopes(ScopeKeySection = "DownstreamApi:Scopes")]

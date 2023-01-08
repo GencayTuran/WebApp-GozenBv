@@ -8,7 +8,7 @@ using WebApp_GozenBv.Models;
 
 namespace WebApp_GozenBv.Data
 {
-    public class DataDbContext : IdentityDbContext
+    public class DataDbContext : DbContext
     {
         public DataDbContext(DbContextOptions<DataDbContext> options) : base(options) { }
         public DbSet<Stock> Stock { get; set; }

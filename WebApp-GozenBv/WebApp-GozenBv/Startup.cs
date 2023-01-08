@@ -26,11 +26,6 @@ namespace WebApp_GozenBv
         // This method gets called by the runtime. Use this method to add services to the container.
         public void ConfigureServices(IServiceCollection services)
         {
-            //services.AddIdentity<IdentityUser, IdentityRole>()
-            //        .AddEntityFrameworkStores<DataDbContext>();
-
-            //services.AddControllersWithViews();
-
             var initialScopes = Configuration.GetValue<string>("DownstreamApi:Scopes")?.Split(' ');
 
             services.AddAuthentication(OpenIdConnectDefaults.AuthenticationScheme)
