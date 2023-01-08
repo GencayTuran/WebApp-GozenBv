@@ -11,6 +11,8 @@ using WebApp_GozenBv.Models;
 using WebApp_GozenBv.Data;
 using WebApp_GozenBv.ViewModels;
 using Microsoft.AspNetCore.Authorization;
+using Microsoft.Graph;
+using Microsoft.Identity.Web;
 
 namespace WebApp_GozenBv.Controllers
 {
@@ -20,13 +22,20 @@ namespace WebApp_GozenBv.Controllers
         private readonly ILogger<HomeController> _logger;
         private readonly DataDbContext _context;
 
-        public HomeController(ILogger<HomeController> logger, DataDbContext context)
+        private readonly GraphServiceClient _graphServiceClient;
+
+
+        public HomeController(ILogger<HomeController> logger,
+            DataDbContext context, GraphServiceClient graphServiceClient)
         {
             _logger = logger;
             _context = context;
+            _graphServiceClient = graphServiceClient;
+
         }
 
-        public IActionResult Index()
+        [AuthorizeForScopes(ScopeKeySection = "DownstreamApi:Scopes")]
+        public async Task<IActionResult> Index()
         {
             List<string> lstAlertsCar = new List<string>();
             var cars = _context.WagenPark.Include(w => w.Firma);
@@ -75,6 +84,9 @@ namespace WebApp_GozenBv.Controllers
 
             ViewData["alertsCar"] = lstAlertsCar;
             ViewData["alertsStock"] = lstAlertsStock;
+
+            var user = await _graphServiceClient.Me.Request().GetAsync();
+            ViewData["ApiResult"] = user.DisplayName;
 
             return View();
         }
