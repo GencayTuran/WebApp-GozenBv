@@ -1,10 +1,10 @@
-﻿@model MVCVoertuig.ViewModels.LoginViewModel
+﻿@model WebApp_GozenBv.ViewModels.LoginViewModel
 
 @{
     ViewData["Title"] = "Login";
 }
 
-<h1>Login</h1>
+<h1>Login</h1>  
 
 <h4>LoginViewModel</h4>
 <hr />
@@ -14,12 +14,12 @@
             <div asp-validation-summary="ModelOnly" class="text-danger"></div>
             <div class="form-group">
                 <label asp-for="Email" class="control-label"></label>
-                <input asp-for="Email" class="form-control" />
+                <input asp-for="Email" value="gencay.turan@hotmail.com" class="form-control" />
                 <span asp-validation-for="Email" class="text-danger"></span>
             </div>
             <div class="form-group">
                 <label asp-for="Password" class="control-label"></label>
-                <input asp-for="Password" class="form-control" />
+                <input asp-for="Password" value="Abc123" class="form-control" />
                 <span asp-validation-for="Password" class="text-danger"></span>
             </div>
             <div class="form-group">
@@ -28,10 +28,7 @@
         </form>
     </div>
 </div>
-<div><a asp-action="Register">Registreer een nieuwe gebruiker</a></div>
-<div>
-    <a asp-action="Index">Back to List</a>
-</div>
+
 
 @section Scripts {
     @{

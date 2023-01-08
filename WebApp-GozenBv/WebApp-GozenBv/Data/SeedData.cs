@@ -1,4 +1,5 @@
 ﻿using Microsoft.AspNetCore.Builder;
+using Microsoft.AspNetCore.Identity;
 using Microsoft.Extensions.DependencyInjection;
 using System;
 using System.Collections.Generic;
@@ -8,12 +9,20 @@ using WebApp_GozenBv.Models;
 
 namespace WebApp_GozenBv.Data
 {
-    public class SeedData
+    public static class SeedData
     {
-        public static DataDbContext context;
-        public static void EnsurePopulated(IApplicationBuilder app)
+        private static DataDbContext context;
+        public static async Task EnsurePopulated(IApplicationBuilder app)
         {
-            context = app.ApplicationServices.CreateScope().ServiceProvider.GetRequiredService<DataDbContext>();
+            context = app
+                .ApplicationServices.CreateScope()
+                .ServiceProvider.GetRequiredService<DataDbContext>();
+
+            UserManager<IdentityUser> userManager = app
+               .ApplicationServices.CreateScope()
+               .ServiceProvider.GetRequiredService<UserManager<IdentityUser>>();
+
+            await CreateIdentityRecordAsync(userManager);
 
             if (!context.Stock.Any())
             {
@@ -28,6 +37,25 @@ namespace WebApp_GozenBv.Data
             }
 
         }
+
+        private static async Task CreateIdentityRecordAsync(UserManager<IdentityUser> userManager)
+        {
+            var email = "gencay.turan@test.be";
+            var userName = "admin";
+            if (await userManager.FindByEmailAsync(email) == null &&
+                await userManager.FindByNameAsync(userName) == null)
+            {
+                var pwd = "test1234";
+                var identityUser = new IdentityUser() { Email = email, UserName = userName };
+                var result = await userManager.CreateAsync(identityUser, pwd);
+
+                if (!result.Succeeded)
+                {
+                    //
+                }
+            }
+        }
+
         private static Stock[] GetStock()
         {
             var stock = new Stock[5];

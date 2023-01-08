@@ -1,4 +1,5 @@
-﻿using Microsoft.EntityFrameworkCore;
+﻿using Microsoft.AspNetCore.Identity.EntityFrameworkCore;
+using Microsoft.EntityFrameworkCore;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -7,7 +8,7 @@ using WebApp_GozenBv.Models;
 
 namespace WebApp_GozenBv.Data
 {
-    public class DataDbContext : DbContext
+    public class DataDbContext : IdentityDbContext
     {
         public DataDbContext(DbContextOptions<DataDbContext> options) : base(options) { }
         public DbSet<Stock> Stock { get; set; }

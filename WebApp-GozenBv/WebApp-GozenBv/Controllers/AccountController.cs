@@ -3,6 +3,8 @@ using Microsoft.AspNetCore.Mvc;
 using System.Threading.Tasks;
 using System;
 using WebApp_GozenBv.ViewModels;
+using System.Linq;
+using Microsoft.AspNetCore.Authorization;
 
 namespace WebApp_GozenBv.Controllers
 {
@@ -18,44 +20,45 @@ namespace WebApp_GozenBv.Controllers
 
 
         #region register
+        [Authorize]
         [HttpGet]
         public IActionResult Register()
         {
             return View();
         }
+
+        [Authorize]
         [HttpPost]
         public async Task<IActionResult> RegisterAsync(RegisterViewModel user)
         {
             if (ModelState.IsValid)
             {
-                //TESTEN OF EMAIL AL BESTAAT
                 if (await UserExistAsync(user))
                 {
                     ModelState.AddModelError("", "Email adres is al geregistreerd");
                     return View(user);
                 }
 
-
                 if (!user.Password.Equals(user.ConfirmPassword))
                 {
-                    ModelState.AddModelError("", "wachtwooord moet identiek zijn!"); // compare in registerviewmodel zelfde 
+                    ModelState.AddModelError("", "wachtwoord moet identiek zijn!");
 
                 }
                 else
                 {
-                    //var result = await RegisterUserAsync(user);
-                    //if (result.Succeeded)
-                    //{
-                    //    return View("RegistrationCompleted", result.CreatedUser);
-                    //}
-                    //else
-                    //{
-                    //    foreach (string error in result.Errors)
+                    var result = await RegisterUserAsync(user);
+                    if (result.Succeeded)
+                    {
+                        return View("RegistrationCompleted", result.CreatedUser);
+                    }
+                    else
+                    {
+                        foreach (string error in result.Errors)
 
-                    //        ModelState.AddModelError("", error);
-                    //    return View(user);
+                            ModelState.AddModelError("", error);
+                        return View(user);
 
-                    //}
+                    }
                     //var identityUser = new IdentityUser { UserName = user.Email, Email = user.Email };
                     //await _userManager.CreateAsync(identityUser, user.Password);
                     ////registration process
@@ -71,34 +74,34 @@ namespace WebApp_GozenBv.Controllers
         }
 
         // Errors worden weergeven door dit!! (password) 
-        //private async Task<RegisterResult> RegisterUserAsync(RegisterViewModel user)
-        //{
-        //    var registerResult = new RegisterResult();
-        //    var identityUser = new IdentityUser { UserName = user.Email, Email = user.Email };
-        //    var result = await _userManager.CreateAsync(identityUser, user.Password);
-        //    if (result.Succeeded)
-        //    {
-        //        var createdUser = new CreatedUser { CreationDate = DateTime.Now, IdentityUser = identityUser };
-        //        registerResult.Succeeded = true;
-        //        registerResult.CreatedUser = createdUser;
-        //    }
-        //    else
-        //    {
-        //        if (result.Errors.Count() > 0)
-        //        {
-        //            foreach (var error in result.Errors)
-        //            {
-        //                registerResult.Errors.Add(error.Description);
-        //            }
-        //        }
-        //        else
-        //        {
-        //            registerResult.Errors.Add("Er is een probleem om de gebruiker te registreren!");
-        //        }
+        private async Task<RegisterResult> RegisterUserAsync(RegisterViewModel user)
+        {
+            var registerResult = new RegisterResult();
+            var identityUser = new IdentityUser { UserName = user.Email, Email = user.Email };
+            var result = await _userManager.CreateAsync(identityUser, user.Password);
+            if (result.Succeeded)
+            {
+                var createdUser = new CreatedUser { CreationDate = DateTime.Now, IdentityUser = identityUser };
+                registerResult.Succeeded = true;
+                registerResult.CreatedUser = createdUser;
+            }
+            else
+            {
+                if (result.Errors.Any())
+                {
+                    foreach (var error in result.Errors)
+                    {
+                        registerResult.Errors.Add(error.Description);
+                    }
+                }
+                else
+                {
+                    registerResult.Errors.Add("Er is een probleem om de gebruiker te registreren!");
+                }
 
-        //    }
-        //    return registerResult;
-        //}
+            }
+            return registerResult;
+        }
 
         // zoeken of email al bestaat!!
         private async Task<bool> UserExistAsync(RegisterViewModel user)
