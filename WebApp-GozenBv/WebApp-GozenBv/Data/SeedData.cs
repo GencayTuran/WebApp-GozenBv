@@ -11,23 +11,23 @@ namespace WebApp_GozenBv.Data
 {
     public static class SeedData
     {
-        private static DataDbContext context;
+        private static DataDbContext _context;
         public static void EnsurePopulated(IApplicationBuilder app)
         {
-            context = app
+            _context = app
                 .ApplicationServices.CreateScope()
                 .ServiceProvider.GetRequiredService<DataDbContext>();
 
-            if (!context.Stock.Any())
+            if (!_context.Stock.Any())
             {
-                context.Stock.AddRange(GetStock());
-                context.SaveChanges();
-                context.Firmas.AddRange(GetFirmas());
-                context.SaveChanges();
-                context.Employees.AddRange(GetEmployees());
-                context.SaveChanges();
-                context.WagenPark.AddRange(GetWagenPark());
-                context.SaveChanges();
+                _context.Stock.AddRange(GetStock());
+                _context.SaveChanges();
+                _context.Firmas.AddRange(GetFirmas());
+                _context.SaveChanges();
+                _context.Employees.AddRange(GetEmployees());
+                _context.SaveChanges();
+                _context.WagenPark.AddRange(GetWagenPark());
+                _context.SaveChanges();
             }
 
         }
