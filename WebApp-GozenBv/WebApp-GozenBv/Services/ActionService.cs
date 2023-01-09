@@ -12,52 +12,56 @@ namespace WebApp_GozenBv.Services
         {
             switch (status)
             {
-                case StockLogStatusConst.Complete:
+                case StockLogStatusConst.Completed:
                     actions.Add(new ActionViewModel
                     {
                         Action = "Details",
                         RouteId = logCode,
                     });
                     break;
+
                 case StockLogStatusConst.AwaitingReturn:
-                    GetGroupActions(id, logCode);
+                    actions.Add(new ActionViewModel
+                    {
+                        Action = "Edit",
+                        RouteId = id.ToString(),
+                    });
+                    actions.Add(new ActionViewModel
+                    {
+                        Action = "Details",
+                        RouteId = logCode,
+                    });
+                    actions.Add(new ActionViewModel
+                    {
+                        Action = "CompleteReturn",
+                        RouteId = logCode,
+                    });
+                    actions.Add(new ActionViewModel
+                    {
+                        Action = "Delete",
+                        RouteId = id.ToString(),
+                    });
                     break;
+
                 case StockLogStatusConst.DamagedAwaitingAction:
                     actions.Add(new ActionViewModel
                     {
                         Action = "Details",
                         RouteId = logCode
                     });
+                    actions.Add(new ActionViewModel
+                    {
+                        Action = "CompleteDamaged",
+                        RouteId = logCode
+                    });
+
                     break;
+
                 default:
                     //notfound
                     break;
             }
-                    return actions;
-        }
-
-        private void GetGroupActions(int id, string logCode)
-        {
-            actions.Add(new ActionViewModel
-            {
-                Action = "Edit",
-                RouteId = id.ToString(),
-            });
-            actions.Add(new ActionViewModel
-            {
-                Action = "Details",
-                RouteId = logCode,
-            });
-            actions.Add(new ActionViewModel
-            {
-                Action = "ToComplete",
-                RouteId = logCode,
-            });
-            actions.Add(new ActionViewModel
-            {
-                Action = "Delete",
-                RouteId = id.ToString(),
-            });
+            return actions;
         }
     }
 }

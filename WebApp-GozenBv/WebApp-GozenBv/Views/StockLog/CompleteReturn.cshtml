@@ -1,12 +1,13 @@
 ﻿@model WebApp_GozenBv.ViewModels.StockLogDetailVM
 
 @{
-    ViewData["Title"] = "Details";
+    ViewData["Title"] = "Complete?";
 }
 
-<h1>Details</h1>
+<h1>Complete?</h1>
 
-<h4>StockLog</h4>
+@*<h3>Which products are damaged?</h3>*@
+<h4>Complete StockLog</h4>
 <hr />
 <table class="table">
     <thead>
@@ -31,27 +32,40 @@
             <th>@Html.DisplayNameFor(model => model.StockLogItem.StockId)</th>
             <th>@Html.DisplayNameFor(model => model.StockLogItem)</th>
             <th>@Html.DisplayNameFor(model => model.StockLogItem.StockAmount)</th>
-            <th>@Html.DisplayNameFor(model => model.StockLogItem.DamagedAmount)</th>
-            <th class="amounts">@Html.DisplayNameFor(model => model.StockLogItem.RepairedAmount)</th>
-            <th class="amounts">@Html.DisplayNameFor(model => model.StockLogItem.DeletedAmount)</th>
+            <th class="damagedView">Damaged?</th>
         </tr>
     </thead>
     <tbody>
         @foreach (var item in Model.StockLogItems)
-        { 
-            <tr>
-                <td>@item.StockId</td>
+        {
+            <tr class="stockLogItemRow">
+                <td>
+                    <p class="labelStockId">
+                        @item.StockId
+                    </p>
+                </td>
                 <td>@item.ProductNameBrand</td>
-                <td>@item.StockAmount</td>
-                <td>@item.DamagedAmount</td>
-                <td class="amounts">@item.RepairedAmount</td>
-                <td class="amounts">@item.DeletedAmount</td>
+                <td>
+                    <p class="labelAmount">@item.StockAmount</p>
+                    <input class="inputAmount damagedView" type="number" value="@item.StockAmount" />
+                </td>
+                <td class="damagedView"><input class="checkRow" type="checkbox" /></td>
             </tr>
         }
     </tbody>
 </table>
+
 <div>
-    <a asp-action="Index">Back to List</a>
+    <input id="chkDamaged" type="checkbox" />
+    <p>Damaged items?</p>
 </div>
-    <input id="status" type="hidden" value="@Model.Status" />
-    <script src="~/js/StockLog_Details.js"></script>
+
+<form asp-action="CompleteReturn">
+    @*<input type="hidden" asp-for=""/>*@
+    <input type="hidden" asp-for="LogCode" />
+    <input id="damagedStockResult" type="hidden" asp-for="DamagedStock" />
+    <input id="btnSubmit" type="submit" value="Complete" class="btn btn-primary" /> |
+    <a asp-action="Index">Back to List</a>
+</form>
+
+<script src="~/js/StockLog_CompleteReturn.js" />
