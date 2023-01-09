@@ -14,6 +14,7 @@
             <th scope="col">@Html.DisplayNameFor(model => model.StockLogDate)</th>
             <th scope="col">@Html.DisplayNameFor(model => model.StockLog.Employee)</th>
             <th scope="col">@Html.DisplayNameFor(model => model.LogCode)</th>
+            <th scope="col">@Html.DisplayNameFor(model => model.Status)</th>
         </tr>
     </thead>
     <tbody>
@@ -21,6 +22,7 @@
             <td>@Html.DisplayFor(model => model.StockLogDate)</td>
             <td>@Html.DisplayFor(model => model.EmployeeFullNameFirma)</td>
             <td>@Html.DisplayFor(model => model.LogCode)</td>
+            <status-color status="@Model.Status"></status-color>
         </tr>
     </tbody>
     <thead>
@@ -32,8 +34,8 @@
             <th>@Html.DisplayNameFor(model => model.StockLogItem)</th>
             <th>@Html.DisplayNameFor(model => model.StockLogItem.StockAmount)</th>
             <th>@Html.DisplayNameFor(model => model.StockLogItem.DamagedAmount)</th>
-            <th class="amounts">@Html.DisplayNameFor(model => model.StockLogItem.RepairedAmount)</th>
-            <th class="amounts">@Html.DisplayNameFor(model => model.StockLogItem.DeletedAmount)</th>
+            <th id="thRepaired" class="amounts">@Html.DisplayNameFor(model => model.StockLogItem.RepairedAmount)</th>
+            <th id="thDeleted" class="amounts">@Html.DisplayNameFor(model => model.StockLogItem.DeletedAmount)</th>
         </tr>
     </thead>
     <tbody>
@@ -44,14 +46,16 @@
                 <td>@item.ProductNameBrand</td>
                 <td>@item.StockAmount</td>
                 <td>@item.DamagedAmount</td>
-                <td class="amounts">@item.RepairedAmount</td>
-                <td class="amounts">@item.DeletedAmount</td>
+                <td id="tdRepaired" class="amounts">@item.RepairedAmount</td>
+                <td id="tdDeleted" class="amounts">@item.DeletedAmount</td>
             </tr>
         }
     </tbody>
 </table>
-<div>
+<div class="d-flex flex-column">
     <a asp-action="Index">Back to List</a>
+    <a id="linkCompleteDamaged" asp-action="CompleteDamaged" asp-route-id="@Model.LogCode">Complete Damaged</a>
+    <a id="linkCompleteReturn" asp-action="CompleteReturn" asp-route-id="@Model.LogCode">Complete Return</a>
 </div>
-    <input id="status" type="hidden" value="@Model.Status" />
+    <input id="statusId" type="hidden" value="@Model.Status" />
     <script src="~/js/StockLog_Details.js"></script>

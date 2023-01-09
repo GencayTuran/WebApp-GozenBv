@@ -7,13 +7,13 @@ using WebApp_GozenBv.Models;
 
 namespace WebApp_GozenBv.Helpers
 {
-    public class StockHelper
+    public static class StockHelper
     {
         public static async Task<Stock> UpdateStockQty(int stockId, int amount, DataDbContext context)
         {
             var stock = await context.Stock.FindAsync(stockId);
 
-            if (stock != null)
+            if (stock != null || amount == 0)
             {
                 if (amount < 0)
                 {

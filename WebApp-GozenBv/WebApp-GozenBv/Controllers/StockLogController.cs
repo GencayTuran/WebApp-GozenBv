@@ -47,7 +47,7 @@ namespace WebApp_GozenBv.Controllers
                 return NotFound();
             }
 
-            var stockLogDetailVM = GetStockLogDetails(logCode, null);
+            var stockLogDetailVM = GetStockLogDetails(logCode, false);
 
             return View(stockLogDetailVM);
         }
@@ -236,7 +236,7 @@ namespace WebApp_GozenBv.Controllers
                 return NotFound();
             }
 
-            var stockLogDetailVM = GetStockLogDetails(logCode, null);
+            var stockLogDetailVM = GetStockLogDetails(logCode, false);
 
             return View(stockLogDetailVM);
         }
@@ -247,12 +247,13 @@ namespace WebApp_GozenBv.Controllers
         public async Task<IActionResult> CompleteReturn(StockLogDetailVM stockLogDetailVM)
         {
             //TODO: alternative modelstate valid check needed
+            string logCode = stockLogDetailVM.LogCode;
 
             //Status COMPLETE
             if (stockLogDetailVM.DamagedStock == null)
             {
                 var stockLog = await _context.StockLogs
-                .Where(s => s.LogCode == stockLogDetailVM.LogCode)
+                .Where(s => s.LogCode == logCode)
                 .FirstOrDefaultAsync();
                 var stockLogItems = GetItemsForStockLog(stockLog);
 
@@ -273,41 +274,42 @@ namespace WebApp_GozenBv.Controllers
             else //Status DAMAGED
             {
                 StockLog stockLog = _context.StockLogs
-                        .FirstOrDefault(s => s.LogCode == stockLogDetailVM.LogCode);
+                        .FirstOrDefault(s => s.LogCode == logCode);
 
                 if (stockLog == null)
                 {
                     return NotFound();
                 }
 
-                stockLog.Status = StockLogStatusConst.DamagedAwaitingAction;
-                stockLog.Damaged = true;
-                _context.Update(stockLog);
-                _context.SaveChanges();
-
                 string[] data = stockLogDetailVM.DamagedStock.Split(","); //id, amount 
                 int[] damagedStock = Array.ConvertAll(data, d => int.Parse(d));
 
-                var stockLogItems = _context.StockLogItems.Where(s => s.LogCode == stockLogDetailVM.LogCode);
+                var stockLogItems = _context.StockLogItems.Where(s => s.LogCode == logCode);
 
                 //update StockLogItems
                 int x = 0;
                 foreach (var item in stockLogItems)
                 {
-                    if (x < damagedStock.Length)
+                    if (x < damagedStock.Length && item.StockId == damagedStock[x])
                     {
-                        if (item.StockId == damagedStock[x])
-                        {
                             x++;
                             item.DamagedAmount = damagedStock[x];
+                            //count back (seperate) the not-damaged items
+                            var notDamagedAmount = item.StockAmount - damagedStock[x];
+                            await StockHelper.UpdateStockQty(item.StockId, notDamagedAmount, _context);
                             _context.Update(item);
                             x++;
-                        }
+                    }
+                    else
+                    {
+                        await StockHelper.UpdateStockQty(item.StockId, item.StockAmount, _context);
                     }
                 }
+                stockLog.Status = StockLogStatusConst.DamagedAwaitingAction;
+                stockLog.Damaged = true;
+                _context.Update(stockLog);
                 await _context.SaveChangesAsync();
 
-                string logCode = stockLogDetailVM.LogCode;
 
                 //TODO: routeValue could be more readable
                 return RedirectToAction("Details", new RouteValueDictionary(
@@ -325,7 +327,7 @@ namespace WebApp_GozenBv.Controllers
                 return NotFound();
             }
 
-            var stockLogDetailVM = GetStockLogDetails(logCode, null);
+            var stockLogDetailVM = GetStockLogDetails(logCode, true);
 
             return View(stockLogDetailVM);
         }
@@ -343,10 +345,6 @@ namespace WebApp_GozenBv.Controllers
                 return NotFound();
             }
 
-            stockLog.Status = StockLogStatusConst.Completed;
-            _context.Update(stockLog);
-            _context.SaveChanges();
-
             string[] data = stockLogDetail.DamagedStock.Split(","); //id, repaired, deleted 
             int[] damagedStock = Array.ConvertAll(data, d => int.Parse(d));
 
@@ -361,15 +359,16 @@ namespace WebApp_GozenBv.Controllers
                     {
                         x++;
                         item.RepairedAmount = damagedStock[x];
-                        //update stock
+                        await StockHelper.UpdateStockQty(item.StockId, damagedStock[x], _context);
                         x++;
                         item.DeletedAmount = damagedStock[x];
-                        //update stock (keep removed actually)
                         _context.Update(item);
                     }
                 }
 
             }
+            stockLog.Status = StockLogStatusConst.Completed;
+            _context.Update(stockLog);
             await _context.SaveChangesAsync();
 
 
@@ -385,16 +384,26 @@ namespace WebApp_GozenBv.Controllers
             return _context.StockLogs.Any(e => e.Id == id);
         }
 
-        private StockLogDetailVM GetStockLogDetails(string logCode, DateTime? completionDate)
+        private StockLogDetailVM GetStockLogDetails(string logCode, bool damagedOnly)
         {
             StockLog stockLog = _context.StockLogs
                 .Include(s => s.Employee)
                 .Include(s => s.Employee.Firma)
                 .FirstOrDefault(s => s.LogCode == logCode);
 
-            List<StockLogItem> stockLogItems = _context.StockLogItems
-                //.Include(s => s.Stock)
+            List<StockLogItem> stockLogItems;
+            if (!damagedOnly)
+            {
+                stockLogItems = _context.StockLogItems
                 .Where(s => s.LogCode == logCode).ToList();
+            }
+            else
+            {
+                stockLogItems = _context.StockLogItems
+                    .Where(s => s.LogCode == logCode)
+                    .Where(s => s.DamagedAmount > 0)
+                    .ToList();
+            }
 
             List<StockLogItem> lstStockLogItems = new List<StockLogItem>();
             foreach (var item in stockLogItems)
@@ -415,7 +424,7 @@ namespace WebApp_GozenBv.Controllers
                 EmployeeFullNameFirma = (stockLog.Employee.Name + " " + stockLog.Employee.Surname + " - " + stockLog.Employee.Firma.FirmaName).ToUpper(),
                 LogCode = stockLog.LogCode, //need to show?
                 StockLogItems = stockLogItems,
-                CompletionDate = completionDate,
+                CompletionDate = stockLog.CompletionDate,
                 Status = stockLog.Status,
             };
 
