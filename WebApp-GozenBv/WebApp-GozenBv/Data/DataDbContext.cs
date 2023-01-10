@@ -18,6 +18,9 @@ namespace WebApp_GozenBv.Data
         public DbSet<WagenMaintenance> WagenMaintenances { get; set; }
         public DbSet<Firma> Firmas { get; set; }
         public DbSet<StockLogItem> StockLogItems { get; set; }
+        public DbSet<UserLog> UserLogs { get; set; }
+        public DbSet<User> Users { get; set; }
+
         
     }
 }
