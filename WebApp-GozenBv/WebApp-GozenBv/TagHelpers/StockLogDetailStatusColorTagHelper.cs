@@ -8,9 +8,17 @@ namespace WebApp_GozenBv.TagHelpers
     public class StockLogDetailStatusColorTagHelper : TagHelper
     {
         public int Status { get; set; }
+        public string View { get; set; }
         public override void Process(TagHelperContext context, TagHelperOutput output)
         {
-            output.TagName = "td";
+            if (View == "Index")
+            {
+                output.TagName = "tr";
+            }
+            else if (View == "Details")
+            {
+                output.TagName = "td";
+            }
             var bgColor = "";
 
             switch (Status)
