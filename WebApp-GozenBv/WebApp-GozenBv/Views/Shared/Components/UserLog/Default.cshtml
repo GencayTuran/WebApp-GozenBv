@@ -1,7 +1,7 @@
-﻿@model List<WebApp_GozenBv.ViewModels>
+﻿@model List<WebApp_GozenBv.ViewModels.UserLogViewModel>
 
 
-        @foreach (var log in Model)
-        {
-            //log here
-        }
+@foreach (var log in Model)
+{
+    <p>@log.UserName @log.Action @log.Controller at @log.LogDate <a>link</a></p>
+}

@@ -12,17 +12,20 @@ using WebApp_GozenBv.Constants;
 using WebApp_GozenBv.Data;
 using WebApp_GozenBv.Helpers;
 using WebApp_GozenBv.Models;
+using WebApp_GozenBv.Services;
 using WebApp_GozenBv.ViewModels;
 
 namespace WebApp_GozenBv.Controllers
 {
-    [Authorize]
+    //[Authorize]
     public class StockLogController : Controller
     {
         private readonly DataDbContext _context;
-        public StockLogController(DataDbContext context)
+        private readonly IUserLogService _userLogService;
+        public StockLogController(DataDbContext context, IUserLogService userLogService)
         {
             _context = context;
+            _userLogService = userLogService;
         }
 
         // GET: StockLog
@@ -146,6 +149,8 @@ namespace WebApp_GozenBv.Controllers
 
                 _context.Add(stockLog);
                 await _context.SaveChangesAsync();
+
+                _userLogService.Create(1, ControllerConst.StockLog, ActionsConst.Create, logCode);
 
                 return RedirectToAction(nameof(Index));
             }

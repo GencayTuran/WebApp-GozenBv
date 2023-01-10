@@ -6,6 +6,7 @@
         public const int Delete = 1;
         public const int Undo = 2;
         public const int Edit = 3;
+        //public const int Index = 4;
 
         public const int CompleteReturn = 10;
         public const int CompleteDamaged = 11;

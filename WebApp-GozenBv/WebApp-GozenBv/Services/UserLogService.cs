@@ -35,26 +35,17 @@ namespace WebApp_GozenBv.Services
             _context.SaveChanges();
         }
 
-        public async Task<List<UserLog>> GetLogs()
+        public async Task<List<UserLogViewModel>> GetLogs()
         {
-            var userlogs = _context.UserLogs
+            var userLogs = _context.UserLogs
                 .Include(u => u.User)
                 .ToList();
+
             List<UserLogViewModel> userlogsViewModel = new();
 
-            foreach (var log in userlogs)
-            {
-                userlogsViewModel.Add(new UserLogViewModel
-                {
-                    UserName = log.User.Name,
-                    Action = SetAction(log.Action),
-                    Controller = SetController(log.Controller),
-                    EntityId = log.EntityId,
-                    LogDate = log.LogDate
-                });
-            }
+            var userLogsViewModel = SetViewModel(userLogs);
 
-            return userlogs;
+            return userLogsViewModel;
         }
 
         public async Task<List<UserLogViewModel>> GetLogsByController(int controller)
@@ -68,10 +59,11 @@ namespace WebApp_GozenBv.Services
             return userLogsViewModel;
         }
 
-        public async Task<List<UserLogViewModel>> GetLogsByEntity(string entityId)
+        public async Task<List<UserLogViewModel>> GetLogsByEntity(string entityId, int controller)
         {
             var userLogs = _context.UserLogs
                 .Where(x => x.EntityId == entityId)
+                .Where(x => x.Controller == controller)
                 .ToList();
 
             var userLogsViewModel = SetViewModel(userLogs);
@@ -154,30 +146,25 @@ namespace WebApp_GozenBv.Services
                     controller = "Stock";
                     break;
                 case ControllerConst.StockLog:
-                    controller = "Stocklogs";
+                    controller = "Stocklog";
                     break;
                 case ControllerConst.Employee:
-                    controller = "Employees";
+                    controller = "Employee";
                     break;
                 case ControllerConst.Firma:
-                    controller = "Firmas";
+                    controller = "Firma";
                     break;
                 case ControllerConst.WagenPark:
                     controller = "Wagenpark";
                     break;
                 case ControllerConst.WagenMaintenance:
-                    controller = "Wagenmaintenances";
+                    controller = "Wagenmaintenance";
                     break;
                 default:
                     break;
             }
 
             return controller;
-        }
-
-        Task<List<UserLogViewModel>> IUserLogService.GetLogs()
-        {
-            throw new NotImplementedException();
         }
     }
     
