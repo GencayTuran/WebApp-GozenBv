@@ -1,6 +1,6 @@
 ﻿namespace WebApp_GozenBv.Constants
 {
-    public static class ActionConst
+    public static class ActionsConst
     {
         public const int Create = 0;
         public const int Delete = 1;
