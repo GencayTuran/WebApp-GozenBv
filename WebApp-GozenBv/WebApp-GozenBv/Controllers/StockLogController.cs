@@ -5,7 +5,6 @@ using System.Threading.Tasks;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.Rendering;
-using Microsoft.AspNetCore.Mvc.TagHelpers;
 using Microsoft.AspNetCore.Routing;
 using Microsoft.EntityFrameworkCore;
 using WebApp_GozenBv.Constants;
@@ -87,7 +86,6 @@ namespace WebApp_GozenBv.Controllers
             }
 
             //stock
-
             var queryStock = from s in _context.Stock
                              select new { s.Id, s.ProductName, s.ProductBrand, s.Quantity };
 
@@ -103,9 +101,6 @@ namespace WebApp_GozenBv.Controllers
 
         }
 
-        // POST: StockLog/Create
-        // To protect from overposting attacks, enable the specific properties you want to bind to, for 
-        // more details, see http://go.microsoft.com/fwlink/?LinkId=317598.
         [HttpPost]
         [ValidateAntiForgeryToken]
         public async Task<IActionResult> Create(StockLogCreateVM stockLogCreateVM)
@@ -150,7 +145,7 @@ namespace WebApp_GozenBv.Controllers
                 _context.Add(stockLog);
                 await _context.SaveChangesAsync();
 
-                _userLogService.Create(1, ControllerConst.StockLog, ActionsConst.Create, logCode);
+                await _userLogService.CreateAsync(ControllerConst.StockLog, ActionsConst.Create, logCode);
 
                 return RedirectToAction(nameof(Index));
             }
@@ -167,7 +162,7 @@ namespace WebApp_GozenBv.Controllers
             }
         }
 
-        // GET: StockLog/Edit/5
+        [HttpGet]
         public async Task<IActionResult> Edit(int? id)
         {
             if (id == null)
@@ -184,9 +179,6 @@ namespace WebApp_GozenBv.Controllers
             return View(stockLog);
         }
 
-        // POST: StockLog/Edit/5
-        // To protect from overposting attacks, enable the specific properties you want to bind to, for 
-        // more details, see http://go.microsoft.com/fwlink/?LinkId=317598.
         [HttpPost]
         [ValidateAntiForgeryToken]
         public async Task<IActionResult> Edit(int id, [Bind("Id,StockLogDate,Action,EmployeeId,LogCode")] StockLog stockLog)

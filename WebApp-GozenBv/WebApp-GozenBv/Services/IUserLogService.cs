@@ -7,7 +7,7 @@ namespace WebApp_GozenBv.Services
 {
     public interface IUserLogService
     {
-        void Create(int userId, int controller, int action, string entityId);
+        Task CreateAsync(int controller, int action, string entityId);
         Task<List<UserLogViewModel>> GetLogs(); //all logs
         Task<List<UserLogViewModel>> GetLogsByEntity(string entityId, int controller); //per entity per controller (details)
         Task<List<UserLogViewModel>> GetLogsByController(int controller); //per index

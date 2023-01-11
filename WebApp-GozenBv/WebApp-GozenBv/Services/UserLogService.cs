@@ -1,5 +1,6 @@
 ﻿using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
+using Microsoft.Graph;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -9,19 +10,27 @@ using WebApp_GozenBv.Data;
 using WebApp_GozenBv.Models;
 using WebApp_GozenBv.ViewModels;
 
+
 namespace WebApp_GozenBv.Services
 {
     public class UserLogService : IUserLogService
     {
         private readonly DataDbContext _context;
+        private readonly IUserService _userService;
+        private readonly GraphServiceClient _graphServiceClient;
 
-        public UserLogService(DataDbContext context)
+        public UserLogService(DataDbContext context, IUserService userService, GraphServiceClient graphServiceClient)
         {
             _context = context;
+            _userService = userService;
+            _graphServiceClient = graphServiceClient;
         }
 
-        public void Create(int userId, int controller, int action, string entityId)
+        public async Task CreateAsync(int controller, int action, string entityId)
         {
+            var user = await _graphServiceClient.Me.Request().GetAsync();
+            var userId = _userService.GetCurrentUserId(user.Mail, user.DisplayName);
+
             var userLog = new UserLog
             {
                 UserId = userId,
