@@ -1,17 +1,16 @@
-﻿using Microsoft.AspNetCore.Razor.Runtime.TagHelpers;
-using Microsoft.AspNetCore.Razor.TagHelpers;
+﻿using Microsoft.AspNetCore.Razor.TagHelpers;
 using WebApp_GozenBv.Constants;
 
 namespace WebApp_GozenBv.TagHelpers
 {
     // You may need to install the Microsoft.AspNetCore.Razor.Runtime package into your project
-    [HtmlTargetElement("stocklog")]
-    public class StockLogIndexTableRowTH : TagHelper
+    [HtmlTargetElement("status-color")]
+    public class StockLogDetailStatusColorTagHelper : TagHelper
     {
         public int Status { get; set; }
         public override void Process(TagHelperContext context, TagHelperOutput output)
         {
-            output.TagName = "tr";
+            output.TagName = "td";
             var bgColor = "";
 
             switch (Status)
@@ -33,4 +32,5 @@ namespace WebApp_GozenBv.TagHelpers
             output.Attributes.SetAttribute("class", bgColor);
         }
     }
+
 }

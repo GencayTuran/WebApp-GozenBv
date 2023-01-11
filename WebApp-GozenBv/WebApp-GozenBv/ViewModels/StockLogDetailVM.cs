@@ -20,6 +20,7 @@ namespace WebApp_GozenBv.ViewModels
         public StockLog StockLog { get; set; }
         public StockLogItem StockLogItem { get; set; }
         public string DamagedStock { get; set; }
+        public int Status { get; set; }
 
     }
 }
