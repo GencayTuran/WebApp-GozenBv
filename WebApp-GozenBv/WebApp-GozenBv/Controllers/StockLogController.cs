@@ -145,7 +145,7 @@ namespace WebApp_GozenBv.Controllers
                 _context.Add(stockLog);
                 await _context.SaveChangesAsync();
 
-                await _userLogService.CreateAsync(ControllerConst.StockLog, ActionsConst.Create, logCode);
+                await _userLogService.CreateAsync(ControllerConst.StockLog, ActionConst.Create, logCode);
 
                 return RedirectToAction(nameof(Index));
             }

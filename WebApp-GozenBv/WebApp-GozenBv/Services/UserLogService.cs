@@ -114,28 +114,28 @@ namespace WebApp_GozenBv.Services
 
             switch (dataAction)
             {
-                case ActionsConst.Create:
+                case ActionConst.Create:
                     action = "created";
                     break;
-                case ActionsConst.Delete:
+                case ActionConst.Delete:
                     action = "deleted";
                     break;
-                case ActionsConst.CompleteDamaged:
+                case ActionConst.CompleteDamaged:
                     action = "completed damaged";
                     break;
-                case ActionsConst.CompleteReturn:
+                case ActionConst.CompleteReturn:
                     action = "completed return";
                     break;
-                case ActionsConst.Edit:
+                case ActionConst.Edit:
                     action = "edited";
                     break;
-                case ActionsConst.Login:
+                case ActionConst.Login:
                     action = "logged in";
                     break;
-                case ActionsConst.Logout:
+                case ActionConst.Logout:
                     action = "logged out";
                     break;
-                case ActionsConst.Undo:
+                case ActionConst.Undo:
                     action = "did undo";
                     break;
                 default:
