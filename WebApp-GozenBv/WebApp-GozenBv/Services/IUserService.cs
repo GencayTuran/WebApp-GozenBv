@@ -1,7 +1,10 @@
-﻿namespace WebApp_GozenBv.Services
+﻿using System.Threading.Tasks;
+
+namespace WebApp_GozenBv.Services
 {
     public interface IUserService
     {
-        int GetCurrentUserId(string userMail, string userName);
+        int GetCurrentUserId(Microsoft.Graph.User mgUser);
+        Task<Microsoft.Graph.User> GetCurrentUser();
     }
 }

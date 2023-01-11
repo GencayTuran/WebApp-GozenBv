@@ -17,19 +17,17 @@ namespace WebApp_GozenBv.Services
     {
         private readonly DataDbContext _context;
         private readonly IUserService _userService;
-        private readonly GraphServiceClient _graphServiceClient;
 
-        public UserLogService(DataDbContext context, IUserService userService, GraphServiceClient graphServiceClient)
+        public UserLogService(DataDbContext context, IUserService userService)
         {
             _context = context;
             _userService = userService;
-            _graphServiceClient = graphServiceClient;
         }
 
         public async Task CreateAsync(int controller, int action, string entityId)
         {
-            var user = await _graphServiceClient.Me.Request().GetAsync();
-            var userId = _userService.GetCurrentUserId(user.Mail, user.DisplayName);
+            var user = await _userService.GetCurrentUser();
+            var userId = _userService.GetCurrentUserId(user);
 
             var userLog = new UserLog
             {
