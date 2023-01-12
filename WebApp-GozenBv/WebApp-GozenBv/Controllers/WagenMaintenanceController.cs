@@ -6,8 +6,10 @@ using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.Rendering;
 using Microsoft.EntityFrameworkCore;
+using WebApp_GozenBv.Constants;
 using WebApp_GozenBv.Data;
 using WebApp_GozenBv.Models;
+using WebApp_GozenBv.Services;
 
 namespace WebApp_GozenBv.Controllers
 {
@@ -15,19 +17,21 @@ namespace WebApp_GozenBv.Controllers
     public class WagenMaintenanceController : Controller
     {
         private readonly DataDbContext _context;
+        private readonly IUserLogService _userLogService;
 
-        public WagenMaintenanceController(DataDbContext context)
+        public WagenMaintenanceController(DataDbContext context, IUserLogService userLogService)
         {
             _context = context;
+            _userLogService = userLogService;
         }
 
-        // GET: WagenMaintenance
+        [HttpGet]
         public async Task<IActionResult> Index()
         {
             return View(await _context.WagenMaintenances.ToListAsync());
         }
 
-        // GET: WagenMaintenance/Details/5
+        [HttpGet]
         public async Task<IActionResult> Details(int? id)
         {
             if (id == null)
@@ -45,15 +49,12 @@ namespace WebApp_GozenBv.Controllers
             return View(wagenMaintenance);
         }
 
-        // GET: WagenMaintenance/Create
+        [HttpGet]
         public IActionResult Create()
         {
             return View();
         }
 
-        // POST: WagenMaintenance/Create
-        // To protect from overposting attacks, enable the specific properties you want to bind to, for 
-        // more details, see http://go.microsoft.com/fwlink/?LinkId=317598.
         [HttpPost]
         [ValidateAntiForgeryToken]
         public async Task<IActionResult> Create([Bind("Id,MaintenanceDate,MaintenanceNotes,WagenId")] WagenMaintenance wagenMaintenance)
@@ -62,12 +63,15 @@ namespace WebApp_GozenBv.Controllers
             {
                 _context.Add(wagenMaintenance);
                 await _context.SaveChangesAsync();
+
+                await _userLogService.CreateAsync(ControllerConst.WagenMaintenance, ActionConst.Create, wagenMaintenance.Id.ToString());
+
                 return RedirectToAction(nameof(Index));
             }
             return View(wagenMaintenance);
         }
 
-        // GET: WagenMaintenance/Edit/5
+        [HttpGet]
         public async Task<IActionResult> Edit(int? id)
         {
             if (id == null)
@@ -83,9 +87,6 @@ namespace WebApp_GozenBv.Controllers
             return View(wagenMaintenance);
         }
 
-        // POST: WagenMaintenance/Edit/5
-        // To protect from overposting attacks, enable the specific properties you want to bind to, for 
-        // more details, see http://go.microsoft.com/fwlink/?LinkId=317598.
         [HttpPost]
         [ValidateAntiForgeryToken]
         public async Task<IActionResult> Edit(int id, [Bind("Id,MaintenanceDate,MaintenanceNotes,WagenId")] WagenMaintenance wagenMaintenance)
@@ -101,6 +102,7 @@ namespace WebApp_GozenBv.Controllers
                 {
                     _context.Update(wagenMaintenance);
                     await _context.SaveChangesAsync();
+                    await _userLogService.CreateAsync(ControllerConst.WagenMaintenance, ActionConst.Edit, wagenMaintenance.Id.ToString());
                 }
                 catch (DbUpdateConcurrencyException)
                 {
@@ -118,7 +120,7 @@ namespace WebApp_GozenBv.Controllers
             return View(wagenMaintenance);
         }
 
-        // GET: WagenMaintenance/Delete/5
+        [HttpGet]
         public async Task<IActionResult> Delete(int? id)
         {
             if (id == null)
@@ -136,7 +138,6 @@ namespace WebApp_GozenBv.Controllers
             return View(wagenMaintenance);
         }
 
-        // POST: WagenMaintenance/Delete/5
         [HttpPost, ActionName("Delete")]
         [ValidateAntiForgeryToken]
         public async Task<IActionResult> DeleteConfirmed(int id)
@@ -144,6 +145,9 @@ namespace WebApp_GozenBv.Controllers
             var wagenMaintenance = await _context.WagenMaintenances.FindAsync(id);
             _context.WagenMaintenances.Remove(wagenMaintenance);
             await _context.SaveChangesAsync();
+
+            await _userLogService.CreateAsync(ControllerConst.WagenMaintenance, ActionConst.Create, wagenMaintenance.Id.ToString());
+
             return RedirectToAction(nameof(Index));
         }
 

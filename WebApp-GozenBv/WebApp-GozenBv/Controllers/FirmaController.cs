@@ -6,8 +6,11 @@ using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.Rendering;
 using Microsoft.EntityFrameworkCore;
+using WebApp_GozenBv.Constants;
 using WebApp_GozenBv.Data;
 using WebApp_GozenBv.Models;
+using WebApp_GozenBv.Services;
+using WebApp_GozenBv.ViewModels;
 
 namespace WebApp_GozenBv.Controllers
 {
@@ -15,10 +18,12 @@ namespace WebApp_GozenBv.Controllers
     public class FirmaController : Controller
     {
         private readonly DataDbContext _context;
+        private readonly IUserLogService _userLogService;
 
-        public FirmaController(DataDbContext context)
+        public FirmaController(DataDbContext context, IUserLogService userLogService)
         {
             _context = context;
+            _userLogService = userLogService;
         }
 
         // GET: Firma
@@ -45,15 +50,12 @@ namespace WebApp_GozenBv.Controllers
             return View(firma);
         }
 
-        // GET: Firma/Create
+        [HttpGet]
         public IActionResult Create()
         {
             return View();
         }
 
-        // POST: Firma/Create
-        // To protect from overposting attacks, enable the specific properties you want to bind to, for 
-        // more details, see http://go.microsoft.com/fwlink/?LinkId=317598.
         [HttpPost]
         [ValidateAntiForgeryToken]
         public async Task<IActionResult> Create([Bind("Id,FirmaName")] Firma firma)
@@ -62,12 +64,14 @@ namespace WebApp_GozenBv.Controllers
             {
                 _context.Add(firma);
                 await _context.SaveChangesAsync();
+                
+                await _userLogService.CreateAsync(ControllerConst.Firma, ActionConst.Create, firma.Id.ToString());
+
                 return RedirectToAction(nameof(Index));
             }
             return View(firma);
         }
 
-        // GET: Firma/Edit/5
         public async Task<IActionResult> Edit(int? id)
         {
             if (id == null)
@@ -83,9 +87,6 @@ namespace WebApp_GozenBv.Controllers
             return View(firma);
         }
 
-        // POST: Firma/Edit/5
-        // To protect from overposting attacks, enable the specific properties you want to bind to, for 
-        // more details, see http://go.microsoft.com/fwlink/?LinkId=317598.
         [HttpPost]
         [ValidateAntiForgeryToken]
         public async Task<IActionResult> Edit(int id, [Bind("Id,FirmaName")] Firma firma)
@@ -101,6 +102,7 @@ namespace WebApp_GozenBv.Controllers
                 {
                     _context.Update(firma);
                     await _context.SaveChangesAsync();
+                    await _userLogService.CreateAsync(ControllerConst.Firma, ActionConst.Edit, firma.Id.ToString());
                 }
                 catch (DbUpdateConcurrencyException)
                 {
@@ -144,6 +146,9 @@ namespace WebApp_GozenBv.Controllers
             var firma = await _context.Firmas.FindAsync(id);
             _context.Firmas.Remove(firma);
             await _context.SaveChangesAsync();
+            
+            await _userLogService.CreateAsync(ControllerConst.Firma, ActionConst.Delete, firma.Id.ToString());
+
             return RedirectToAction(nameof(Index));
         }
 

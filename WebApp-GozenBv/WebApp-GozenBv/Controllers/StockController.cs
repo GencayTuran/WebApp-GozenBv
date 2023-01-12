@@ -24,14 +24,14 @@ namespace WebApp_GozenBv.Controllers
             _userLogService = userLogService;
         }
 
-        // GET: Stock
+        [HttpGet]
         public async Task<IActionResult> Index()
         {
             var dataDbContext = _context.Stock.Select(s => s);
             return View(await dataDbContext.ToListAsync());
         }
-
-        // GET: Stock/Details/5
+        
+        [HttpGet]
         public async Task<IActionResult> Details(int? id)
         {
             if (id == null)
@@ -50,7 +50,7 @@ namespace WebApp_GozenBv.Controllers
             return View(stock);
         }
 
-        // GET: Stock/Create
+        [HttpGet]
         public IActionResult Create()
         {
             var productBrands = _context.Stock
@@ -74,7 +74,6 @@ namespace WebApp_GozenBv.Controllers
 
                 return RedirectToAction(nameof(Index));
             }
-            //ViewData["ProductBrands"] = new SelectList(_context.Set<ProductBrand>(), "Id", "Name");
             return View(stock);
         }
 
@@ -90,7 +89,6 @@ namespace WebApp_GozenBv.Controllers
             {
                 return NotFound();
             }
-            //ViewData["ProductBrands"] = new SelectList(_context.Set<ProductBrand>(), "Id", "Id", stock.ProductBrandId);
             return View(stock);
         }
 

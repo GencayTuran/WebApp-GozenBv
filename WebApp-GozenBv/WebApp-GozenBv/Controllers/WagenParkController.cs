@@ -6,8 +6,10 @@ using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.Rendering;
 using Microsoft.EntityFrameworkCore;
+using WebApp_GozenBv.Constants;
 using WebApp_GozenBv.Data;
 using WebApp_GozenBv.Models;
+using WebApp_GozenBv.Services;
 
 namespace WebApp_GozenBv.Controllers
 {
@@ -15,20 +17,22 @@ namespace WebApp_GozenBv.Controllers
     public class WagenParkController : Controller
     {
         private readonly DataDbContext _context;
+        private readonly IUserLogService _userLogService;
 
-        public WagenParkController(DataDbContext context)
+        public WagenParkController(DataDbContext context, IUserLogService userLogService)
         {
             _context = context;
+            _userLogService = userLogService;
         }
 
-        // GET: WagenPark
+        [HttpGet]
         public async Task<IActionResult> Index()
         {
             var dataDbContext = _context.WagenPark.Include(w => w.Firma);
             return View(await dataDbContext.ToListAsync());
         }
 
-        // GET: WagenPark/Details/5
+        [HttpGet]
         public async Task<IActionResult> Details(int? id)
         {
             if (id == null)
@@ -47,16 +51,13 @@ namespace WebApp_GozenBv.Controllers
             return View(wagenPark);
         }
 
-        // GET: WagenPark/Create
+        [HttpGet]
         public IActionResult Create()
         {
             ViewData["FirmaId"] = new SelectList(_context.Firmas, "Id", "Id");
             return View();
         }
 
-        // POST: WagenPark/Create
-        // To protect from overposting attacks, enable the specific properties you want to bind to, for 
-        // more details, see http://go.microsoft.com/fwlink/?LinkId=317598.
         [HttpPost]
         [ValidateAntiForgeryToken]
         public async Task<IActionResult> Create([Bind("Id,LicencePlate,ChassisNumber,Brand,Model,Km,KeuringDate,DeadlineKeuring,FirmaId")] WagenPark wagenPark)
@@ -65,13 +66,16 @@ namespace WebApp_GozenBv.Controllers
             {
                 _context.Add(wagenPark);
                 await _context.SaveChangesAsync();
+                
+                await _userLogService.CreateAsync(ControllerConst.WagenPark, ActionConst.Create, wagenPark.Id.ToString());
+
                 return RedirectToAction(nameof(Index));
             }
             ViewData["FirmaId"] = new SelectList(_context.Firmas, "Id", "Id", wagenPark.FirmaId);
             return View(wagenPark);
         }
 
-        // GET: WagenPark/Edit/5
+        [HttpGet]
         public async Task<IActionResult> Edit(int? id)
         {
             if (id == null)
@@ -88,9 +92,6 @@ namespace WebApp_GozenBv.Controllers
             return View(wagenPark);
         }
 
-        // POST: WagenPark/Edit/5
-        // To protect from overposting attacks, enable the specific properties you want to bind to, for 
-        // more details, see http://go.microsoft.com/fwlink/?LinkId=317598.
         [HttpPost]
         [ValidateAntiForgeryToken]
         public async Task<IActionResult> Edit(int id, [Bind("Id,LicencePlate,ChassisNumber,Brand,Model,Km,KeuringDate,DeadlineKeuring,FirmaId")] WagenPark wagenPark)
@@ -106,6 +107,7 @@ namespace WebApp_GozenBv.Controllers
                 {
                     _context.Update(wagenPark);
                     await _context.SaveChangesAsync();
+                    await _userLogService.CreateAsync(ControllerConst.WagenPark, ActionConst.Edit, wagenPark.Id.ToString());
                 }
                 catch (DbUpdateConcurrencyException)
                 {
@@ -151,6 +153,9 @@ namespace WebApp_GozenBv.Controllers
             var wagenPark = await _context.WagenPark.FindAsync(id);
             _context.WagenPark.Remove(wagenPark);
             await _context.SaveChangesAsync();
+
+            await _userLogService.CreateAsync(ControllerConst.WagenPark, ActionConst.Delete, wagenPark.Id.ToString());
+
             return RedirectToAction(nameof(Index));
         }
 
