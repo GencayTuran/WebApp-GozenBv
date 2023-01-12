@@ -1,4 +1,5 @@
 ﻿using Microsoft.AspNetCore.Builder;
+using Microsoft.AspNetCore.Identity;
 using Microsoft.Extensions.DependencyInjection;
 using System;
 using System.Collections.Generic;
@@ -8,26 +9,29 @@ using WebApp_GozenBv.Models;
 
 namespace WebApp_GozenBv.Data
 {
-    public class SeedData
+    public static class SeedData
     {
-        public static DataDbContext context;
+        private static DataDbContext _context;
         public static void EnsurePopulated(IApplicationBuilder app)
         {
-            context = app.ApplicationServices.CreateScope().ServiceProvider.GetRequiredService<DataDbContext>();
+            _context = app
+                .ApplicationServices.CreateScope()
+                .ServiceProvider.GetRequiredService<DataDbContext>();
 
-            if (!context.Stock.Any())
+            if (!_context.Stock.Any())
             {
-                context.Stock.AddRange(GetStock());
-                context.SaveChanges();
-                context.Firmas.AddRange(GetFirmas());
-                context.SaveChanges();
-                context.Employees.AddRange(GetEmployees());
-                context.SaveChanges();
-                context.WagenPark.AddRange(GetWagenPark());
-                context.SaveChanges();
+                _context.Stock.AddRange(GetStock());
+                _context.SaveChanges();
+                _context.Firmas.AddRange(GetFirmas());
+                _context.SaveChanges();
+                _context.Employees.AddRange(GetEmployees());
+                _context.SaveChanges();
+                _context.WagenPark.AddRange(GetWagenPark());
+                _context.SaveChanges();
             }
 
         }
+
         private static Stock[] GetStock()
         {
             var stock = new Stock[5];

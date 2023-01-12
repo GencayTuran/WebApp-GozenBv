@@ -1,4 +1,5 @@
-﻿using Microsoft.EntityFrameworkCore;
+﻿using Microsoft.AspNetCore.Identity.EntityFrameworkCore;
+using Microsoft.EntityFrameworkCore;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -17,7 +18,6 @@ namespace WebApp_GozenBv.Data
         public DbSet<WagenMaintenance> WagenMaintenances { get; set; }
         public DbSet<Firma> Firmas { get; set; }
         public DbSet<StockLogItem> StockLogItems { get; set; }
-        public DbSet<StockLogItemDamaged> StockDamaged { get; set; }
         
     }
 }

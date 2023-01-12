@@ -2,8 +2,11 @@
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.Rendering;
+using Microsoft.AspNetCore.Mvc.TagHelpers;
+using Microsoft.AspNetCore.Routing;
 using Microsoft.EntityFrameworkCore;
 using WebApp_GozenBv.Constants;
 using WebApp_GozenBv.Data;
@@ -13,16 +16,17 @@ using WebApp_GozenBv.ViewModels;
 
 namespace WebApp_GozenBv.Controllers
 {
+    [Authorize]
     public class StockLogController : Controller
     {
         private readonly DataDbContext _context;
-
         public StockLogController(DataDbContext context)
         {
             _context = context;
         }
 
         // GET: StockLog
+        [HttpGet]
         public async Task<IActionResult> Index()
         {
             var stockLogs = await _context.StockLogs
@@ -43,19 +47,28 @@ namespace WebApp_GozenBv.Controllers
                 return NotFound();
             }
 
-            var stockLogDetailVM = GetStockLogDetails(logCode, null);
+            var stockLogDetailVM = GetStockLogDetails(logCode, false);
 
             return View(stockLogDetailVM);
         }
 
-        // GET: StockLog/Create
+        private readonly List<EmployeeVM> lstEmp = new List<EmployeeVM>();
+        private readonly List<StockQuantityVM> lstStock = new();
+        [HttpGet]
         public IActionResult Create()
         {
-            DateTime dateToday = DateTime.Now;
+            GetCreateViewData();
 
-            Employee emp = new Employee();
-            List<EmployeeVM> lstEmp = new List<EmployeeVM>();
+            ViewData["employees"] = new SelectList(lstEmp, "EmployeeId", "EmployeeFullNameFirma");
+            ViewData["stock"] = new SelectList(lstStock, "StockId", "ProductNameBrand");
+            ViewData["stockQuantity"] = lstStock;
 
+            return View();
+        }
+
+        private void GetCreateViewData()
+        {
+            //employees
             var queryEmp = from e in _context.Employees
                            join f in _context.Firmas
                            on e.FirmaId equals f.Id
@@ -70,29 +83,21 @@ namespace WebApp_GozenBv.Controllers
                 });
             }
 
-
-            Stock stock = new Stock();
-            List<ProductVM> lstStock = new List<ProductVM>();
+            //stock
 
             var queryStock = from s in _context.Stock
-                             select new { s.Id, s.ProductName, s.ProductBrand };
+                             select new { s.Id, s.ProductName, s.ProductBrand, s.Quantity };
 
             foreach (var product in queryStock)
             {
-                lstStock.Add(new ProductVM
+                lstStock.Add(new StockQuantityVM
                 {
                     StockId = product.Id,
+                    Quantity = product.Quantity,
                     ProductNameBrand = product.ProductName + " - " + product.ProductBrand
                 });
             }
 
-            ViewData["employees"] = new SelectList(lstEmp, "EmployeeId", "EmployeeFullNameFirma");
-            ViewData["dateToday"] = dateToday;
-            ViewData["stock"] = new SelectList(lstStock, "StockId", "ProductNameBrand");
-            ViewData["stockx"] = lstStock;
-            ViewData["stockQuantity"] = new SelectList(_context.Stock, "Id", "Quantity");
-
-            return View();
         }
 
         // POST: StockLog/Create
@@ -103,24 +108,25 @@ namespace WebApp_GozenBv.Controllers
         public async Task<IActionResult> Create(StockLogCreateVM stockLogCreateVM)
         {
 
-            if (ModelState.IsValid)
+            if (ModelState.IsValid && stockLogCreateVM.SelectedProducts != null)
             {
+
                 string[] data = stockLogCreateVM.SelectedProducts.Split(","); //id, amount 
                 int[] products = Array.ConvertAll(data, d => int.Parse(d));
+
                 Guid guid = Guid.NewGuid();
                 string logCode = guid.ToString();
-                StockLog stockLog = new StockLog();
-
-                //TODO: check here if stock/amount exists ==> else return view
 
                 //new StockLogItem
                 for (int x = 0; x < data.Length; x++)
                 {
                     StockLogItem stockLogItem = new StockLogItem();
+                    var stock = _context.Stock.Where(s => s.Id == products[x]).FirstOrDefault();
                     stockLogItem.LogCode = logCode;
                     stockLogItem.StockId = products[x];
                     x++;
-                    stockLogItem.Amount = products[x];
+                    stockLogItem.StockAmount = products[x];
+                    stockLogItem.ProductNameBrand = (stock.ProductName + " " + stock.ProductBrand).ToUpper();
 
                     _context.Add(stockLogItem);
                 }
@@ -135,7 +141,7 @@ namespace WebApp_GozenBv.Controllers
 
                 //new stocklog
                 stockLogCreateVM.LogCode = logCode;
-                stockLog = stockLogCreateVM;
+                StockLog stockLog = stockLogCreateVM;
                 stockLog.Status = StockLogStatusConst.AwaitingReturn;
 
                 _context.Add(stockLog);
@@ -143,7 +149,17 @@ namespace WebApp_GozenBv.Controllers
 
                 return RedirectToAction(nameof(Index));
             }
-            return View(stockLogCreateVM);
+            else
+            {
+                //TODO: this return will normally not be hit but needs to be better :)
+                GetCreateViewData();
+
+                ViewData["employees"] = new SelectList(lstEmp, "EmployeeId", "EmployeeFullNameFirma");
+                ViewData["stock"] = new SelectList(lstStock, "StockId", "ProductNameBrand");
+                ViewData["stockQuantity"] = lstStock;
+
+                return View();
+            }
         }
 
         // GET: StockLog/Edit/5
@@ -203,7 +219,7 @@ namespace WebApp_GozenBv.Controllers
 
         // GET: StockLog/Delete/5
         [HttpGet]
-        public async Task<IActionResult> ToComplete(string id)
+        public async Task<IActionResult> CompleteReturn(string id)
         {
             string logCode = id;
 
@@ -220,16 +236,7 @@ namespace WebApp_GozenBv.Controllers
                 return NotFound();
             }
 
-            var stockLogDetailVM = GetStockLogDetails(logCode, null);
-
-            //StockLogDetailVM stockLogDetailVM = new StockLogDetailVM
-            //{
-            //    StockLogDate = stockLogDetails.StockLogDate,
-            //    EmployeeFullNameFirma = stockLogDetails.EmployeeFullNameFirma,
-            //    LogCode = stockLogDetails.LogCode, //TODO: need to show?
-            //    StockLogItems = stockLogDetails.StockLogItems
-            //};
-
+            var stockLogDetailVM = GetStockLogDetails(logCode, false);
 
             return View(stockLogDetailVM);
         }
@@ -237,93 +244,177 @@ namespace WebApp_GozenBv.Controllers
         // POST: StockLog/Delete/5
         [HttpPost]
         [ValidateAntiForgeryToken]
-        public async Task<IActionResult> ToComplete(StockLogDetailVM stockLogDetailVM)
+        public async Task<IActionResult> CompleteReturn(StockLogDetailVM stockLogDetailVM)
         {
             //TODO: alternative modelstate valid check needed
-                if (stockLogDetailVM.DamagedStock == null)
+            string logCode = stockLogDetailVM.LogCode;
+
+            //Status COMPLETE
+            if (stockLogDetailVM.DamagedStock == null)
+            {
+                var stockLog = await _context.StockLogs
+                .Where(s => s.LogCode == logCode)
+                .FirstOrDefaultAsync();
+                var stockLogItems = GetItemsForStockLog(stockLog);
+
+                //update stock amount for each stocklogitems
+                foreach (var item in stockLogItems)
                 {
-                    var stockLog = await _context.StockLogs
-                    .Where(s => s.LogCode == stockLogDetailVM.LogCode)
-                    .FirstOrDefaultAsync();
-                    var stockLogItems = GetItemsForStockLog(stockLog);
-
-                    //update stock amount for each stocklogitems
-                    foreach (var item in stockLogItems)
-                    {
-                        var stock = await StockHelper.UpdateStockQty(item.StockId, item.Amount, _context);
-                        _context.Update(stock);
-                    }
-
-                    stockLog.CompletionDate = DateTime.Now;
-                    stockLog.Status = StockLogStatusConst.Complete;
-                    _context.Update(stockLog);
-                    _context.SaveChanges();
-
-                    return RedirectToAction(nameof(Index));
+                    var stock = await StockHelper.UpdateStockQty(item.StockId, item.StockAmount, _context);
+                    _context.Update(stock);
                 }
-                else
+
+                stockLog.CompletionDate = DateTime.Now;
+                stockLog.Status = StockLogStatusConst.Completed;
+                _context.Update(stockLog);
+                _context.SaveChanges();
+
+                return RedirectToAction(nameof(Index));
+            }
+            else //Status DAMAGED
+            {
+                StockLog stockLog = _context.StockLogs
+                        .FirstOrDefault(s => s.LogCode == logCode);
+
+                if (stockLog == null)
                 {
-                    StockLog stockLog = _context.StockLogs
-                            .FirstOrDefault(s => s.LogCode == stockLogDetailVM.LogCode);
-
-                    if (stockLog == null)
-                    {
-                        return NotFound();
-                    }
-
-                    stockLog.Status = StockLogStatusConst.DamagedAwaitingAction;
-                    stockLog.Damaged = true;
-                    _context.Update(stockLog);
-                    _context.SaveChanges();
-
-                    string[] data = stockLogDetailVM.DamagedStock.Split(","); //id, amount 
-                    int[] damagedStock = Array.ConvertAll(data, d => int.Parse(d));
-
-                    //new StockLogItemDamaged
-                    for (int x = 0; x < data.Length; x++)
-                    {
-                        StockLogItemDamaged stockLogItemDamaged = new StockLogItemDamaged();
-                        stockLogItemDamaged.LogCode = stockLogDetailVM.LogCode;
-                        stockLogItemDamaged.StockId = damagedStock[x];
-                        x++;
-                        stockLogItemDamaged.StockAmount = damagedStock[x];
-
-                        _context.Add(stockLogItemDamaged);
-                    }
-                    await _context.SaveChangesAsync();
-
-                    return RedirectToAction(nameof(Index));
+                    return NotFound();
                 }
+
+                string[] data = stockLogDetailVM.DamagedStock.Split(","); //id, amount 
+                int[] damagedStock = Array.ConvertAll(data, d => int.Parse(d));
+
+                var stockLogItems = _context.StockLogItems.Where(s => s.LogCode == logCode);
+
+                //update StockLogItems
+                int x = 0;
+                foreach (var item in stockLogItems)
+                {
+                    if (x < damagedStock.Length && item.StockId == damagedStock[x])
+                    {
+                            x++;
+                            item.DamagedAmount = damagedStock[x];
+                            //count back (seperate) the not-damaged items
+                            var notDamagedAmount = item.StockAmount - damagedStock[x];
+                            await StockHelper.UpdateStockQty(item.StockId, notDamagedAmount, _context);
+                            _context.Update(item);
+                            x++;
+                    }
+                    else
+                    {
+                        await StockHelper.UpdateStockQty(item.StockId, item.StockAmount, _context);
+                    }
+                }
+                stockLog.Status = StockLogStatusConst.DamagedAwaitingAction;
+                stockLog.Damaged = true;
+                _context.Update(stockLog);
+                await _context.SaveChangesAsync();
+
+
+                //TODO: routeValue could be more readable
+                return RedirectToAction("Details", new RouteValueDictionary(
+                    new { ControllerContext = "StockLog", Action = "Details", Id = logCode }));
+            }
         }
+
+        [HttpGet]
+        public async Task<IActionResult> CompleteDamaged(string id)
+        {
+            string logCode = id;
+
+            if (logCode == null)
+            {
+                return NotFound();
+            }
+
+            var stockLogDetailVM = GetStockLogDetails(logCode, true);
+
+            return View(stockLogDetailVM);
+        }
+
+        [HttpPost]
+        public async Task<IActionResult> CompleteDamaged(StockLogDetailVM stockLogDetail)
+        {
+            string logCode = stockLogDetail.LogCode;
+
+            StockLog stockLog = _context.StockLogs
+                        .FirstOrDefault(s => s.LogCode == stockLogDetail.LogCode);
+
+            if (stockLog == null)
+            {
+                return NotFound();
+            }
+
+            string[] data = stockLogDetail.DamagedStock.Split(","); //id, repaired, deleted 
+            int[] damagedStock = Array.ConvertAll(data, d => int.Parse(d));
+
+            var stockLogItems = _context.StockLogItems.Where(s => s.LogCode == logCode);
+
+            //update StockLogItems
+            for (int x = 0; x < damagedStock.Length; x++)
+            {
+                foreach (var item in stockLogItems)
+                {
+                    if (item.StockId == damagedStock[x])
+                    {
+                        x++;
+                        item.RepairedAmount = damagedStock[x];
+                        await StockHelper.UpdateStockQty(item.StockId, damagedStock[x], _context);
+                        x++;
+                        item.DeletedAmount = damagedStock[x];
+                        _context.Update(item);
+                    }
+                }
+
+            }
+            stockLog.Status = StockLogStatusConst.Completed;
+            _context.Update(stockLog);
+            await _context.SaveChangesAsync();
+
+
+            //TODO: routeValue could be more readable
+            return RedirectToAction("Details", new RouteValueDictionary(
+                new { ControllerContext = "StockLog", Action = "Details", Id = logCode }));
+        }
+
+
 
         private bool StockLogExists(int id)
         {
             return _context.StockLogs.Any(e => e.Id == id);
         }
 
-        private StockLogDetailVM GetStockLogDetails(string logCode, DateTime? completionDate)
+        private StockLogDetailVM GetStockLogDetails(string logCode, bool damagedOnly)
         {
             StockLog stockLog = _context.StockLogs
                 .Include(s => s.Employee)
                 .Include(s => s.Employee.Firma)
                 .FirstOrDefault(s => s.LogCode == logCode);
 
-            List<StockLogItem> stockLogItems = _context.StockLogItems
-                .Include(s => s.Stock)
+            List<StockLogItem> stockLogItems;
+            if (!damagedOnly)
+            {
+                stockLogItems = _context.StockLogItems
                 .Where(s => s.LogCode == logCode).ToList();
+            }
+            else
+            {
+                stockLogItems = _context.StockLogItems
+                    .Where(s => s.LogCode == logCode)
+                    .Where(s => s.DamagedAmount > 0)
+                    .ToList();
+            }
 
-            //adds ProductNameBrand to StockLogItems (= StockLogItemVM)
-            List<StockLogItemVM> stockLogItemsVM = new List<StockLogItemVM>();
+            List<StockLogItem> lstStockLogItems = new List<StockLogItem>();
             foreach (var item in stockLogItems)
             {
-                stockLogItemsVM.Add(new StockLogItemVM
+                lstStockLogItems.Add(new StockLogItem
                 {
                     Id = item.Id,
                     LogCode = item.LogCode,
-                    Amount = item.Amount,
+                    StockAmount = item.StockAmount,
                     StockId = item.StockId,
-                    Stock = item.Stock,
-                    ProductNameBrand = (item.Stock.ProductName + " " + item.Stock.ProductBrand).ToUpper()
+                    ProductNameBrand = item.ProductNameBrand,
                 });
             }
 
@@ -332,38 +423,13 @@ namespace WebApp_GozenBv.Controllers
                 StockLogDate = stockLog.StockLogDate,
                 EmployeeFullNameFirma = (stockLog.Employee.Name + " " + stockLog.Employee.Surname + " - " + stockLog.Employee.Firma.FirmaName).ToUpper(),
                 LogCode = stockLog.LogCode, //need to show?
-                StockLogItems = stockLogItemsVM,
-                CompletionDate = completionDate
+                StockLogItems = stockLogItems,
+                CompletionDate = stockLog.CompletionDate,
+                Status = stockLog.Status,
             };
 
             return stockLogDetailVM;
         }
-
-        //[HttpGet]
-        //public async Task<IActionResult> CompletedList()
-        //{
-        //    var confirmedStockLogs = await _context.StockLogs
-        //        .Include(s => s.Employee)
-        //        .Where(s => s.CompletionDate.HasValue)
-        //        .ToListAsync();
-
-        //    return View(confirmedStockLogs);
-        //}
-
-        //[HttpGet]
-        //public async Task<IActionResult> CompletedDetails(string id)
-        //{
-        //    string logCode = id;
-
-        //    if (logCode == null)
-        //    {
-        //        return NotFound();
-        //    }
-        //    // ??
-        //    var stockLogDetailVM = GetStockLogDetails(logCode, DateTime.Now);
-
-        //    return View(stockLogDetailVM);
-        //}
 
         // GET: StockLog/Delete/5
         [HttpGet]
@@ -399,7 +465,7 @@ namespace WebApp_GozenBv.Controllers
             //update stock amount for each stocklogitems
             foreach (var item in stockLogItems)
             {
-                var stock = await StockHelper.UpdateStockQty(item.StockId, item.Amount, _context);
+                var stock = await StockHelper.UpdateStockQty(item.StockId, item.StockAmount, _context);
             }
 
             _context.StockLogs.Remove(stockLog);
@@ -408,61 +474,59 @@ namespace WebApp_GozenBv.Controllers
             return RedirectToAction(nameof(Index));
         }
 
-        private DamagedDetailVM GetDamagedDetails(string logCode)
-        {
-            StockLog stockLog = _context.StockLogs
-                        .Include(s => s.Employee)
-                        .Include(s => s.Employee.Firma)
-                        .FirstOrDefault(s => s.LogCode == logCode);
+        //private DamagedDetailVM GetDamagedDetails(string logCode)
+        //{
+        //    StockLog stockLog = _context.StockLogs
+        //                .Include(s => s.Employee)
+        //                .Include(s => s.Employee.Firma)
+        //                .FirstOrDefault(s => s.LogCode == logCode);
 
-            //get list damageditems
-            List<StockLogItemDamaged> damagedItems = new List<StockLogItemDamaged>();
-            List<StockDamagedVM> damagedItemsVM = new List<StockDamagedVM>();
+        //    //get list damageditems
+        //    List<StockLogItemDamaged> damagedItems = new List<StockLogItemDamaged>();
+        //    List<StockDamagedVM> damagedItemsVM = new List<StockDamagedVM>();
 
-            damagedItems = _context.StockDamaged
-                .Include(d => d.Stock)
-                .Where(s => s.LogCode == logCode).ToList();
+        //    damagedItems = _context.StockDamaged
+        //        .Where(s => s.LogCode == logCode).ToList();
 
-            foreach (var item in damagedItems)
-            {
-                damagedItemsVM.Add(new StockDamagedVM
-                {
-                    Id = item.Id,
-                    LogCode = item.LogCode,
-                    StockAmount = item.StockAmount,
-                    StockId = item.StockId,
-                    Stock = item.Stock,
-                    ProductNameBrand = (item.Stock.ProductName + " " + item.Stock.ProductBrand).ToUpper()
-                });
-            }
+        //    foreach (var item in damagedItems)
+        //    {
+        //        damagedItemsVM.Add(new StockDamagedVM
+        //        {
+        //            Id = item.Id,
+        //            LogCode = item.LogCode,
+        //            StockAmount = item.StockAmount,
+        //            StockId = item.StockId,
+        //            ProductNameBrand = item.ProductNameBrand
+        //        });
+        //    }
 
-            DamagedDetailVM damagedDetailVM = new DamagedDetailVM
-            {
-                StockLog = stockLog,
-                EmployeeFullNameFirma = (stockLog.Employee.Name + " " + stockLog.Employee.Surname + " - " + stockLog.Employee.Firma.FirmaName).ToUpper(),
-                DamagedItemsVM = damagedItemsVM
-            };
+        //    DamagedDetailVM damagedDetailVM = new DamagedDetailVM
+        //    {
+        //        StockLog = stockLog,
+        //        EmployeeFullNameFirma = (stockLog.Employee.Name + " " + stockLog.Employee.Surname + " - " + stockLog.Employee.Firma.FirmaName).ToUpper(),
+        //        DamagedItemsVM = damagedItemsVM
+        //    };
 
-            return damagedDetailVM;
-        }
+        //    return damagedDetailVM;
+        //}
 
-        public async Task<IActionResult> RepairStock(int stockId, int stockAmount, int damagedStockId)
-        {
-            //remove damagedstock record when repaired
-            //update stock qty
+        //public async Task<IActionResult> RepairStock(int stockId, int stockAmount, int damagedStockId)
+        //{
+        //    //remove damagedstock record when repaired
+        //    //update stock qty
 
-            var damagedStock = await _context.StockDamaged.FindAsync(damagedStockId);
-            var stock = await StockHelper.UpdateStockQty(stockId, stockAmount, _context);
+        //    var damagedStock = await _context.StockDamaged.FindAsync(damagedStockId);
+        //    var stock = await StockHelper.UpdateStockQty(stockId, stockAmount, _context);
 
-            //check stock?
+        //    //check stock?
 
-            _context.Update(stock);
-            _context.StockDamaged.Remove(damagedStock);
-            await _context.SaveChangesAsync();
+        //    _context.Update(stock);
+        //    _context.StockDamaged.Remove(damagedStock);
+        //    await _context.SaveChangesAsync();
 
 
-            return RedirectToAction(nameof(Index));
-        }
+        //    return RedirectToAction(nameof(Index));
+        //}
 
         private IQueryable<StockLogItem> GetItemsForStockLog(StockLog stockLog)
         {

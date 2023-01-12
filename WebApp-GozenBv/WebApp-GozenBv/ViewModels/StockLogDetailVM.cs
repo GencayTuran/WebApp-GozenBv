@@ -16,10 +16,11 @@ namespace WebApp_GozenBv.ViewModels
         public DateTime StockLogDate { get; set; }
         public string EmployeeFullNameFirma { get; set; }
         public string LogCode { get; set; }
-        public List<StockLogItemVM> StockLogItems { get; set; }
+        public List<StockLogItem> StockLogItems { get; set; }
         public StockLog StockLog { get; set; }
         public StockLogItem StockLogItem { get; set; }
         public string DamagedStock { get; set; }
+        public int Status { get; set; }
 
     }
 }

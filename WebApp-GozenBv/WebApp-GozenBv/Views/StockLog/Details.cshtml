@@ -6,46 +6,56 @@
 
 <h1>Details</h1>
 
-<div>
-    <h4>StockLog</h4>
-    <hr />
-    <table class="table">
-        <thead>
+<h4>StockLog</h4>
+<hr />
+<table class="table">
+    <thead>
+        <tr>
+            <th scope="col">@Html.DisplayNameFor(model => model.StockLogDate)</th>
+            <th scope="col">@Html.DisplayNameFor(model => model.StockLog.Employee)</th>
+            <th scope="col">@Html.DisplayNameFor(model => model.LogCode)</th>
+            <th scope="col">@Html.DisplayNameFor(model => model.Status)</th>
+        </tr>
+    </thead>
+    <tbody>
+        <tr>
+            <td>@Html.DisplayFor(model => model.StockLogDate)</td>
+            <td>@Html.DisplayFor(model => model.EmployeeFullNameFirma)</td>
+            <td>@Html.DisplayFor(model => model.LogCode)</td>
+            <status-color status="@Model.Status" view="Details"></status-color>
+        </tr>
+    </tbody>
+    <thead>
+        <tr>
+            <th scope="col">@Html.DisplayNameFor(model => model.StockLogItems)</th>
+        </tr>
+        <tr>
+            <th>@Html.DisplayNameFor(model => model.StockLogItem.StockId)</th>
+            <th>@Html.DisplayNameFor(model => model.StockLogItem)</th>
+            <th>@Html.DisplayNameFor(model => model.StockLogItem.StockAmount)</th>
+            <th>@Html.DisplayNameFor(model => model.StockLogItem.DamagedAmount)</th>
+            <th id="thRepaired" class="amounts">@Html.DisplayNameFor(model => model.StockLogItem.RepairedAmount)</th>
+            <th id="thDeleted" class="amounts">@Html.DisplayNameFor(model => model.StockLogItem.DeletedAmount)</th>
+        </tr>
+    </thead>
+    <tbody>
+        @foreach (var item in Model.StockLogItems)
+        { 
             <tr>
-                <th scope="col">@Html.DisplayNameFor(model => model.StockLogDate)</th>
-                <th scope="col">@Html.DisplayNameFor(model => model.StockLog.Employee)</th>
-                <th scope="col">@Html.DisplayNameFor(model => model.LogCode)</th>
+                <td>@item.StockId</td>
+                <td>@item.ProductNameBrand</td>
+                <td>@item.StockAmount</td>
+                <td>@item.DamagedAmount</td>
+                <td id="tdRepaired" class="amounts">@item.RepairedAmount</td>
+                <td id="tdDeleted" class="amounts">@item.DeletedAmount</td>
             </tr>
-        </thead>
-        <tbody>
-            <tr>
-                <td>@Html.DisplayFor(model => model.StockLogDate)</td>
-                <td>@Html.DisplayFor(model => model.EmployeeFullNameFirma)</td>
-                <td>@Html.DisplayFor(model => model.LogCode)</td>
-            </tr>
-        </tbody>
-        <thead>
-            <tr>
-                <th scope="col">@Html.DisplayNameFor(model => model.StockLogItems)</th>
-            </tr>
-            <tr>
-                <th>@Html.DisplayNameFor(model => model.StockLogItem.StockId)</th>
-                <th>@Html.DisplayNameFor(model => model.StockLogItem.Stock)</th>
-                <th>@Html.DisplayNameFor(model => model.StockLogItem.Amount)</th>
-            </tr>
-        </thead>
-        <tbody>
-            @foreach (var item in Model.StockLogItems)
-            { 
-                <tr>
-                    <td>@item.StockId</td>
-                    <td>@item.ProductNameBrand</td>
-                    <td>@item.Amount</td>
-                </tr>
-            }
-        </tbody>
-    </table>
-<div>
-    @*<a asp-action="Edit" asp-route-id="@Model.Id">Edit</a>*@ |
+        }
+    </tbody>
+</table>
+<div class="d-flex flex-column">
     <a asp-action="Index">Back to List</a>
+    <a id="linkCompleteDamaged" asp-action="CompleteDamaged" asp-route-id="@Model.LogCode">Complete Damaged</a>
+    <a id="linkCompleteReturn" asp-action="CompleteReturn" asp-route-id="@Model.LogCode">Complete Return</a>
 </div>
+    <input id="statusId" type="hidden" value="@Model.Status" />
+    <script src="~/js/StockLog_Details.js"></script>

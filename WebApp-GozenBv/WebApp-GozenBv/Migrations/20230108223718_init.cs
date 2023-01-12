@@ -41,6 +41,25 @@ namespace WebApp_GozenBv.Migrations
                 });
 
             migrationBuilder.CreateTable(
+                name: "StockLogItems",
+                columns: table => new
+                {
+                    Id = table.Column<int>(type: "int", nullable: false)
+                        .Annotation("SqlServer:Identity", "1, 1"),
+                    LogCode = table.Column<string>(type: "nvarchar(max)", nullable: true),
+                    StockId = table.Column<int>(type: "int", nullable: false),
+                    StockAmount = table.Column<int>(type: "int", nullable: false),
+                    ProductNameBrand = table.Column<string>(type: "nvarchar(max)", nullable: true),
+                    DamagedAmount = table.Column<int>(type: "int", nullable: true),
+                    RepairedAmount = table.Column<int>(type: "int", nullable: true),
+                    DeletedAmount = table.Column<int>(type: "int", nullable: true)
+                },
+                constraints: table =>
+                {
+                    table.PrimaryKey("PK_StockLogItems", x => x.Id);
+                });
+
+            migrationBuilder.CreateTable(
                 name: "Employees",
                 columns: table => new
                 {
@@ -83,49 +102,6 @@ namespace WebApp_GozenBv.Migrations
                         name: "FK_WagenPark_Firmas_FirmaId",
                         column: x => x.FirmaId,
                         principalTable: "Firmas",
-                        principalColumn: "Id",
-                        onDelete: ReferentialAction.Cascade);
-                });
-
-            migrationBuilder.CreateTable(
-                name: "StockDamaged",
-                columns: table => new
-                {
-                    Id = table.Column<int>(type: "int", nullable: false)
-                        .Annotation("SqlServer:Identity", "1, 1"),
-                    LogCode = table.Column<string>(type: "nvarchar(max)", nullable: true),
-                    StockId = table.Column<int>(type: "int", nullable: false),
-                    StockAmount = table.Column<int>(type: "int", nullable: false),
-                    Status = table.Column<int>(type: "int", nullable: false)
-                },
-                constraints: table =>
-                {
-                    table.PrimaryKey("PK_StockDamaged", x => x.Id);
-                    table.ForeignKey(
-                        name: "FK_StockDamaged_Stock_StockId",
-                        column: x => x.StockId,
-                        principalTable: "Stock",
-                        principalColumn: "Id",
-                        onDelete: ReferentialAction.Cascade);
-                });
-
-            migrationBuilder.CreateTable(
-                name: "StockLogItems",
-                columns: table => new
-                {
-                    Id = table.Column<int>(type: "int", nullable: false)
-                        .Annotation("SqlServer:Identity", "1, 1"),
-                    LogCode = table.Column<string>(type: "nvarchar(max)", nullable: true),
-                    Amount = table.Column<int>(type: "int", nullable: false),
-                    StockId = table.Column<int>(type: "int", nullable: false)
-                },
-                constraints: table =>
-                {
-                    table.PrimaryKey("PK_StockLogItems", x => x.Id);
-                    table.ForeignKey(
-                        name: "FK_StockLogItems_Stock_StockId",
-                        column: x => x.StockId,
-                        principalTable: "Stock",
                         principalColumn: "Id",
                         onDelete: ReferentialAction.Cascade);
                 });
@@ -182,16 +158,6 @@ namespace WebApp_GozenBv.Migrations
                 column: "FirmaId");
 
             migrationBuilder.CreateIndex(
-                name: "IX_StockDamaged_StockId",
-                table: "StockDamaged",
-                column: "StockId");
-
-            migrationBuilder.CreateIndex(
-                name: "IX_StockLogItems_StockId",
-                table: "StockLogItems",
-                column: "StockId");
-
-            migrationBuilder.CreateIndex(
                 name: "IX_StockLogs_EmployeeId",
                 table: "StockLogs",
                 column: "EmployeeId");
@@ -210,7 +176,7 @@ namespace WebApp_GozenBv.Migrations
         protected override void Down(MigrationBuilder migrationBuilder)
         {
             migrationBuilder.DropTable(
-                name: "StockDamaged");
+                name: "Stock");
 
             migrationBuilder.DropTable(
                 name: "StockLogItems");
@@ -220,9 +186,6 @@ namespace WebApp_GozenBv.Migrations
 
             migrationBuilder.DropTable(
                 name: "WagenMaintenances");
-
-            migrationBuilder.DropTable(
-                name: "Stock");
 
             migrationBuilder.DropTable(
                 name: "Employees");

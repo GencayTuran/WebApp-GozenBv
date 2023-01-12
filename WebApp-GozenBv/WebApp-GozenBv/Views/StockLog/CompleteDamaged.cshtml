@@ -1,13 +1,12 @@
 ﻿@model WebApp_GozenBv.ViewModels.StockLogDetailVM
 
 @{
-    ViewData["Title"] = "Complete?";
+    ViewData["Title"] = "Complete";
 }
 
-<h1>Complete?</h1>
+<h1>Complete Damaged Items</h1>
 
-@*<h3>Which products are damaged?</h3>*@
-<h4>Complete StockLog</h4>
+<h4>StockLog</h4>
 <hr />
 <table class="table">
     <thead>
@@ -30,41 +29,39 @@
         </tr>
         <tr>
             <th>@Html.DisplayNameFor(model => model.StockLogItem.StockId)</th>
-            <th>@Html.DisplayNameFor(model => model.StockLogItem.Stock)</th>
-            <th>@Html.DisplayNameFor(model => model.StockLogItem.Amount)</th>
-            <th class="damagedView">Damaged?</th>
+            <th>@Html.DisplayNameFor(model => model.StockLogItem)</th>
+            <th>@Html.DisplayNameFor(model => model.StockLogItem.StockAmount)</th>
+            <th>@Html.DisplayNameFor(model => model.StockLogItem.DamagedAmount)</th>
+            <th>@Html.DisplayNameFor(model => model.StockLogItem.RepairedAmount)</th>
+            <th>@Html.DisplayNameFor(model => model.StockLogItem.DeletedAmount)</th>
         </tr>
     </thead>
     <tbody>
         @foreach (var item in Model.StockLogItems)
         {
-            <tr class="stockLogItemRow">
+            <tr>
                 <td>
-                    <p class="labelStockId">
-                        @item.StockId
-                    </p>
+                    <p class="stockId">@item.StockId</p>
                 </td>
+
                 <td>@item.ProductNameBrand</td>
+                <td>@item.StockAmount</td>
+                <td><p class="inputDamaged">@item.DamagedAmount</p></td>
                 <td>
-                    <p class="labelAmount">@item.Amount</p>
-                    <input class="inputAmount damagedView" type="number" value="@item.Amount" />
+                    <input class="inputRepaired" type="number" />
                 </td>
-                <td class="damagedView"><input class="checkRow" type="checkbox" /></td>
+                <td>
+                    <input class="inputDeleted" type="number" />
+                </td>
             </tr>
         }
     </tbody>
 </table>
-
-<div>
-    <input id="chkDamaged" type="checkbox" />
-    <p>Damaged items?</p>
-</div>
-
-<form asp-action="ToComplete">
+<form asp-action="CompleteDamaged">
     <input type="hidden" asp-for="LogCode" />
-    <input id="damagedStockResult" type="hidden" asp-for="DamagedStock" />
-    <input id="btnSubmit" type="submit" value="Complete" class="btn btn-primary" /> |
+    <input id="completeDamagedResult" type="hidden" asp-for="DamagedStock" />
+    <input id="btnSubmit" type="submit" value="Complete" onclick="FillData()" class="btn btn-primary" /> |
     <a asp-action="Index">Back to List</a>
 </form>
 
-<script src="~/js/StockLog_ToComplete.js" />
+<script src="~/js/StockLog_CompleteDamaged.js" />

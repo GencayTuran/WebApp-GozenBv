@@ -2,7 +2,7 @@
 {
     public static class StockLogStatusConst
     {
-        public const int Complete = 1;
+        public const int Completed = 1;
         public const int AwaitingReturn = 0;
         public const int DamagedAwaitingAction = 2;
 

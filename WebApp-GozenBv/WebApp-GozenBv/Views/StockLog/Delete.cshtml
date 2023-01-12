@@ -31,8 +31,8 @@
             </tr>
             <tr>
                 <th>@Html.DisplayNameFor(model => model.StockLogItem.StockId)</th>
-                <th>@Html.DisplayNameFor(model => model.StockLogItem.Stock)</th>
-                <th>@Html.DisplayNameFor(model => model.StockLogItem.Amount)</th>
+                <th>@Html.DisplayNameFor(model => model.StockLogItem)</th>
+                <th>@Html.DisplayNameFor(model => model.StockLogItem.StockAmount)</th>
             </tr>
         </thead>
         <tbody>
@@ -41,7 +41,7 @@
                 <tr>
                     <td>@item.StockId</td>
                     <td>@item.ProductNameBrand</td>
-                    <td>@item.Amount</td>
+                    <td>@item.StockAmount</td>
                 </tr>
             }
         </tbody>

@@ -7,12 +7,6 @@
 <h1>Index</h1>
 
 <p>
-    <a asp-action="CompletedList">Completed List</a>
-</p>
-<p>
-    <a asp-action="DamagedList">Damaged List</a>
-</p>
-<p>
     <a asp-action="Create">Create New</a>
 </p>
 
@@ -32,25 +26,23 @@
         </tr>
     </thead>
     <tbody>
-@foreach (var item in Model) {
-        <stocklog status="item.Status">
-            <td>
-                @Html.DisplayFor(modelItem => item.StockLogDate)
-            </td>
-            <td>
-                @Html.DisplayFor(modelItem => item.Employee.Name)
-                @Html.DisplayFor(modelItem => item.Employee.Surname)
-            </td>
-            <td>
-                @Html.DisplayFor(modelItem => item.LogCode)
-            </td>
-            <td>
-                <a asp-action="Edit" asp-route-id="@item.Id">Edit</a> |
-                <a asp-action="Details" asp-route-id="@item.LogCode">Details</a> |
-                <a asp-action="ToComplete" asp-route-id="@item.LogCode">Complete</a> |
-                <a asp-action="Delete" asp-route-id="@item.Id">Delete</a>
-            </td>
-        </stocklog>
-}
+        @foreach (var item in Model)
+        {
+            <status-color status="@item.Status" view="Index">
+                <td>
+                    @Html.DisplayFor(modelItem => item.StockLogDate)
+                </td>
+                <td>
+                    @Html.DisplayFor(modelItem => item.Employee.Name)
+                    @Html.DisplayFor(modelItem => item.Employee.Surname)
+                </td>
+                <td>
+                    @Html.DisplayFor(modelItem => item.LogCode)
+                </td>
+                <td>
+                    <vc:actions status="@item.Status" id="@item.Id" log-code="@item.LogCode"></vc:actions>
+                </td>
+            </status-color>
+        }
     </tbody>
 </table>
