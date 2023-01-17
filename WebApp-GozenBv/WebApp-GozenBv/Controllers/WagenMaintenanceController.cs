@@ -11,7 +11,7 @@ using WebApp_GozenBv.Models;
 
 namespace WebApp_GozenBv.Controllers
 {
-    [Authorize]
+    //[Authorize]
     public class WagenMaintenanceController : Controller
     {
         private readonly DataDbContext _context;

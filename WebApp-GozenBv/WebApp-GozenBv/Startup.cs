@@ -26,23 +26,24 @@ namespace WebApp_GozenBv
         // This method gets called by the runtime. Use this method to add services to the container.
         public void ConfigureServices(IServiceCollection services)
         {
-            var initialScopes = Configuration.GetValue<string>("DownstreamApi:Scopes")?.Split(' ');
+            //var initialScopes = Configuration.GetValue<string>("DownstreamApi:Scopes")?.Split(' ');
+            //services.AddAuthentication(OpenIdConnectDefaults.AuthenticationScheme)
+            //    .AddMicrosoftIdentityWebApp(Configuration.GetSection("AzureAd"))
+            //        .EnableTokenAcquisitionToCallDownstreamApi(initialScopes)
+            //            .AddMicrosoftGraph(Configuration.GetSection("DownstreamApi"))
+            //            .AddInMemoryTokenCaches();
 
-            services.AddAuthentication(OpenIdConnectDefaults.AuthenticationScheme)
-                .AddMicrosoftIdentityWebApp(Configuration.GetSection("AzureAd"))
-                    .EnableTokenAcquisitionToCallDownstreamApi(initialScopes)
-                        .AddMicrosoftGraph(Configuration.GetSection("DownstreamApi"))
-                        .AddInMemoryTokenCaches();
+            //services.AddControllersWithViews(options =>
+            //{
+            //    var policy = new AuthorizationPolicyBuilder()
+            //        .RequireAuthenticatedUser()
+            //        .Build();
+            //    options.Filters.Add(new AuthorizeFilter(policy));
+            //});
+            //services.AddRazorPages()
+            //     .AddMicrosoftIdentityUI();
 
-            services.AddControllersWithViews(options =>
-            {
-                var policy = new AuthorizationPolicyBuilder()
-                    .RequireAuthenticatedUser()
-                    .Build();
-                options.Filters.Add(new AuthorizeFilter(policy));
-            });
-            services.AddRazorPages()
-                 .AddMicrosoftIdentityUI();
+            services.AddControllersWithViews();
 
             services.AddDbContext<DataDbContext>(opts =>
             {
@@ -51,6 +52,8 @@ namespace WebApp_GozenBv
             });
 
             services.AddTransient<IActionService, ActionService>();
+            services.AddScoped<IUserLogService, UserLogService>();
+            services.AddSingleton<IUserService, UserService>();
         }
 
         // This method gets called by the runtime. Use this method to configure the HTTP request pipeline.
@@ -71,7 +74,7 @@ namespace WebApp_GozenBv
 
             app.UseRouting();
 
-            app.UseAuthentication();
+            //app.UseAuthentication();
             app.UseAuthorization();
 
             app.UseEndpoints(endpoints =>

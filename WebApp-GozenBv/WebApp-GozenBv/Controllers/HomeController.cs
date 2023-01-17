@@ -16,24 +16,31 @@ using Microsoft.Identity.Web;
 
 namespace WebApp_GozenBv.Controllers
 {
-    [Authorize]
+    //[Authorize]
     public class HomeController : Controller
     {
         private readonly ILogger<HomeController> _logger;
         private readonly DataDbContext _context;
 
-        private readonly GraphServiceClient _graphServiceClient;
+        //private readonly GraphServiceClient _graphServiceClient;
 
+
+        //public HomeController(ILogger<HomeController> logger,
+        //    DataDbContext context, GraphServiceClient graphServiceClient)
+        //{
+        //    _logger = logger;
+        //    _context = context;
+        //    _graphServiceClient = graphServiceClient;
+        //}
 
         public HomeController(ILogger<HomeController> logger,
-            DataDbContext context, GraphServiceClient graphServiceClient)
+            DataDbContext context)
         {
             _logger = logger;
             _context = context;
-            _graphServiceClient = graphServiceClient;
         }
 
-        [AuthorizeForScopes(ScopeKeySection = "DownstreamApi:Scopes")]
+        //[AuthorizeForScopes(ScopeKeySection = "DownstreamApi:Scopes")]
         public async Task<IActionResult> Index()
         {
             List<string> lstAlertsCar = new List<string>();
@@ -84,8 +91,8 @@ namespace WebApp_GozenBv.Controllers
             ViewData["alertsCar"] = lstAlertsCar;
             ViewData["alertsStock"] = lstAlertsStock;
 
-            var user = await _graphServiceClient.Me.Request().GetAsync();
-            ViewData["ApiResult"] = user.DisplayName;
+            //var user = await _graphServiceClient.Me.Request().GetAsync();
+            //ViewData["ApiResult"] = user.DisplayName;
 
             return View();
         }

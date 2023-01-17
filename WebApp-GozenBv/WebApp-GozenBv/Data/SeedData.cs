@@ -28,11 +28,27 @@ namespace WebApp_GozenBv.Data
                 _context.SaveChanges();
                 _context.WagenPark.AddRange(GetWagenPark());
                 _context.SaveChanges();
+
+                _context.Users.AddRange(GetUsers());
+                _context.SaveChanges();
             }
 
         }
 
-        private static Stock[] GetStock()
+        private static User[] GetUsers()
+        {
+            var users = new User[1];
+
+            users[0] = new User
+            {
+                Email = "gencay.turan@hotmail.com",
+                Name = "Gencay Turan"
+            };
+
+            return users;
+        }
+
+            private static Stock[] GetStock()
         {
             var stock = new Stock[5];
             stock[0] = new Stock

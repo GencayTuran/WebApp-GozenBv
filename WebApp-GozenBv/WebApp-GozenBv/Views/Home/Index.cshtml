@@ -1,4 +1,5 @@
-﻿@{
+﻿@using WebApp_GozenBv.Constants;
+@{
     ViewData["Title"] = "Home Page";
 }
 
@@ -22,6 +23,7 @@
             <p>@alert</p>
         }*@
     </div>
-    <div>Api result</div>
-    <div>@ViewData["ApiResult"]</div>
+    @*<div>Api result</div>
+    <div>@ViewData["ApiResult"]</div>*@
+    <vc:user-log view="@ViewTypeConst.All" controller="@ControllerConst.Home" entity-id="" user-id="1"></vc:user-log>
 </div>
