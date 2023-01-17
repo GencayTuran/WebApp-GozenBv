@@ -16,7 +16,7 @@ using WebApp_GozenBv.ViewModels;
 
 namespace WebApp_GozenBv.Controllers
 {
-    [Authorize]
+    //[Authorize]
     public class StockLogController : Controller
     {
         private readonly DataDbContext _context;

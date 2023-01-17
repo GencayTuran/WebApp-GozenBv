@@ -44,10 +44,12 @@ namespace WebApp_GozenBv
             //services.AddRazorPages()
             //     .AddMicrosoftIdentityUI();
 
+            services.AddControllersWithViews();
+
             services.AddDbContext<DataDbContext>(opts =>
             {
-                opts.UseSqlServer(Configuration["ConnectionStrings:DbConnection"]);
-                //opts.UseSqlServer(Configuration.GetConnectionString("AZURE_SQL_CONNECTIONSTRING"));
+                //opts.UseSqlServer(Configuration["ConnectionStrings:DbConnection"]);
+                opts.UseSqlServer(Configuration.GetConnectionString("AZURE_SQL_CONNECTIONSTRING"));
             });
 
             services.AddTransient<IActionService, ActionService>();
@@ -72,7 +74,7 @@ namespace WebApp_GozenBv
             app.UseRouting();
 
             app.UseAuthentication();
-            app.UseAuthorization();
+            //app.UseAuthorization();
 
             app.UseEndpoints(endpoints =>
             {

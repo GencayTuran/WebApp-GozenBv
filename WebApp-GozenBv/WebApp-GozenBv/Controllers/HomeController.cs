@@ -16,7 +16,7 @@ using Microsoft.Identity.Web;
 
 namespace WebApp_GozenBv.Controllers
 {
-    [Authorize]
+    //[Authorize]
     public class HomeController : Controller
     {
         private readonly DataDbContext _context;
