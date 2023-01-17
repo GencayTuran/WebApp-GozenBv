@@ -3,6 +3,7 @@ using WebApp_GozenBv.Models;
 using WebApp_GozenBv.Data;
 using Microsoft.Graph;
 using System.Threading.Tasks;
+using System.Runtime.InteropServices;
 
 namespace WebApp_GozenBv.Services
 {
@@ -31,22 +32,39 @@ namespace WebApp_GozenBv.Services
             }
             else
             {
-                var newUser = new Models.User
-                {
-                    Email = mgUser.Mail,
-                    Name = mgUser.DisplayName
-                };
-                _context.Users.Add(newUser);
-                _context.SaveChanges();
-
-                var userId = _context.Users
-                    .Where(u => u.Email.Contains(mgUser.Mail))
-                    .Select(u => u.Id)
-                    .FirstOrDefault();
+                var userId = SaveNewUser(mgUser);
 
                 return userId;
             }
 
+        }
+
+        //test purpose (without azure ad)
+        public async Task<Models.User> GetUserFromSeed()
+        {
+            var user = _context.Users
+                .Where(u => u.Email == "gencay.turan@hotmail.com")
+                .FirstOrDefault();
+            return user;
+        }
+
+        private int SaveNewUser(Microsoft.Graph.User mgUser)
+        {
+
+            var newUser = new Models.User
+            {
+                Email = mgUser.Mail,
+                Name = mgUser.DisplayName
+            };
+            _context.Users.Add(newUser);
+            _context.SaveChanges();
+
+            var userId = _context.Users
+                .Where(u => u.Email.Contains(mgUser.Mail))
+                .Select(u => u.Id)
+                .FirstOrDefault();
+
+            return userId;
         }
     }
 }

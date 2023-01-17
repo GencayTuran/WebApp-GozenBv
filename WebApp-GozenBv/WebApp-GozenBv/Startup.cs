@@ -7,6 +7,7 @@ using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
+using Microsoft.Graph;
 using Microsoft.Identity.Web;
 using Microsoft.Identity.Web.UI;
 using WebApp_GozenBv.Data;
@@ -49,7 +50,8 @@ namespace WebApp_GozenBv
 
             services.AddTransient<IActionService, ActionService>();
             services.AddScoped<IUserLogService, UserLogService>();
-            services.AddSingleton<IUserService, UserService>();
+            //services.AddSingleton<IUserService, UserService>();
+            //services.AddTransient<GraphServiceClient>();
         }
 
         // This method gets called by the runtime. Use this method to configure the HTTP request pipeline.

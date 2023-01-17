@@ -16,22 +16,29 @@ namespace WebApp_GozenBv.Services
     public class UserLogService : IUserLogService
     {
         private readonly DataDbContext _context;
-        private readonly IUserService _userService;
+        //private readonly IUserService _userService;
 
-        public UserLogService(DataDbContext context, IUserService userService)
+        //public UserLogService(DataDbContext context, IUserService userService)
+        //{
+        //    _context = context;
+        //    _userService = userService;
+        //}
+        public UserLogService(DataDbContext context)
         {
             _context = context;
-            _userService = userService;
         }
+
 
         public async Task CreateAsync(int controller, int action, string entityId)
         {
-            var user = await _userService.GetCurrentUser();
-            var userId = _userService.GetCurrentUserId(user);
+            //var user = await _userService.GetCurrentUser();
+            //var userId = _userService.GetCurrentUserId(user);
+
+            //var user = await _userService.GetUserFromSeed();
 
             var userLog = new UserLog
             {
-                UserId = userId,
+                UserId = 1, //testing withour azure ad
                 Controller = controller,
                 Action = action,
                 EntityId = entityId,

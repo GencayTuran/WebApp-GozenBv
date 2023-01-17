@@ -1,4 +1,5 @@
 ﻿using System.Threading.Tasks;
+using WebApp_GozenBv.Models;
 
 namespace WebApp_GozenBv.Services
 {
@@ -6,5 +7,6 @@ namespace WebApp_GozenBv.Services
     {
         int GetCurrentUserId(Microsoft.Graph.User mgUser);
         Task<Microsoft.Graph.User> GetCurrentUser();
+        Task<User> GetUserFromSeed();
     }
 }
