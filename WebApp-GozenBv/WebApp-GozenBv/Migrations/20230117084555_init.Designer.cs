@@ -12,7 +12,7 @@ using WebApp_GozenBv.Data;
 namespace WebApp_GozenBv.Migrations
 {
     [DbContext(typeof(DataDbContext))]
-    [Migration("20230108223718_init")]
+    [Migration("20230117084555_init")]
     partial class init
     {
         protected override void BuildTargetModel(ModelBuilder modelBuilder)
