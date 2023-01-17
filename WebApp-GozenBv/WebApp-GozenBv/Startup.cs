@@ -27,22 +27,17 @@ namespace WebApp_GozenBv
         public void ConfigureServices(IServiceCollection services)
         {
             //var initialScopes = Configuration.GetValue<string>("DownstreamApi:Scopes")?.Split(' ');
-
             //services.AddAuthentication(OpenIdConnectDefaults.AuthenticationScheme)
             //    .AddMicrosoftIdentityWebApp(Configuration.GetSection("AzureAd"))
             //        .EnableTokenAcquisitionToCallDownstreamApi(initialScopes)
             //            .AddMicrosoftGraph(Configuration.GetSection("DownstreamApi"))
             //            .AddInMemoryTokenCaches();
 
-            //services.AddControllersWithViews(options =>
-            //{
-            //    var policy = new AuthorizationPolicyBuilder()
-            //        .RequireAuthenticatedUser()
-            //        .Build();
-            //    options.Filters.Add(new AuthorizeFilter(policy));
-            //});
-            //services.AddRazorPages()
-            //     .AddMicrosoftIdentityUI();
+            //services.AddAuthentication(OpenIdConnectDefaults.AuthenticationScheme)
+            //    .AddMicrosoftIdentityWebApp(Configuration.GetSection("AzureAd"))
+            //        .EnableTokenAcquisitionToCallDownstreamApi(initialScopes)
+            //            .AddMicrosoftGraph(Configuration.GetSection("DownstreamApi"))
+            //            .AddInMemoryTokenCaches();
 
             services.AddControllersWithViews();
 
@@ -53,6 +48,8 @@ namespace WebApp_GozenBv
             });
 
             services.AddTransient<IActionService, ActionService>();
+            services.AddScoped<IUserLogService, UserLogService>();
+            //services.AddSingleton<IUserService, UserService>();
         }
 
         // This method gets called by the runtime. Use this method to configure the HTTP request pipeline.

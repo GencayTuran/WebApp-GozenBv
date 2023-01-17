@@ -6,8 +6,10 @@ using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.Rendering;
 using Microsoft.EntityFrameworkCore;
+using WebApp_GozenBv.Constants;
 using WebApp_GozenBv.Data;
 using WebApp_GozenBv.Models;
+using WebApp_GozenBv.Services;
 
 namespace WebApp_GozenBv.Controllers
 {
@@ -15,10 +17,11 @@ namespace WebApp_GozenBv.Controllers
     public class StockController : Controller
     {
         private readonly DataDbContext _context;
-
-        public StockController(DataDbContext context)
+        private readonly IUserLogService _userLogService;
+        public StockController(DataDbContext context, IUserLogService userLogService)
         {
             _context = context;
+            _userLogService = userLogService;
         }
 
         // GET: Stock
@@ -58,9 +61,6 @@ namespace WebApp_GozenBv.Controllers
             return View();
         }
 
-        // POST: Stock/Create
-        // To protect from overposting attacks, enable the specific properties you want to bind to, for 
-        // more details, see http://go.microsoft.com/fwlink/?LinkId=317598.
         [HttpPost]
         [ValidateAntiForgeryToken]
         public async Task<IActionResult> Create([Bind("Id,ProductName,Quantity,MinQuantity,Used,Cost,ProductBrand")] Stock stock)
@@ -69,13 +69,15 @@ namespace WebApp_GozenBv.Controllers
             {
                 _context.Add(stock);
                 await _context.SaveChangesAsync();
+
+                await _userLogService.CreateAsync(ControllerConst.Stock, ActionConst.Create, stock.Id.ToString());
+
                 return RedirectToAction(nameof(Index));
             }
             //ViewData["ProductBrands"] = new SelectList(_context.Set<ProductBrand>(), "Id", "Name");
             return View(stock);
         }
 
-        // GET: Stock/Edit/5
         public async Task<IActionResult> Edit(int? id)
         {
             if (id == null)
@@ -92,9 +94,6 @@ namespace WebApp_GozenBv.Controllers
             return View(stock);
         }
 
-        // POST: Stock/Edit/5
-        // To protect from overposting attacks, enable the specific properties you want to bind to, for 
-        // more details, see http://go.microsoft.com/fwlink/?LinkId=317598.
         [HttpPost]
         [ValidateAntiForgeryToken]
         public async Task<IActionResult> Edit(int id, [Bind("Id,ProductName,Quantity,MinQuantity,Used,Cost,ProductBrand")] Stock stock)
@@ -110,8 +109,9 @@ namespace WebApp_GozenBv.Controllers
                 {
                     _context.Update(stock);
                     await _context.SaveChangesAsync();
+                    await _userLogService.CreateAsync(ControllerConst.Stock, ActionConst.Edit, stock.Id.ToString());
                 }
-                catch (DbUpdateConcurrencyException)
+                catch (DbUpdateConcurrencyException e)
                 {
                     if (!StockExists(stock.Id))
                     {
@@ -128,7 +128,7 @@ namespace WebApp_GozenBv.Controllers
             return View(stock);
         }
 
-        // GET: Stock/Delete/5
+        [HttpGet]
         public async Task<IActionResult> Delete(int? id)
         {
             if (id == null)
@@ -147,7 +147,6 @@ namespace WebApp_GozenBv.Controllers
             return View(stock);
         }
 
-        // POST: Stock/Delete/5
         [HttpPost, ActionName("Delete")]
         [ValidateAntiForgeryToken]
         public async Task<IActionResult> DeleteConfirmed(int id)
@@ -155,6 +154,9 @@ namespace WebApp_GozenBv.Controllers
             var stock = await _context.Stock.FindAsync(id);
             _context.Stock.Remove(stock);
             await _context.SaveChangesAsync();
+
+            await _userLogService.CreateAsync(ControllerConst.Stock, ActionConst.Delete, stock.Id.ToString());
+
             return RedirectToAction(nameof(Index));
         }
 
