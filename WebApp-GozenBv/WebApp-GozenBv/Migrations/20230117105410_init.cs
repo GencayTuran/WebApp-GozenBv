@@ -60,6 +60,20 @@ namespace WebApp_GozenBv.Migrations
                 });
 
             migrationBuilder.CreateTable(
+                name: "Users",
+                columns: table => new
+                {
+                    Id = table.Column<int>(type: "int", nullable: false)
+                        .Annotation("SqlServer:Identity", "1, 1"),
+                    Name = table.Column<string>(type: "nvarchar(max)", nullable: true),
+                    Email = table.Column<string>(type: "nvarchar(max)", nullable: true)
+                },
+                constraints: table =>
+                {
+                    table.PrimaryKey("PK_Users", x => x.Id);
+                });
+
+            migrationBuilder.CreateTable(
                 name: "Employees",
                 columns: table => new
                 {
@@ -102,6 +116,29 @@ namespace WebApp_GozenBv.Migrations
                         name: "FK_WagenPark_Firmas_FirmaId",
                         column: x => x.FirmaId,
                         principalTable: "Firmas",
+                        principalColumn: "Id",
+                        onDelete: ReferentialAction.Cascade);
+                });
+
+            migrationBuilder.CreateTable(
+                name: "UserLogs",
+                columns: table => new
+                {
+                    Id = table.Column<int>(type: "int", nullable: false)
+                        .Annotation("SqlServer:Identity", "1, 1"),
+                    UserId = table.Column<int>(type: "int", nullable: false),
+                    Action = table.Column<int>(type: "int", nullable: false),
+                    Controller = table.Column<int>(type: "int", nullable: false),
+                    EntityId = table.Column<string>(type: "nvarchar(max)", nullable: true),
+                    LogDate = table.Column<DateTime>(type: "datetime2", nullable: false)
+                },
+                constraints: table =>
+                {
+                    table.PrimaryKey("PK_UserLogs", x => x.Id);
+                    table.ForeignKey(
+                        name: "FK_UserLogs_Users_UserId",
+                        column: x => x.UserId,
+                        principalTable: "Users",
                         principalColumn: "Id",
                         onDelete: ReferentialAction.Cascade);
                 });
@@ -163,6 +200,11 @@ namespace WebApp_GozenBv.Migrations
                 column: "EmployeeId");
 
             migrationBuilder.CreateIndex(
+                name: "IX_UserLogs_UserId",
+                table: "UserLogs",
+                column: "UserId");
+
+            migrationBuilder.CreateIndex(
                 name: "IX_WagenMaintenances_WagenParkId",
                 table: "WagenMaintenances",
                 column: "WagenParkId");
@@ -185,10 +227,16 @@ namespace WebApp_GozenBv.Migrations
                 name: "StockLogs");
 
             migrationBuilder.DropTable(
+                name: "UserLogs");
+
+            migrationBuilder.DropTable(
                 name: "WagenMaintenances");
 
             migrationBuilder.DropTable(
                 name: "Employees");
+
+            migrationBuilder.DropTable(
+                name: "Users");
 
             migrationBuilder.DropTable(
                 name: "WagenPark");
