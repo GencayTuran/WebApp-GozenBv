@@ -146,7 +146,7 @@ namespace WebApp_GozenBv.Controllers
             _context.WagenMaintenances.Remove(wagenMaintenance);
             await _context.SaveChangesAsync();
 
-            await _userLogService.CreateAsync(ControllerConst.WagenMaintenance, ActionConst.Create, wagenMaintenance.Id.ToString());
+            await _userLogService.CreateAsync(ControllerConst.WagenMaintenance, ActionConst.Delete, wagenMaintenance.Id.ToString());
 
             return RedirectToAction(nameof(Index));
         }

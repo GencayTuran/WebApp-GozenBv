@@ -47,13 +47,13 @@ namespace WebApp_GozenBv
 
             services.AddDbContext<DataDbContext>(opts =>
             {
-                opts.UseSqlServer(Configuration["ConnectionStrings:DbConnection"]);
-                //opts.UseSqlServer(Configuration.GetConnectionString("AZURE_SQL_CONNECTIONSTRING"));
+                //opts.UseSqlServer(Configuration["ConnectionStrings:DbConnection"]);
+                opts.UseSqlServer(Configuration.GetConnectionString("AZURE_SQL_CONNECTIONSTRING"));
             });
 
             services.AddTransient<IActionService, ActionService>();
-            services.AddScoped<IUserLogService, UserLogService>();
-            services.AddSingleton<IUserService, UserService>();
+            services.AddTransient<IUserLogService, UserLogService>();
+            services.AddTransient<IUserService, UserService>();
         }
 
         // This method gets called by the runtime. Use this method to configure the HTTP request pipeline.

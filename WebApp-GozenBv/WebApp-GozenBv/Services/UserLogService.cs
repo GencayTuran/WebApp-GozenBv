@@ -26,12 +26,14 @@ namespace WebApp_GozenBv.Services
 
         public async Task CreateAsync(int controller, int action, string entityId)
         {
+            //var user = await _userService.GetCurrentUser();
+            //var userId = _userService.GetCurrentUserId(user);
+
             var user = await _userService.GetCurrentUser();
-            var userId = _userService.GetCurrentUserId(user);
 
             var userLog = new UserLog
             {
-                UserId = userId,
+                UserId = user.Id,
                 Controller = controller,
                 Action = action,
                 EntityId = entityId,
