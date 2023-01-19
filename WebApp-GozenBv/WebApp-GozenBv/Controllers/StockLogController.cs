@@ -196,6 +196,8 @@ namespace WebApp_GozenBv.Controllers
 
                     _context.Update(stockLog);
                     await _context.SaveChangesAsync();
+                    await _userLogService.CreateAsync(ControllerConst.StockLog, ActionConst.Edit, stockLog.LogCode);
+
                 }
                 catch (DbUpdateConcurrencyException)
                 {
@@ -266,6 +268,8 @@ namespace WebApp_GozenBv.Controllers
                 _context.Update(stockLog);
                 _context.SaveChanges();
 
+                await _userLogService.CreateAsync(ControllerConst.StockLog, ActionConst.CompleteReturn, logCode);
+
                 return RedirectToAction(nameof(Index));
             }
             else //Status DAMAGED
@@ -307,6 +311,7 @@ namespace WebApp_GozenBv.Controllers
                 _context.Update(stockLog);
                 await _context.SaveChangesAsync();
 
+                await _userLogService.CreateAsync(ControllerConst.StockLog, ActionConst.CompleteReturn, logCode);
 
                 //TODO: routeValue could be more readable
                 return RedirectToAction("Details", new RouteValueDictionary(
@@ -368,6 +373,7 @@ namespace WebApp_GozenBv.Controllers
             _context.Update(stockLog);
             await _context.SaveChangesAsync();
 
+            await _userLogService.CreateAsync(ControllerConst.StockLog, ActionConst.CompleteDamaged, logCode);
 
             //TODO: routeValue could be more readable
             return RedirectToAction("Details", new RouteValueDictionary(
@@ -467,6 +473,8 @@ namespace WebApp_GozenBv.Controllers
 
             _context.StockLogs.Remove(stockLog);
             _context.SaveChanges();
+
+            await _userLogService.CreateAsync(ControllerConst.StockLog, ActionConst.Delete, stockLog.LogCode);
 
             return RedirectToAction(nameof(Index));
         }

@@ -49,9 +49,8 @@ namespace WebApp_GozenBv
             });
 
             services.AddTransient<IActionService, ActionService>();
-            services.AddScoped<IUserLogService, UserLogService>();
-            //services.AddSingleton<IUserService, UserService>();
-            //services.AddTransient<GraphServiceClient>();
+            services.AddTransient<IUserLogService, UserLogService>();
+            services.AddTransient<IUserService, UserService>();
         }
 
         // This method gets called by the runtime. Use this method to configure the HTTP request pipeline.

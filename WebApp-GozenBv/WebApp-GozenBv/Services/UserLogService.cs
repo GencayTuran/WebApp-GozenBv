@@ -34,11 +34,11 @@ namespace WebApp_GozenBv.Services
             //var user = await _userService.GetCurrentUser();
             //var userId = _userService.GetCurrentUserId(user);
 
-            //var user = await _userService.GetUserFromSeed();
+            var user = await _userService.GetCurrentUser();
 
             var userLog = new UserLog
             {
-                UserId = 1, //testing withour azure ad
+                UserId = user.Id,
                 Controller = controller,
                 Action = action,
                 EntityId = entityId,

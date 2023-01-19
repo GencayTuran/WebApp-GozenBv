@@ -6,8 +6,10 @@ using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.Rendering;
 using Microsoft.EntityFrameworkCore;
+using WebApp_GozenBv.Constants;
 using WebApp_GozenBv.Data;
 using WebApp_GozenBv.Models;
+using WebApp_GozenBv.Services;
 
 namespace WebApp_GozenBv.Controllers
 {
@@ -15,10 +17,12 @@ namespace WebApp_GozenBv.Controllers
     public class EmployeeController : Controller
     {
         private readonly DataDbContext _context;
+        private readonly IUserLogService _userLogService;
 
-        public EmployeeController(DataDbContext context)
+        public EmployeeController(DataDbContext context, IUserLogService userLogService)
         {
             _context = context;
+            _userLogService = userLogService;
         }
 
         // GET: Employee
@@ -47,16 +51,13 @@ namespace WebApp_GozenBv.Controllers
             return View(employee);
         }
 
-        // GET: Employee/Create
+        [HttpGet]
         public IActionResult Create()
         {
             ViewData["FirmaId"] = new SelectList(_context.Firmas, "Id", "Id");
             return View();
         }
 
-        // POST: Employee/Create
-        // To protect from overposting attacks, enable the specific properties you want to bind to, for 
-        // more details, see http://go.microsoft.com/fwlink/?LinkId=317598.
         [HttpPost]
         [ValidateAntiForgeryToken]
         public async Task<IActionResult> Create([Bind("Id,Name,Surname,FirmaId")] Employee employee)
@@ -65,6 +66,9 @@ namespace WebApp_GozenBv.Controllers
             {
                 _context.Add(employee);
                 await _context.SaveChangesAsync();
+
+                await _userLogService.CreateAsync(ControllerConst.Employee, ActionConst.Create, employee.Id.ToString());
+
                 return RedirectToAction(nameof(Index));
             }
             ViewData["FirmaId"] = new SelectList(_context.Firmas, "Id", "Id", employee.FirmaId);
@@ -88,9 +92,6 @@ namespace WebApp_GozenBv.Controllers
             return View(employee);
         }
 
-        // POST: Employee/Edit/5
-        // To protect from overposting attacks, enable the specific properties you want to bind to, for 
-        // more details, see http://go.microsoft.com/fwlink/?LinkId=317598.
         [HttpPost]
         [ValidateAntiForgeryToken]
         public async Task<IActionResult> Edit(int id, [Bind("Id,Name,Surname,FirmaId")] Employee employee)
@@ -106,6 +107,7 @@ namespace WebApp_GozenBv.Controllers
                 {
                     _context.Update(employee);
                     await _context.SaveChangesAsync();
+                    await _userLogService.CreateAsync(ControllerConst.Employee, ActionConst.Edit, employee.Id.ToString());
                 }
                 catch (DbUpdateConcurrencyException)
                 {
@@ -151,6 +153,7 @@ namespace WebApp_GozenBv.Controllers
             var employee = await _context.Employees.FindAsync(id);
             _context.Employees.Remove(employee);
             await _context.SaveChangesAsync();
+            await _userLogService.CreateAsync(ControllerConst.Employee, ActionConst.Delete, employee.Id.ToString());
             return RedirectToAction(nameof(Index));
         }
 
