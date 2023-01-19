@@ -16,16 +16,12 @@ namespace WebApp_GozenBv.Services
     public class UserLogService : IUserLogService
     {
         private readonly DataDbContext _context;
-        //private readonly IUserService _userService;
+        private readonly IUserService _userService;
 
-        //public UserLogService(DataDbContext context, IUserService userService)
-        //{
-        //    _context = context;
-        //    _userService = userService;
-        //}
-        public UserLogService(DataDbContext context)
+        public UserLogService(DataDbContext context, IUserService userService)
         {
             _context = context;
+            _userService = userService;
         }
 
 
