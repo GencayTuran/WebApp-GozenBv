@@ -479,60 +479,6 @@ namespace WebApp_GozenBv.Controllers
             return RedirectToAction(nameof(Index));
         }
 
-        //private DamagedDetailVM GetDamagedDetails(string logCode)
-        //{
-        //    StockLog stockLog = _context.StockLogs
-        //                .Include(s => s.Employee)
-        //                .Include(s => s.Employee.Firma)
-        //                .FirstOrDefault(s => s.LogCode == logCode);
-
-        //    //get list damageditems
-        //    List<StockLogItemDamaged> damagedItems = new List<StockLogItemDamaged>();
-        //    List<StockDamagedVM> damagedItemsVM = new List<StockDamagedVM>();
-
-        //    damagedItems = _context.StockDamaged
-        //        .Where(s => s.LogCode == logCode).ToList();
-
-        //    foreach (var item in damagedItems)
-        //    {
-        //        damagedItemsVM.Add(new StockDamagedVM
-        //        {
-        //            Id = item.Id,
-        //            LogCode = item.LogCode,
-        //            StockAmount = item.StockAmount,
-        //            StockId = item.StockId,
-        //            ProductNameBrand = item.ProductNameBrand
-        //        });
-        //    }
-
-        //    DamagedDetailVM damagedDetailVM = new DamagedDetailVM
-        //    {
-        //        StockLog = stockLog,
-        //        EmployeeFullNameFirma = (stockLog.Employee.Name + " " + stockLog.Employee.Surname + " - " + stockLog.Employee.Firma.FirmaName).ToUpper(),
-        //        DamagedItemsVM = damagedItemsVM
-        //    };
-
-        //    return damagedDetailVM;
-        //}
-
-        //public async Task<IActionResult> RepairStock(int stockId, int stockAmount, int damagedStockId)
-        //{
-        //    //remove damagedstock record when repaired
-        //    //update stock qty
-
-        //    var damagedStock = await _context.StockDamaged.FindAsync(damagedStockId);
-        //    var stock = await StockHelper.UpdateStockQty(stockId, stockAmount, _context);
-
-        //    //check stock?
-
-        //    _context.Update(stock);
-        //    _context.StockDamaged.Remove(damagedStock);
-        //    await _context.SaveChangesAsync();
-
-
-        //    return RedirectToAction(nameof(Index));
-        //}
-
         private IQueryable<StockLogItem> GetItemsForStockLog(StockLog stockLog)
         {
             //get stocklogitems that link with current stocklog
