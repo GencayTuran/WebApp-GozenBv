@@ -1,4 +1,5 @@
-﻿@model WebApp_GozenBv.Models.Firma
+﻿@using WebApp_GozenBv.Constants;
+@model WebApp_GozenBv.Models.Firma
 
 @{
     ViewData["Title"] = "Details";
@@ -18,6 +19,11 @@
         </dd>
     </dl>
 </div>
+
+<div>
+    <vc:user-log view="@ViewTypeConst.Entity" controller="@ControllerConst.Firma" entity-id="@Model.Id"></vc:user-log>
+</div>
+
 <div>
     <a asp-action="Edit" asp-route-id="@Model.Id">Edit</a> |
     <a asp-action="Index">Back to List</a>

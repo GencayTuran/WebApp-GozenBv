@@ -11,12 +11,14 @@ namespace WebApp_GozenBv.ViewComponents
     public class UserLogViewComponent : ViewComponent
     {
         private readonly IUserLogService _userLogService;
-        public UserLogViewComponent(IUserLogService userLogService)
+        private readonly IUserService _userService;
+        public UserLogViewComponent(IUserLogService userLogService, IUserService userService)
         {
             _userLogService = userLogService;
+            _userService= userService;
         }
 
-        public async Task<IViewComponentResult> InvokeAsync(int view, int userId, string entityId, int controller)
+        public async Task<IViewComponentResult> InvokeAsync(int view, string entityId, int controller)
         {
             List<UserLogViewModel> userLogs = new();
 
@@ -29,7 +31,8 @@ namespace WebApp_GozenBv.ViewComponents
                     userLogs = await _userLogService.GetLogsByEntity(entityId, controller);
                     break;
                 case ViewTypeConst.User:
-                    userLogs = await _userLogService.GetLogsByUser(userId);
+                    var user = _userService.GetCurrentUser();
+                    userLogs = await _userLogService.GetLogsByUser(user.Id);
                     break;
                 case ViewTypeConst.All:
                     userLogs = await _userLogService.GetLogs();

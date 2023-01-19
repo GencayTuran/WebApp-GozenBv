@@ -61,6 +61,7 @@ namespace WebApp_GozenBv.Services
         public async Task<List<UserLogViewModel>> GetLogsByController(int controller)
         {
             var userLogs = _context.UserLogs
+                .Include(u => u.User)
                 .Where(x => x.Controller == controller)
                 .ToList();
 
@@ -72,6 +73,7 @@ namespace WebApp_GozenBv.Services
         public async Task<List<UserLogViewModel>> GetLogsByEntity(string entityId, int controller)
         {
             var userLogs = _context.UserLogs
+                .Include(u => u.User)
                 .Where(x => x.EntityId == entityId)
                 .Where(x => x.Controller == controller)
                 .ToList();
@@ -84,6 +86,7 @@ namespace WebApp_GozenBv.Services
         public async Task<List<UserLogViewModel>> GetLogsByUser(int userId)
         {
             var userLogs = _context.UserLogs
+                .Include(u => u.User)
                 .Where(x => x.UserId == userId)
                 .ToList();
 
@@ -96,18 +99,21 @@ namespace WebApp_GozenBv.Services
         {
             List<UserLogViewModel> userLogsViewModel = new();
 
-            foreach (var log in userLogs)
+            if (userLogs.Any())
             {
-                userLogsViewModel.Add(new UserLogViewModel
+                foreach (var log in userLogs)
                 {
-                    UserName = log.User.Name,
-                    Action = SetAction(log.Action),
-                    Controller = SetController(log.Controller),
-                    EntityId = log.EntityId,
-                    LogDate = log.LogDate
-                });
+                    userLogsViewModel.Add(new UserLogViewModel
+                    {
+                        UserName = log.User.Name,
+                        Action = SetAction(log.Action),
+                        Controller = SetController(log.Controller),
+                        EntityId = log.EntityId,
+                        LogDate = log.LogDate
+                    });
+                }
+                return userLogsViewModel;
             }
-
             return userLogsViewModel;
         }
 
@@ -144,7 +150,7 @@ namespace WebApp_GozenBv.Services
                 default:
                     break;
             }
-                    return action;
+            return action;
         }
 
         private string SetController(int dataController)
@@ -177,5 +183,5 @@ namespace WebApp_GozenBv.Services
             return controller;
         }
     }
-    
+
 }

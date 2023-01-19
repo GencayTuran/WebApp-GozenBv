@@ -109,7 +109,7 @@ namespace WebApp_GozenBv.Controllers
                     await _context.SaveChangesAsync();
                     await _userLogService.CreateAsync(ControllerConst.Stock, ActionConst.Edit, stock.Id.ToString());
                 }
-                catch (DbUpdateConcurrencyException e)
+                catch (DbUpdateConcurrencyException)
                 {
                     if (!StockExists(stock.Id))
                     {

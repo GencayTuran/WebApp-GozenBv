@@ -1,4 +1,5 @@
-﻿@model WebApp_GozenBv.ViewModels.StockLogDetailVM
+﻿@using WebApp_GozenBv.Constants;
+@model WebApp_GozenBv.ViewModels.StockLogDetailVM
 
 @{
     ViewData["Title"] = "Details";
@@ -52,6 +53,11 @@
         }
     </tbody>
 </table>
+
+<div>
+    <vc:user-log view="@ViewTypeConst.Entity" controller="@ControllerConst.StockLog" entity-id="@Model.LogCode"></vc:user-log>
+</div>
+
 <div class="d-flex flex-column">
     <a asp-action="Index">Back to List</a>
     <a id="linkCompleteDamaged" asp-action="CompleteDamaged" asp-route-id="@Model.LogCode">Complete Damaged</a>
