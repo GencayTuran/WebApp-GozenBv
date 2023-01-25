@@ -12,7 +12,7 @@ using WebApp_GozenBv.Data;
 namespace WebApp_GozenBv.Migrations
 {
     [DbContext(typeof(DataDbContext))]
-    [Migration("20230117105410_init")]
+    [Migration("20230125081635_init")]
     partial class init
     {
         protected override void BuildTargetModel(ModelBuilder modelBuilder)
@@ -141,10 +141,10 @@ namespace WebApp_GozenBv.Migrations
 
                     SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"), 1L, 1);
 
-                    b.Property<int?>("DamagedAmount")
+                    b.Property<int>("DamagedAmount")
                         .HasColumnType("int");
 
-                    b.Property<int?>("DeletedAmount")
+                    b.Property<int>("DeletedAmount")
                         .HasColumnType("int");
 
                     b.Property<string>("LogCode")
@@ -153,7 +153,7 @@ namespace WebApp_GozenBv.Migrations
                     b.Property<string>("ProductNameBrand")
                         .HasColumnType("nvarchar(max)");
 
-                    b.Property<int?>("RepairedAmount")
+                    b.Property<int>("RepairedAmount")
                         .HasColumnType("int");
 
                     b.Property<int>("StockAmount")

@@ -12,8 +12,8 @@ namespace WebApp_GozenBv.Models
         public int StockId { get; set; }
         public int StockAmount { get; set; }
         public string ProductNameBrand { get; set; }
-        public int? DamagedAmount { get; set; }
-        public int? RepairedAmount { get; set; }
-        public int? DeletedAmount { get; set; }
+        public int DamagedAmount { get; set; }
+        public int RepairedAmount { get; set; }
+        public int DeletedAmount { get; set; }
     }
 }

@@ -50,9 +50,9 @@ namespace WebApp_GozenBv.Migrations
                     StockId = table.Column<int>(type: "int", nullable: false),
                     StockAmount = table.Column<int>(type: "int", nullable: false),
                     ProductNameBrand = table.Column<string>(type: "nvarchar(max)", nullable: true),
-                    DamagedAmount = table.Column<int>(type: "int", nullable: true),
-                    RepairedAmount = table.Column<int>(type: "int", nullable: true),
-                    DeletedAmount = table.Column<int>(type: "int", nullable: true)
+                    DamagedAmount = table.Column<int>(type: "int", nullable: false),
+                    RepairedAmount = table.Column<int>(type: "int", nullable: false),
+                    DeletedAmount = table.Column<int>(type: "int", nullable: false)
                 },
                 constraints: table =>
                 {
