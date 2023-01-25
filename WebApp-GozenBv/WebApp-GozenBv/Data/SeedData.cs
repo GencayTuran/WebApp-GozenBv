@@ -54,7 +54,7 @@ namespace WebApp_GozenBv.Data
             stock[0] = new Stock
             {
                 ProductName = "Kniptang",
-                Quantity = 3,
+                Quantity = 10,
                 MinQuantity = 5,
                 ProductBrand = "Knipex",
                 Cost = 20
@@ -71,7 +71,7 @@ namespace WebApp_GozenBv.Data
             stock[2] = new Stock
             {
                 ProductName = "Slijper",
-                Quantity = 3,
+                Quantity = 5,
                 MinQuantity = 1,
                 ProductBrand = "Bosch",
                 Cost = 80
@@ -79,7 +79,7 @@ namespace WebApp_GozenBv.Data
             stock[3] = new Stock
             {
                 ProductName = "Hamer",
-                Quantity = 4,
+                Quantity = 15,
                 MinQuantity = 1,
                 ProductBrand = "Hitachi",
                 Cost = 20
@@ -87,8 +87,8 @@ namespace WebApp_GozenBv.Data
             stock[4] = new Stock
             {
                 ProductName = "Kniptang",
-                Quantity = 3,
-                MinQuantity = 1,
+                Quantity = 5,
+                MinQuantity = 7,
                 ProductBrand = "Andere",
                 Cost = 20
             };

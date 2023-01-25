@@ -293,13 +293,13 @@ namespace WebApp_GozenBv.Controllers
                 {
                     if (x < damagedStock.Length && item.StockId == damagedStock[x])
                     {
-                            x++;
-                            item.DamagedAmount = damagedStock[x];
-                            //count back (seperate) the not-damaged items
-                            var notDamagedAmount = item.StockAmount - damagedStock[x];
-                            await StockHelper.UpdateStockQty(item.StockId, notDamagedAmount, _context);
-                            _context.Update(item);
-                            x++;
+                        x++;
+                        item.DamagedAmount = damagedStock[x];
+                        //count back (seperate) the not-damaged items
+                        var notDamagedAmount = item.StockAmount - damagedStock[x];
+                        await StockHelper.UpdateStockQty(item.StockId, notDamagedAmount, _context);
+                        _context.Update(item);
+                        x++;
                     }
                     else
                     {
@@ -380,7 +380,80 @@ namespace WebApp_GozenBv.Controllers
                 new { ControllerContext = "StockLog", Action = "Details", Id = logCode }));
         }
 
+        public async Task<IActionResult> Undo(string id)
+        {
+            var logCode = id;
+            var stockLog = _context.StockLogs
+                .Where(s => s.LogCode == logCode)
+                .FirstOrDefault();
 
+            var stockLogItems = _context.StockLogItems
+                .Where(s => s.LogCode == logCode);
+
+            switch (stockLog.Status)
+            {
+                case StockLogStatusConst.DamagedAwaitingAction:
+
+                    foreach (var item in stockLogItems)
+                    {
+                        var notDamagedItems = item.StockAmount - item.DamagedAmount;
+                        await StockHelper.UpdateStockQty(item.StockId, -notDamagedItems, _context);
+                        item.DamagedAmount = 0;
+
+                        _context.Update(item);
+                    }
+
+                    stockLog.Status = StockLogStatusConst.AwaitingReturn;
+                    break;
+
+                case StockLogStatusConst.Completed:
+                    if (stockLog.Damaged)
+                    {
+                        foreach (var item in stockLogItems)
+                        {
+                            if (item.RepairedAmount > 0)
+                            {
+                                await StockHelper.UpdateStockQty(item.StockId, -item.RepairedAmount, _context);
+                            }
+
+                            if (item.DeletedAmount > 0)
+                            {
+                                await StockHelper.UpdateStockQty(item.StockId, item.DeletedAmount, _context);
+                            }
+
+                            var notDamagedItems = item.StockAmount - item.DamagedAmount;
+                            await StockHelper.UpdateStockQty(item.StockId, -notDamagedItems, _context);
+
+                            item.RepairedAmount = 0;
+                            item.DeletedAmount = 0;
+                            stockLog.Damaged = false;
+
+                            _context.Update(item);
+
+                        }
+                        stockLog.Status = StockLogStatusConst.DamagedAwaitingAction;
+                    }
+                    else
+                    {
+                        foreach (var item in stockLogItems)
+                        {
+                            await StockHelper.UpdateStockQty(item.StockId, -item.StockAmount, _context);
+
+                            _context.Update(item);
+                        }
+                        stockLog.Status = StockLogStatusConst.AwaitingReturn;
+                    }
+                    break;
+
+                default:
+                    break;
+            }
+            _context.Update(stockLog);
+            _context.SaveChanges();
+
+            return RedirectToAction("Details", new RouteValueDictionary(
+             new { ControllerContext = "StockLog", Action = "Details", Id = logCode }));
+        }
 
         private bool StockLogExists(int id)
         {
