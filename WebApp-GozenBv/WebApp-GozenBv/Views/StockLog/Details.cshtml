@@ -60,6 +60,11 @@
 
 <div class="d-flex flex-column">
     <a asp-action="Index">Back to List</a>
+    @if (Model.Status == StockLogStatusConst.Completed ||
+    Model.Status == StockLogStatusConst.DamagedAwaitingAction)
+    {
+        <a asp-action="Undo" asp-route-id="@Model.LogCode">Undo</a>
+    }
     <a id="linkCompleteDamaged" asp-action="CompleteDamaged" asp-route-id="@Model.LogCode">Complete Damaged</a>
     <a id="linkCompleteReturn" asp-action="CompleteReturn" asp-route-id="@Model.LogCode">Complete Return</a>
 </div>
