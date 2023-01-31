@@ -48,8 +48,8 @@
     </table>
 
     <form asp-action="Delete">
-        <input type="hidden" asp-for="LogCode" />
-        <input type="submit" value="Delete" class="btn btn-danger" /> |
+        @*<input type="hidden" asp-for="LogCode" />*@
+        <input type="submit" asp-route-id="@Model.LogCode" value="Delete" class="btn btn-danger" /> |
         <a asp-action="Index">Back to List</a>
     </form>
 </div>

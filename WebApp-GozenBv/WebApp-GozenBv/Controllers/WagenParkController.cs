@@ -45,7 +45,7 @@ namespace WebApp_GozenBv.Controllers
                 .FirstOrDefaultAsync(m => m.Id == id);
             if (wagenPark == null)
             {
-                return NotFound();
+                return PartialView("_EntityNotFound");
             }
 
             return View(wagenPark);

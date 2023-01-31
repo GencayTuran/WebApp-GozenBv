@@ -44,13 +44,16 @@ namespace WebApp_GozenBv.Controllers
         {
             string logCode = id;
 
-            if (logCode == null)
+            var stockLog = await _context.StockLogs
+                .Where(s => s.LogCode == logCode)
+                .FirstOrDefaultAsync();
+
+            if (stockLog == null)
             {
-                return NotFound();
+                return PartialView("_EntityNotFound");
             }
 
             var stockLogDetailVM = GetStockLogDetails(logCode, false);
-
             return View(stockLogDetailVM);
         }
 
@@ -192,7 +195,7 @@ namespace WebApp_GozenBv.Controllers
             {
                 try
                 {
-                    var stockLogItems = GetItemsForStockLog(stockLog);
+                    var stockLogItems = GetStockLogItems(stockLog);
 
                     _context.Update(stockLog);
                     await _context.SaveChangesAsync();
@@ -254,7 +257,7 @@ namespace WebApp_GozenBv.Controllers
                 var stockLog = await _context.StockLogs
                 .Where(s => s.LogCode == logCode)
                 .FirstOrDefaultAsync();
-                var stockLogItems = GetItemsForStockLog(stockLog);
+                var stockLogItems = GetStockLogItems(stockLog);
 
                 //update stock amount for each stocklogitems
                 foreach (var item in stockLogItems)
@@ -516,32 +519,33 @@ namespace WebApp_GozenBv.Controllers
                 return NotFound();
             }
 
-            var stockLog = await _context.StockLogs
-                .Include(s => s.Employee)
-                .FirstOrDefaultAsync(m => m.Id == id);
+            var logCode = _context.StockLogs
+                .Where(s => s.Id == id)
+                .Select(s => s.LogCode)
+                .FirstOrDefault();
 
-            if (stockLog == null)
-            {
-                return NotFound();
-            }
+            var stockLogDetailVM = GetStockLogDetails(logCode, false);
 
-            return View(stockLog);
+            return View(stockLogDetailVM);
         }
 
         // POST: StockLog/Delete/5
-        [HttpDelete]
-        [ValidateAntiForgeryToken]
-        public async Task<IActionResult> Delete(int id)
+        [HttpPost]
+        public async Task<IActionResult> Delete(string id)
         {
-            var stockLog = await _context.StockLogs.FindAsync(id);
+            var logCode = id;
 
-            //TODO: group this into a method 
-            var stockLogItems = GetItemsForStockLog(stockLog);
+            var stockLog = await _context.StockLogs
+                .Where(s => s.LogCode == logCode)
+                .FirstOrDefaultAsync();
+
+            var stockLogItems = GetStockLogItems(stockLog);
 
             //update stock amount for each stocklogitems
             foreach (var item in stockLogItems)
             {
                 var stock = await StockHelper.UpdateStockQty(item.StockId, item.StockAmount, _context);
+                _context.StockLogItems.Remove(item);
             }
 
             _context.StockLogs.Remove(stockLog);
@@ -552,7 +556,7 @@ namespace WebApp_GozenBv.Controllers
             return RedirectToAction(nameof(Index));
         }
 
-        private IQueryable<StockLogItem> GetItemsForStockLog(StockLog stockLog)
+        private IQueryable<StockLogItem> GetStockLogItems(StockLog stockLog)
         {
             //get stocklogitems that link with current stocklog
             var stockLogItems = _context.StockLogItems
