@@ -46,8 +46,7 @@
                 </td>
                 <td>@item.ProductNameBrand</td>
                 <td>
-                    <p class="labelAmount">@item.StockAmount</p>
-                    <input class="inputAmount damagedView" type="number" value="@item.StockAmount" />
+                    <input class="inputAmount damagedView" type="number" max="@item.StockAmount" value="@item.StockAmount" />
                 </td>
                 <td class="damagedView"><input class="checkRow" type="checkbox" /></td>
             </tr>
@@ -55,16 +54,11 @@
     </tbody>
 </table>
 
-<div>
-    <input id="chkDamaged" type="checkbox" />
-    <p>Damaged items?</p>
-</div>
-
 <form asp-action="CompleteReturn">
     @*<input type="hidden" asp-for=""/>*@
     <input type="hidden" asp-for="LogCode" />
     <input id="damagedStockResult" type="hidden" asp-for="DamagedStock" />
-    <input id="btnSubmit" type="submit" value="Complete" class="btn btn-primary" /> |
+    <input id="btnSubmit" onclick="PassDamagedItems()" type="submit" value="Complete" class="btn btn-primary" /> |
     <a asp-action="Index">Back to List</a>
 </form>
 

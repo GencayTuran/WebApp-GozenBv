@@ -251,44 +251,23 @@ namespace WebApp_GozenBv.Controllers
             //TODO: alternative modelstate valid check needed
             string logCode = stockLogDetailVM.LogCode;
 
-            //Status COMPLETE
-            if (stockLogDetailVM.DamagedStock == null)
+            StockLog stockLog = _context.StockLogs
+                .FirstOrDefault(s => s.LogCode == logCode);
+
+            if (stockLog == null)
             {
-                var stockLog = await _context.StockLogs
-                .Where(s => s.LogCode == logCode)
-                .FirstOrDefaultAsync();
-                var stockLogItems = GetStockLogItems(stockLog);
-
-                //update stock amount for each stocklogitems
-                foreach (var item in stockLogItems)
-                {
-                    var stock = await StockHelper.UpdateStockQty(item.StockId, item.StockAmount, _context);
-                    _context.Update(stock);
-                }
-
-                stockLog.CompletionDate = DateTime.Now;
-                stockLog.Status = StockLogStatusConst.Completed;
-                _context.Update(stockLog);
-                _context.SaveChanges();
-
-                await _userLogService.CreateAsync(ControllerConst.StockLog, ActionConst.CompleteReturn, logCode);
-
-                return RedirectToAction(nameof(Index));
+                return NotFound();
             }
-            else //Status DAMAGED
-            {
-                StockLog stockLog = _context.StockLogs
-                        .FirstOrDefault(s => s.LogCode == logCode);
 
-                if (stockLog == null)
-                {
-                    return NotFound();
-                }
+            var stockLogItems = GetStockLogItems(stockLog);
+
+            //Status COMPLETE
+            if (stockLogDetailVM.DamagedStock != null)
+            {
 
                 string[] data = stockLogDetailVM.DamagedStock.Split(","); //id, amount 
                 int[] damagedStock = Array.ConvertAll(data, d => int.Parse(d));
 
-                var stockLogItems = _context.StockLogItems.Where(s => s.LogCode == logCode);
 
                 //update StockLogItems
                 int x = 0;
@@ -320,6 +299,22 @@ namespace WebApp_GozenBv.Controllers
                 return RedirectToAction("Details", new RouteValueDictionary(
                     new { ControllerContext = "StockLog", Action = "Details", Id = logCode }));
             }
+
+            //update stock amount for each stocklogitems
+            foreach (var item in stockLogItems)
+            {
+                var stock = await StockHelper.UpdateStockQty(item.StockId, item.StockAmount, _context);
+                _context.Update(stock);
+            }
+
+            stockLog.CompletionDate = DateTime.Now;
+            stockLog.Status = StockLogStatusConst.Completed;
+            _context.Update(stockLog);
+            _context.SaveChanges();
+
+            await _userLogService.CreateAsync(ControllerConst.StockLog, ActionConst.CompleteReturn, logCode);
+
+            return RedirectToAction(nameof(Index));
         }
 
         [HttpGet]
