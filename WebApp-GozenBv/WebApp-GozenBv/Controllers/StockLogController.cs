@@ -402,6 +402,7 @@ namespace WebApp_GozenBv.Controllers
                     }
 
                     stockLog.Status = StockLogStatusConst.AwaitingReturn;
+                    stockLog.Damaged = false;
                     break;
 
                 case StockLogStatusConst.Completed:
@@ -424,7 +425,6 @@ namespace WebApp_GozenBv.Controllers
 
                             item.RepairedAmount = 0;
                             item.DeletedAmount = 0;
-                            stockLog.Damaged = false;
 
                             _context.Update(item);
 
@@ -500,6 +500,7 @@ namespace WebApp_GozenBv.Controllers
                 StockLogItems = stockLogItems,
                 CompletionDate = stockLog.CompletionDate,
                 Status = stockLog.Status,
+                IsDamaged = stockLog.Damaged,
             };
 
             return stockLogDetailVM;

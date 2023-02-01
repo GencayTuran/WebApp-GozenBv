@@ -24,6 +24,10 @@
             <td>@Html.DisplayFor(model => model.EmployeeFullNameFirma)</td>
             <td>@Html.DisplayFor(model => model.LogCode)</td>
             <status-color status="@Model.Status" view="Details"></status-color>
+            @if (Model.IsDamaged && Model.Status == StockLogStatusConst.Completed)
+            {
+                <td><p>damaged</p></td>
+            }
         </tr>
     </tbody>
     <thead>
@@ -40,7 +44,10 @@
                 <th>@Html.DisplayNameFor(model => model.StockLogItem.RepairedAmount)</th>
                 <th>@Html.DisplayNameFor(model => model.StockLogItem.DeletedAmount)</th>
             }
-
+            @if (Model.Status == StockLogStatusConst.DamagedAwaitingAction)
+            {
+                <th>@Html.DisplayNameFor(model => model.StockLogItem.DamagedAmount)</th>
+            }
         </tr>
     </thead>
     <tbody>
@@ -50,11 +57,19 @@
                 <td>@item.StockId</td>
                 <td>@item.ProductNameBrand</td>
                 <td>@item.StockAmount</td>
-                @if (Model.IsDamaged && Model.Status == StockLogStatusConst.Completed)
+                @if (Model.IsDamaged && Model.Status == StockLogStatusConst.Completed && item.DamagedAmount > 0)
                 {
                     <td>@item.DamagedAmount</td>
                     <td>@item.RepairedAmount</td>
                     <td>@item.DeletedAmount</td>
+                }
+
+                @if (Model.Status == StockLogStatusConst.DamagedAwaitingAction)
+                {
+                    if (item.DamagedAmount != 0)
+                    {
+                        <td>@item.DamagedAmount</td>    
+                    }
                 }
             </tr>
         }

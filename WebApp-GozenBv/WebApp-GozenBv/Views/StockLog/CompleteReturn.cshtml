@@ -32,23 +32,21 @@
             <th>@Html.DisplayNameFor(model => model.StockLogItem.StockId)</th>
             <th>@Html.DisplayNameFor(model => model.StockLogItem)</th>
             <th>@Html.DisplayNameFor(model => model.StockLogItem.StockAmount)</th>
-            <th class="damagedView">Damaged?</th>
+            <th>Damaged?</th>
+            <th id="damagedTitle" style="opacity: 0.6">@Html.DisplayNameFor(model => model.StockLogItem.DamagedAmount)</th>
         </tr>
     </thead>
     <tbody>
         @foreach (var item in Model.StockLogItems)
         {
             <tr class="stockLogItemRow">
+                <td><p class="labelStockId">@item.StockId</p></td>
+                <td><p>@item.ProductNameBrand</p></td>
+                <td><p>@item.StockAmount</p></td>
+                <td><input class="chkDamaged" type="checkbox" onclick="ChangeDamaged(this)" /></td>
                 <td>
-                    <p class="labelStockId">
-                        @item.StockId
-                    </p>
+                    <input class="inputAmount w-25" disabled type="number" max="@item.StockAmount" value="@item.StockAmount" />
                 </td>
-                <td>@item.ProductNameBrand</td>
-                <td>
-                    <input class="inputAmount damagedView" type="number" max="@item.StockAmount" value="@item.StockAmount" />
-                </td>
-                <td class="damagedView"><input class="checkRow" type="checkbox" /></td>
             </tr>
         }
     </tbody>
