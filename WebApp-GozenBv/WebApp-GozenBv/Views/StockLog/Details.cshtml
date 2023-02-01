@@ -34,21 +34,28 @@
             <th>@Html.DisplayNameFor(model => model.StockLogItem.StockId)</th>
             <th>@Html.DisplayNameFor(model => model.StockLogItem)</th>
             <th>@Html.DisplayNameFor(model => model.StockLogItem.StockAmount)</th>
-            <th>@Html.DisplayNameFor(model => model.StockLogItem.DamagedAmount)</th>
-            <th id="thRepaired" class="amounts">@Html.DisplayNameFor(model => model.StockLogItem.RepairedAmount)</th>
-            <th id="thDeleted" class="amounts">@Html.DisplayNameFor(model => model.StockLogItem.DeletedAmount)</th>
+            @if (Model.IsDamaged && Model.Status == StockLogStatusConst.Completed)
+            {
+                <th>@Html.DisplayNameFor(model => model.StockLogItem.DamagedAmount)</th>
+                <th>@Html.DisplayNameFor(model => model.StockLogItem.RepairedAmount)</th>
+                <th>@Html.DisplayNameFor(model => model.StockLogItem.DeletedAmount)</th>
+            }
+
         </tr>
     </thead>
     <tbody>
         @foreach (var item in Model.StockLogItems)
-        { 
+        {
             <tr>
                 <td>@item.StockId</td>
                 <td>@item.ProductNameBrand</td>
                 <td>@item.StockAmount</td>
-                <td>@item.DamagedAmount</td>
-                <td id="tdRepaired" class="amounts">@item.RepairedAmount</td>
-                <td id="tdDeleted" class="amounts">@item.DeletedAmount</td>
+                @if (Model.IsDamaged && Model.Status == StockLogStatusConst.Completed)
+                {
+                    <td>@item.DamagedAmount</td>
+                    <td>@item.RepairedAmount</td>
+                    <td>@item.DeletedAmount</td>
+                }
             </tr>
         }
     </tbody>
@@ -60,13 +67,22 @@
 
 <div class="d-flex flex-column">
     <a asp-action="Index">Back to List</a>
-    @if (Model.Status == StockLogStatusConst.Completed ||
-    Model.Status == StockLogStatusConst.DamagedAwaitingAction)
+
+    @switch (Model.Status)
     {
-        <a asp-action="Undo" asp-route-id="@Model.LogCode">Undo</a>
+        case StockLogStatusConst.AwaitingReturn:
+            <a asp-action="CompleteReturn" asp-route-id="@Model.LogCode">Complete Return</a>
+            break;
+
+        case StockLogStatusConst.DamagedAwaitingAction:
+            <a asp-action="Undo" asp-route-id="@Model.LogCode">Undo</a>
+            <a asp-action="CompleteDamaged" asp-route-id="@Model.LogCode">Complete Damaged</a>
+            break;
+
+        case StockLogStatusConst.Completed:
+            <a asp-action="Undo" asp-route-id="@Model.LogCode">Undo</a>
+            break;
     }
-    <a id="linkCompleteDamaged" asp-action="CompleteDamaged" asp-route-id="@Model.LogCode">Complete Damaged</a>
-    <a id="linkCompleteReturn" asp-action="CompleteReturn" asp-route-id="@Model.LogCode">Complete Return</a>
 </div>
-    <input id="statusId" type="hidden" value="@Model.Status" />
-    <script src="~/js/StockLog_Details.js"></script>
+<input id="statusId" type="hidden" value="@Model.Status" />
+<script src="~/js/StockLog_Details.js"></script>
