@@ -10,6 +10,8 @@ namespace WebApp_GozenBv.Models
         public int Id { get; set; }
         public string LogCode { get; set; }
         public int StockId { get; set; }
+        public bool IsDamaged { get; set; }
+        public double Cost { get; set; }
         public int StockAmount { get; set; }
         public string ProductNameBrand { get; set; }
         public int DamagedAmount { get; set; }

@@ -48,6 +48,8 @@ namespace WebApp_GozenBv.Migrations
                         .Annotation("SqlServer:Identity", "1, 1"),
                     LogCode = table.Column<string>(type: "nvarchar(max)", nullable: true),
                     StockId = table.Column<int>(type: "int", nullable: false),
+                    IsDamaged = table.Column<bool>(type: "bit", nullable: false),
+                    Cost = table.Column<double>(type: "float", nullable: false),
                     StockAmount = table.Column<int>(type: "int", nullable: false),
                     ProductNameBrand = table.Column<string>(type: "nvarchar(max)", nullable: true),
                     DamagedAmount = table.Column<int>(type: "int", nullable: false),

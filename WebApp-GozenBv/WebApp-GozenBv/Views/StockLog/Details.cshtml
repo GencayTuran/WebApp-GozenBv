@@ -37,6 +37,11 @@
         <tr>
             <th>@Html.DisplayNameFor(model => model.StockLogItem.StockId)</th>
             <th>@Html.DisplayNameFor(model => model.StockLogItem)</th>
+            @if (Model.IsDamaged)
+            {
+                <th>@Html.DisplayNameFor(model => model.StockLogItem.Cost)</th>
+
+            }
             <th>@Html.DisplayNameFor(model => model.StockLogItem.StockAmount)</th>
             @if (Model.IsDamaged && Model.Status == StockLogStatusConst.Completed)
             {
@@ -56,8 +61,19 @@
             <tr>
                 <td>@item.StockId</td>
                 <td>@item.ProductNameBrand</td>
+                @if (Model.IsDamaged)
+                {
+                    @if (item.IsDamaged)
+                    {
+                        <td>@item.Cost</td>
+                    }
+                    else
+                    {
+                        <td></td>
+                    }
+                }
                 <td>@item.StockAmount</td>
-                @if (Model.IsDamaged && Model.Status == StockLogStatusConst.Completed && item.DamagedAmount > 0)
+                @if (Model.IsDamaged && Model.Status == StockLogStatusConst.Completed && item.IsDamaged)
                 {
                     <td>@item.DamagedAmount</td>
                     <td>@item.RepairedAmount</td>
@@ -68,7 +84,11 @@
                 {
                     if (item.DamagedAmount != 0)
                     {
-                        <td>@item.DamagedAmount</td>    
+                        <td>@item.DamagedAmount</td>
+                    }
+                    else
+                    {
+                        <td></td>
                     }
                 }
             </tr>

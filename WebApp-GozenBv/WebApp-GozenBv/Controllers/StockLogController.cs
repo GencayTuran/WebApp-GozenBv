@@ -124,6 +124,7 @@ namespace WebApp_GozenBv.Controllers
                     StockLogItem stockLogItem = new StockLogItem();
                     var stock = _context.Stock.Where(s => s.Id == products[x]).FirstOrDefault();
                     stockLogItem.LogCode = logCode;
+                    stockLogItem.Cost = stock.Cost;
                     stockLogItem.StockId = products[x];
                     x++;
                     stockLogItem.StockAmount = products[x];
@@ -277,9 +278,9 @@ namespace WebApp_GozenBv.Controllers
                     {
                         x++;
                         item.DamagedAmount = damagedStock[x];
-                        //count back (seperate) the not-damaged items
                         var notDamagedAmount = item.StockAmount - damagedStock[x];
                         await StockHelper.UpdateStockQty(item.StockId, notDamagedAmount, _context);
+                        item.IsDamaged = true;
                         _context.Update(item);
                         x++;
                     }

@@ -139,11 +139,17 @@ namespace WebApp_GozenBv.Migrations
 
                     SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"), 1L, 1);
 
+                    b.Property<double>("Cost")
+                        .HasColumnType("float");
+
                     b.Property<int>("DamagedAmount")
                         .HasColumnType("int");
 
                     b.Property<int>("DeletedAmount")
                         .HasColumnType("int");
+
+                    b.Property<bool>("IsDamaged")
+                        .HasColumnType("bit");
 
                     b.Property<string>("LogCode")
                         .HasColumnType("nvarchar(max)");
