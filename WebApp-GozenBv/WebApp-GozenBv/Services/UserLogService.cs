@@ -49,6 +49,7 @@ namespace WebApp_GozenBv.Services
         {
             var userLogs = _context.UserLogs
                 .Include(u => u.User)
+                .OrderByDescending(x => x.LogDate)
                 .ToList();
 
             List<UserLogViewModel> userlogsViewModel = new();
@@ -63,6 +64,7 @@ namespace WebApp_GozenBv.Services
             var userLogs = _context.UserLogs
                 .Include(u => u.User)
                 .Where(x => x.Controller == controller)
+                .OrderByDescending(x => x.LogDate)
                 .ToList();
 
             var userLogsViewModel = SetViewModel(userLogs);
@@ -76,6 +78,7 @@ namespace WebApp_GozenBv.Services
                 .Include(u => u.User)
                 .Where(x => x.EntityId == entityId)
                 .Where(x => x.Controller == controller)
+                .OrderByDescending(x => x.LogDate)
                 .ToList();
 
             var userLogsViewModel = SetViewModel(userLogs);
@@ -88,6 +91,7 @@ namespace WebApp_GozenBv.Services
             var userLogs = _context.UserLogs
                 .Include(u => u.User)
                 .Where(x => x.UserId == userId)
+                .OrderByDescending(x => x.LogDate)
                 .ToList();
 
             var userLogsViewModel = SetViewModel(userLogs);

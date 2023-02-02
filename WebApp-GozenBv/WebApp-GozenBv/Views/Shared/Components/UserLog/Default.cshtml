@@ -5,15 +5,17 @@
 
         <div class="card">
             <div class="card-header" id="headingOne">
-                <h4 class="mb-0">
-                    <button class="btn btn-link" data-toggle="collapse" data-target="#collapseOne" aria-expanded="true" aria-controls="collapseOne">
+                <button class="btn btn-link w-100 d-flex justify-content-sm-center justify-content-md-start" data-toggle="collapse" data-target="#collapseOne" aria-expanded="true" aria-controls="collapseOne">
+                    <h4 class="mb-0">
                         User logs
-                    </button>
-                </h4>
+                    </h4>
+                </button>
             </div>
 
             <div id="collapseOne" class="collapse" aria-labelledby="headingOne" data-parent="#accordion">
                 <div class="card-body">
+                    @if (Model.Count != 0)
+                    {
                         <ul class="list-group">
                             @foreach (var log in Model)
                             {
@@ -29,6 +31,11 @@
                                 </li>
                             }
                         </ul>
+                    }
+                    else
+                    {
+                        <p><em>No logs here</em></p>
+                    }
                 </div>
             </div>
         </div>

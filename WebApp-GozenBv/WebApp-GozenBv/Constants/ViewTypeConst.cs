@@ -6,6 +6,7 @@
         public const int Entity = 1;
         public const int User = 2;
         public const int All = 3;
+        public const int Limit = 4;
 
     }
 }

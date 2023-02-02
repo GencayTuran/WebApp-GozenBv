@@ -1,6 +1,7 @@
 ﻿using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore.Metadata.Internal;
 using System.Collections.Generic;
+using System.Linq;
 using System.Threading.Tasks;
 using WebApp_GozenBv.Constants;
 using WebApp_GozenBv.Services;
@@ -36,6 +37,10 @@ namespace WebApp_GozenBv.ViewComponents
                     break;
                 case ViewTypeConst.All:
                     userLogs = await _userLogService.GetLogs();
+                    break;
+                case ViewTypeConst.Limit:
+                    var logs = await _userLogService.GetLogs();
+                    userLogs.AddRange(logs.Take(20));
                     break;
                 default:
                     break;
