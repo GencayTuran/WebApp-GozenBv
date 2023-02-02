@@ -46,21 +46,21 @@
 
                 <td>@item.ProductNameBrand</td>
                 <td>@item.StockAmount</td>
-                <td><p class="inputDamaged">@item.DamagedAmount</p></td>
+                <td><p class="damagedAmount">@item.DamagedAmount</p></td>
                 <td>
-                    <input class="inputRepaired" type="number" />
+                    <input class="inputRepaired" min="0" max="@item.DamagedAmount" type="number" />
                 </td>
                 <td>
-                    <input class="inputDeleted" type="number" />
+                    <input class="inputDeleted" min="0" max="@item.DamagedAmount" type="number" />
                 </td>
             </tr>
         }
     </tbody>
 </table>
-<form asp-action="CompleteDamaged">
+<form asp-action="CompleteDamaged" onsubmit="FillData(event)">
     <input type="hidden" asp-for="LogCode" />
     <input id="completeDamagedResult" type="hidden" asp-for="DamagedStock" />
-    <input id="btnSubmit" type="submit" value="Complete" onclick="FillData()" class="btn btn-primary" /> |
+    <input id="btnSubmit" type="submit" value="Complete" class="btn btn-primary" /> |
     <a asp-action="Index">Back to List</a>
 </form>
 
