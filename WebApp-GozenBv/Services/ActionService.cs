@@ -12,7 +12,7 @@ namespace WebApp_GozenBv.Services
         {
             switch (status)
             {
-                case StockLogStatusConst.Completed:
+                case StockLogStatusConst.Returned:
                     actions.Add(new ActionViewModel
                     {
                         Action = "Details",
@@ -20,7 +20,7 @@ namespace WebApp_GozenBv.Services
                     });
                     break;
 
-                case StockLogStatusConst.AwaitingReturn:
+                case StockLogStatusConst.Created:
                     actions.Add(new ActionViewModel
                     {
                         Action = "Edit",

@@ -24,7 +24,7 @@
             <td>@Html.DisplayFor(model => model.EmployeeFullNameFirma)</td>
             <td>@Html.DisplayFor(model => model.LogCode)</td>
             <status-color status="@Model.Status" view="Details"></status-color>
-            @if (Model.IsDamaged && Model.Status == StockLogStatusConst.Completed)
+            @if (Model.IsDamaged && Model.Status == StockLogStatusConst.Returned)
             {
                 <td><p>damaged</p></td>
             }
@@ -43,7 +43,7 @@
 
             }
             <th>@Html.DisplayNameFor(model => model.StockLogItem.StockAmount)</th>
-            @if (Model.IsDamaged && Model.Status == StockLogStatusConst.Completed)
+            @if (Model.IsDamaged && Model.Status == StockLogStatusConst.Returned)
             {
                 <th>@Html.DisplayNameFor(model => model.StockLogItem.DamagedAmount)</th>
                 <th>@Html.DisplayNameFor(model => model.StockLogItem.RepairedAmount)</th>
@@ -73,7 +73,7 @@
                     }
                 }
                 <td>@item.StockAmount</td>
-                @if (Model.IsDamaged && Model.Status == StockLogStatusConst.Completed && item.IsDamaged)
+                @if (Model.IsDamaged && Model.Status == StockLogStatusConst.Returned && item.IsDamaged)
                 {
                     <td>@item.DamagedAmount</td>
                     <td>@item.RepairedAmount</td>
@@ -105,7 +105,7 @@
 
     @switch (Model.Status)
     {
-        case StockLogStatusConst.AwaitingReturn:
+        case StockLogStatusConst.Created:
             <a asp-action="CompleteReturn" asp-route-id="@Model.LogCode">Complete Return</a>
             break;
 
@@ -114,7 +114,7 @@
             <a asp-action="CompleteDamaged" asp-route-id="@Model.LogCode">Complete Damaged</a>
             break;
 
-        case StockLogStatusConst.Completed:
+        case StockLogStatusConst.Returned:
             <a asp-action="Undo" asp-route-id="@Model.LogCode">Undo</a>
             break;
     }

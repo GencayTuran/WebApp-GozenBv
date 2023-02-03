@@ -23,11 +23,11 @@ namespace WebApp_GozenBv.TagHelpers
 
             switch (Status)
             {
-                case StockLogStatusConst.Completed:
-                    bgColor = "bg-success";
-                    break;
-                case StockLogStatusConst.AwaitingReturn:
+                case StockLogStatusConst.Returned:
                     bgColor = "bg-info";
+                    break;
+                case StockLogStatusConst.Created:
+                    bgColor = "bg-success";
                     break;
                 case StockLogStatusConst.DamagedAwaitingAction:
                     bgColor = "bg-warning";

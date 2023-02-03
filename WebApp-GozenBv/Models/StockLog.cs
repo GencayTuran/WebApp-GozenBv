@@ -17,9 +17,6 @@ namespace WebApp_GozenBv.Models
         public string LogCode { get; set; }
 
         [DataType(DataType.Date)]
-        public DateTime? CompletionDate { get; set; }
-
-        [DataType(DataType.Date)]
         public DateTime? ReturnDate { get; set; }
 
         public bool Damaged { get; set; }

@@ -144,7 +144,7 @@ namespace WebApp_GozenBv.Controllers
                 //new stocklog
                 stockLogCreateVM.LogCode = logCode;
                 StockLog stockLog = stockLogCreateVM;
-                stockLog.Status = StockLogStatusConst.AwaitingReturn;
+                stockLog.Status = StockLogStatusConst.Created;
 
                 _context.Add(stockLog);
                 await _context.SaveChangesAsync();
@@ -308,8 +308,8 @@ namespace WebApp_GozenBv.Controllers
                 _context.Update(stock);
             }
 
-            stockLog.CompletionDate = DateTime.Now;
-            stockLog.Status = StockLogStatusConst.Completed;
+            stockLog.ReturnDate = DateTime.Now;
+            stockLog.Status = StockLogStatusConst.Returned;
             _context.Update(stockLog);
             _context.SaveChanges();
 
@@ -368,7 +368,7 @@ namespace WebApp_GozenBv.Controllers
                 }
 
             }
-            stockLog.Status = StockLogStatusConst.Completed;
+            stockLog.Status = StockLogStatusConst.Returned;
             _context.Update(stockLog);
             await _context.SaveChangesAsync();
 
@@ -402,11 +402,11 @@ namespace WebApp_GozenBv.Controllers
                         _context.Update(item);
                     }
 
-                    stockLog.Status = StockLogStatusConst.AwaitingReturn;
+                    stockLog.Status = StockLogStatusConst.Created;
                     stockLog.Damaged = false;
                     break;
 
-                case StockLogStatusConst.Completed:
+                case StockLogStatusConst.Returned:
                     if (stockLog.Damaged)
                     {
                         foreach (var item in stockLogItems)
@@ -440,7 +440,7 @@ namespace WebApp_GozenBv.Controllers
 
                             _context.Update(item);
                         }
-                        stockLog.Status = StockLogStatusConst.AwaitingReturn;
+                        stockLog.Status = StockLogStatusConst.Created;
                     }
                     break;
 
@@ -499,7 +499,7 @@ namespace WebApp_GozenBv.Controllers
                 EmployeeFullNameFirma = (stockLog.Employee.Name + " " + stockLog.Employee.Surname + " - " + stockLog.Employee.Firma.FirmaName).ToUpper(),
                 LogCode = stockLog.LogCode, //need to show?
                 StockLogItems = stockLogItems,
-                CompletionDate = stockLog.CompletionDate,
+                CompletionDate = stockLog.ReturnDate,
                 Status = stockLog.Status,
                 IsDamaged = stockLog.Damaged,
             };
