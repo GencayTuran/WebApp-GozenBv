@@ -14,14 +14,12 @@
 <table class="table">
     <thead>
         <tr>
+            <th class="col-1">@Html.DisplayNameFor(model => model.Status)</th>
             <th>
                 @Html.DisplayNameFor(model => model.StockLogDate)
             </th>
             <th>
                 @Html.DisplayNameFor(model => model.Employee)
-            </th>
-            <th>
-                @Html.DisplayNameFor(model => model.LogCode)
             </th>
             <th></th>
         </tr>
@@ -29,7 +27,9 @@
     <tbody>
         @foreach (var item in Model)
         {
-            <status-color status="@item.Status" view="Index">
+            <tr>
+                <vc:status-icon status="item.Status" is-damaged="item.Damaged"></vc:status-icon>
+                @*<td><img class="col-1" src="~/resources/icons/check-svgrepo-com.svg" /></td>*@
                 <td>
                     @Html.DisplayFor(modelItem => item.StockLogDate)
                 </td>
@@ -38,12 +38,9 @@
                     @Html.DisplayFor(modelItem => item.Employee.Surname)
                 </td>
                 <td>
-                    @Html.DisplayFor(modelItem => item.LogCode)
-                </td>
-                <td>
                     <vc:actions status="@item.Status" id="@item.Id" log-code="@item.LogCode"></vc:actions>
                 </td>
-            </status-color>
+            </tr>
         }
     </tbody>
 </table>

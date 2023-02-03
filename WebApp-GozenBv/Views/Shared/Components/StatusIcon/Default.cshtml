@@ -1,0 +1,23 @@
+﻿@using WebApp_GozenBv.Constants;
+@model WebApp_GozenBv.ViewModels.StatusIconViewModel;
+
+<td>
+    @if (Model.Status == StockLogStatusConst.Created)
+    {
+        <img class="col-10" src="~/resources/icons/check-svgrepo-com.svg" />
+    }
+
+    @if (Model.Status == StockLogStatusConst.DamagedAwaitingAction)
+    {
+        <img class="col-10" src="~/resources/icons/red-exclamation-mark-svgrepo-com.svg" />
+    }
+
+    @if (Model.Status == StockLogStatusConst.Returned)
+    {
+        <img class="col-10" src="~/resources/icons/return-svgrepo-com.svg" />
+        if (Model.IsDamaged)
+        {
+            <img class="col-10" src="~/resources/icons/red-exclamation-mark-svgrepo-com.svg" />
+        }
+    }
+</td>
