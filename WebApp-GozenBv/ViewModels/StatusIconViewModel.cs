@@ -4,5 +4,8 @@
     {
         public int Status { get; set; }
         public bool IsDamaged { get; set; }
+        public int Col { get; set; }
+
+
     }
 }

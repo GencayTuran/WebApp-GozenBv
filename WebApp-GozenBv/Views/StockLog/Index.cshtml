@@ -28,8 +28,7 @@
         @foreach (var item in Model)
         {
             <tr>
-                <vc:status-icon status="item.Status" is-damaged="item.Damaged"></vc:status-icon>
-                @*<td><img class="col-1" src="~/resources/icons/check-svgrepo-com.svg" /></td>*@
+                <vc:status-icon col="12" status="item.Status" is-damaged="item.Damaged"></vc:status-icon>
                 <td>
                     @Html.DisplayFor(modelItem => item.StockLogDate)
                 </td>

@@ -14,7 +14,6 @@
         <tr>
             <th scope="col">@Html.DisplayNameFor(model => model.StockLogDate)</th>
             <th scope="col">@Html.DisplayNameFor(model => model.StockLog.Employee)</th>
-            <th scope="col">@Html.DisplayNameFor(model => model.LogCode)</th>
             <th scope="col">@Html.DisplayNameFor(model => model.Status)</th>
         </tr>
     </thead>
@@ -22,12 +21,7 @@
         <tr>
             <td>@Html.DisplayFor(model => model.StockLogDate)</td>
             <td>@Html.DisplayFor(model => model.EmployeeFullNameFirma)</td>
-            <td>@Html.DisplayFor(model => model.LogCode)</td>
-            <status-color status="@Model.Status" view="Details"></status-color>
-            @if (Model.IsDamaged && Model.Status == StockLogStatusConst.Returned)
-            {
-                <td><p>damaged</p></td>
-            }
+            <vc:status-icon col="6" status="@Model.Status" is-damaged="@Model.IsDamaged"></vc:status-icon>
         </tr>
     </tbody>
     <thead>
