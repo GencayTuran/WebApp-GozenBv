@@ -112,31 +112,30 @@ namespace WebApp_GozenBv.Controllers
             if (ModelState.IsValid && stockLogCreateVM.SelectedProducts != null)
             {
 
-                string[] data = stockLogCreateVM.SelectedProducts.Split(","); //id, amount 
-                int[] products = Array.ConvertAll(data, d => int.Parse(d));
+                var selectedProducts = ConvertStringToIntArray(stockLogCreateVM.SelectedProducts);
 
                 Guid guid = Guid.NewGuid();
                 string logCode = guid.ToString();
 
                 //new StockLogItem
-                for (int x = 0; x < data.Length; x++)
+                for (int x = 0; x < selectedProducts.Length; x++)
                 {
                     StockLogItem stockLogItem = new StockLogItem();
-                    var stock = _context.Stock.Where(s => s.Id == products[x]).FirstOrDefault();
+                    var stock = _context.Stock.Where(s => s.Id == selectedProducts[x]).FirstOrDefault();
                     stockLogItem.LogCode = logCode;
                     stockLogItem.Cost = stock.Cost;
-                    stockLogItem.StockId = products[x];
+                    stockLogItem.StockId = selectedProducts[x];
                     x++;
-                    stockLogItem.StockAmount = products[x];
+                    stockLogItem.StockAmount = selectedProducts[x];
                     stockLogItem.ProductNameBrand = (stock.ProductName + " " + stock.ProductBrand).ToUpper();
 
                     _context.Add(stockLogItem);
                 }
 
                 //update stock amount
-                for (int s = 0; s < data.Length; s++)
+                for (int s = 0; s < selectedProducts.Length; s++)
                 {
-                    var stock = await StockHelper.UpdateStockQty(products[s], -products[s + 1], _context);
+                    var stock = await StockHelper.UpdateStockQty(selectedProducts[s], -selectedProducts[s + 1], _context);
                     _context.Update(stock);
                     s++;
                 }
@@ -266,9 +265,7 @@ namespace WebApp_GozenBv.Controllers
             if (stockLogDetailVM.DamagedStock != null)
             {
 
-                string[] data = stockLogDetailVM.DamagedStock.Split(","); //id, amount 
-                int[] damagedStock = Array.ConvertAll(data, d => int.Parse(d));
-
+                var damagedStock = ConvertStringToIntArray(stockLogDetailVM.DamagedStock);
 
                 //update StockLogItems
                 int x = 0;
@@ -346,8 +343,7 @@ namespace WebApp_GozenBv.Controllers
                 return NotFound();
             }
 
-            string[] data = stockLogDetail.DamagedStock.Split(","); //id, repaired, deleted 
-            int[] damagedStock = Array.ConvertAll(data, d => int.Parse(d));
+            var damagedStock = ConvertStringToIntArray(stockLogDetail.DamagedStock);
 
             var stockLogItems = _context.StockLogItems.Where(s => s.LogCode == logCode);
 
@@ -560,6 +556,13 @@ namespace WebApp_GozenBv.Controllers
                 .Where(s => s.LogCode == stockLog.LogCode);
 
             return stockLogItems;
+        }
+
+        private int[] ConvertStringToIntArray(string selectedProducts)
+        {
+            string[] data = selectedProducts.Split(","); //id, amount
+            int[] products = Array.ConvertAll(data, d => int.Parse(d));
+            return products;
         }
     }
 }
