@@ -1,27 +1,6 @@
 ﻿@using WebApp_GozenBv.Constants;
 @model WebApp_GozenBv.ViewModels.StatusIconViewModel;
 
-@*<td class="d-flex flex-row justify-content-start col-12">
-    @if (Model.Status == StockLogStatusConst.Created)
-    {
-        <img class="p-0 col-@Model.Col" src="~/resources/icons/check-svgrepo-com.svg" />
-    }
-
-    @if (Model.Status == StockLogStatusConst.DamagedAwaitingAction)
-    {
-        <img class="p-0 col-@Model.Col" src="~/resources/icons/red-exclamation-mark-svgrepo-com.svg" />
-    }
-
-    @if (Model.Status == StockLogStatusConst.Returned)
-    {
-        <img class="p-0 col-@Model.Col" src="~/resources/icons/return-svgrepo-com.svg" />
-        if (Model.IsDamaged)
-        {
-            <img class="p-0 col-@Model.Col" src="~/resources/icons/red-exclamation-mark-svgrepo-com.svg" />
-        }
-    }
-</td>*@
-
 <td class="d-flex flex-row justify-content-start col-@Model.Col">
     @if (Model.Status == StockLogStatusConst.Created)
     {
