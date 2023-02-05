@@ -1,13 +1,13 @@
 ﻿@model WebApp_GozenBv.ViewModels.StockLogDetailVM
 
 @{
-    ViewData["Title"] = "Complete?";
+    ViewData["Title"] = "Return items?";
 }
 
-<h1>Complete?</h1>
+<h1>Return</h1>
 
 @*<h3>Which products are damaged?</h3>*@
-<h4>Complete StockLog</h4>
+<h4>Return items?</h4>
 <hr />
 <table class="table">
     <thead>
@@ -52,7 +52,7 @@
     </tbody>
 </table>
 
-<form asp-action="CompleteReturn">
+<form asp-action="ReturnItems">
     @*<input type="hidden" asp-for=""/>*@
     <input type="hidden" asp-for="LogCode" />
     <input id="damagedStockResult" type="hidden" asp-for="DamagedStock" />
@@ -60,4 +60,4 @@
     <a asp-action="Index">Back to List</a>
 </form>
 
-<script src="~/js/StockLog_CompleteReturn.js" />
+<script src="~/js/StockLog_ReturnItems.js" />

@@ -33,7 +33,7 @@ namespace WebApp_GozenBv.Services
                     });
                     actions.Add(new ActionViewModel
                     {
-                        Action = "CompleteReturn",
+                        Action = "ReturnItems",
                         RouteId = logCode,
                     });
                     actions.Add(new ActionViewModel

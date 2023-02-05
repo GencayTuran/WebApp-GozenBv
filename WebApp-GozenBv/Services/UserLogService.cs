@@ -136,8 +136,8 @@ namespace WebApp_GozenBv.Services
                 case ActionConst.CompleteDamaged:
                     action = "completed damaged";
                     break;
-                case ActionConst.CompleteReturn:
-                    action = "completed return";
+                case ActionConst.ReturnItems:
+                    action = "returned items";
                     break;
                 case ActionConst.Edit:
                     action = "edited";

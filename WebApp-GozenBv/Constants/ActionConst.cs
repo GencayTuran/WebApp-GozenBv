@@ -8,7 +8,7 @@
         public const int Edit = 3;
         //public const int Index = 4;
 
-        public const int CompleteReturn = 10;
+        public const int ReturnItems = 10;
         public const int CompleteDamaged = 11;
 
         public const int Login = 100;

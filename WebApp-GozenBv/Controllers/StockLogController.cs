@@ -221,7 +221,7 @@ namespace WebApp_GozenBv.Controllers
 
         // GET: StockLog/Delete/5
         [HttpGet]
-        public async Task<IActionResult> CompleteReturn(string id)
+        public async Task<IActionResult> ReturnItems(string id)
         {
             string logCode = id;
 
@@ -246,7 +246,7 @@ namespace WebApp_GozenBv.Controllers
         // POST: StockLog/Delete/5
         [HttpPost]
         [ValidateAntiForgeryToken]
-        public async Task<IActionResult> CompleteReturn(StockLogDetailVM stockLogDetailVM)
+        public async Task<IActionResult> ReturnItems(StockLogDetailVM stockLogDetailVM)
         {
             //TODO: alternative modelstate valid check needed
             string logCode = stockLogDetailVM.LogCode;
@@ -291,7 +291,7 @@ namespace WebApp_GozenBv.Controllers
                 _context.Update(stockLog);
                 await _context.SaveChangesAsync();
 
-                await _userLogService.CreateAsync(ControllerConst.StockLog, ActionConst.CompleteReturn, logCode);
+                await _userLogService.CreateAsync(ControllerConst.StockLog, ActionConst.ReturnItems, logCode);
 
                 //TODO: routeValue could be more readable
                 return RedirectToAction("Details", new RouteValueDictionary(
@@ -310,7 +310,7 @@ namespace WebApp_GozenBv.Controllers
             _context.Update(stockLog);
             _context.SaveChanges();
 
-            await _userLogService.CreateAsync(ControllerConst.StockLog, ActionConst.CompleteReturn, logCode);
+            await _userLogService.CreateAsync(ControllerConst.StockLog, ActionConst.ReturnItems, logCode);
 
             return RedirectToAction(nameof(Index));
         }
