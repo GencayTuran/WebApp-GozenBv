@@ -33,6 +33,7 @@ namespace WebApp_GozenBv.Controllers
         {
             var stockLogs = await _context.StockLogs
                 .Include(s => s.Employee)
+                .OrderByDescending(s => s.StockLogDate)
                 .ToListAsync();
 
             return View(stockLogs);
@@ -64,6 +65,8 @@ namespace WebApp_GozenBv.Controllers
         {
             GetCreateViewData();
 
+            //ViewData["dateToday"] = $"{DateTime.Today.Year}-{DateTime.Today.Month}-{DateTime.Today.Day}";
+            ViewData["dateToday"] = DateTime.Today.ToString("yyyy-MM-dd");
             ViewData["employees"] = new SelectList(lstEmp, "EmployeeId", "EmployeeFullNameFirma");
             ViewData["stock"] = new SelectList(lstStock, "StockId", "ProductNameBrand");
             ViewData["stockQuantity"] = lstStock;
@@ -496,7 +499,7 @@ namespace WebApp_GozenBv.Controllers
                 EmployeeFullNameFirma = (stockLog.Employee.Name + " " + stockLog.Employee.Surname + " - " + stockLog.Employee.Firma.FirmaName).ToUpper(),
                 LogCode = stockLog.LogCode, //need to show?
                 StockLogItems = stockLogItems,
-                CompletionDate = stockLog.ReturnDate,
+                ReturnDate = stockLog.ReturnDate,
                 Status = stockLog.Status,
                 IsDamaged = stockLog.Damaged,
             };

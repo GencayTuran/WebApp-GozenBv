@@ -11,7 +11,7 @@ namespace WebApp_GozenBv.ViewModels
     {
         public int StockLogId { get; set; }
         [DataType(DataType.Date)]
-        public DateTime? CompletionDate { get; set; }
+        public DateTime? ReturnDate { get; set; }
 
         [DataType(DataType.Date)]
         public DateTime StockLogDate { get; set; }

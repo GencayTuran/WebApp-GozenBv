@@ -24,7 +24,7 @@ function GetElements()
 
 Init();
 
-function Init(){
+function Init() {
     inputProduct.value = "";
     SetMinValue();
 }
