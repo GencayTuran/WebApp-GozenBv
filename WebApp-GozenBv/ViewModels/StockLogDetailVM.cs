@@ -9,6 +9,7 @@ namespace WebApp_GozenBv.ViewModels
 {
     public class StockLogDetailVM
     {
+        public int StockLogId { get; set; }
         [DataType(DataType.Date)]
         public DateTime? CompletionDate { get; set; }
 

@@ -48,7 +48,6 @@ namespace WebApp_GozenBv
                 opts.UseSqlServer(Configuration.GetConnectionString("AZURE_SQL_CONNECTIONSTRING"));
             });
 
-            services.AddTransient<IActionService, ActionService>();
             services.AddTransient<IUserLogService, UserLogService>();
             services.AddTransient<IUserService, UserService>();
         }

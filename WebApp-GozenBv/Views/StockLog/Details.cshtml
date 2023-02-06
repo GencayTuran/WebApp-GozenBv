@@ -9,6 +9,29 @@
 
 <h4>StockLog</h4>
 <hr />
+
+<div class="d-flex flex-column">
+    <a asp-action="Index">Back to List</a>
+
+    @switch (Model.Status)
+    {
+        case StockLogStatusConst.Created:
+            <a asp-action="Edit" asp-route-id="@Model.StockLogId">Edit</a>
+            <a asp-action="Delete" asp-route-id="@Model.StockLogId">Delete</a>
+            <a asp-action="ReturnItems" asp-route-id="@Model.LogCode">Return Items</a>
+            break;
+
+        case StockLogStatusConst.DamagedAwaitingAction:
+            <a asp-action="Undo" asp-route-id="@Model.LogCode">Undo</a>
+            <a asp-action="CompleteDamaged" asp-route-id="@Model.LogCode">Complete Damaged</a>
+            break;
+
+        case StockLogStatusConst.Returned:
+            <a asp-action="Undo" asp-route-id="@Model.LogCode">Undo</a>
+            break;
+    }
+</div>
+
 <table class="table">
     <thead>
         <tr>
@@ -94,24 +117,6 @@
     <vc:user-log view="@ViewTypeConst.Entity" controller="@ControllerConst.StockLog" entity-id="@Model.LogCode"></vc:user-log>
 </div>
 
-<div class="d-flex flex-column">
-    <a asp-action="Index">Back to List</a>
 
-    @switch (Model.Status)
-    {
-        case StockLogStatusConst.Created:
-            <a asp-action="CompleteReturn" asp-route-id="@Model.LogCode">Complete Return</a>
-            break;
-
-        case StockLogStatusConst.DamagedAwaitingAction:
-            <a asp-action="Undo" asp-route-id="@Model.LogCode">Undo</a>
-            <a asp-action="CompleteDamaged" asp-route-id="@Model.LogCode">Complete Damaged</a>
-            break;
-
-        case StockLogStatusConst.Returned:
-            <a asp-action="Undo" asp-route-id="@Model.LogCode">Undo</a>
-            break;
-    }
-</div>
 <input id="statusId" type="hidden" value="@Model.Status" />
 <script src="~/js/StockLog_Details.js"></script>

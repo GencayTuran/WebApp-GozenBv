@@ -5,10 +5,10 @@
     ViewData["Title"] = "Index";
 }
 
-<h1>Index</h1>
+<h1>All logs</h1>
 
 <p>
-    <a asp-action="Create">Create New</a>
+    <a asp-action="Create">Create New Log</a>
 </p>
 
 <table class="table">
@@ -28,17 +28,16 @@
         @foreach (var item in Model)
         {
             <tr>
+            
                 <vc:status-icon col="12" status="item.Status" is-damaged="item.Damaged"></vc:status-icon>
                 <td>
-                    @Html.DisplayFor(modelItem => item.StockLogDate)
+                        @Html.DisplayFor(modelItem => item.StockLogDate)
                 </td>
                 <td>
-                    @Html.DisplayFor(modelItem => item.Employee.Name)
-                    @Html.DisplayFor(modelItem => item.Employee.Surname)
+                        @Html.DisplayFor(modelItem => item.Employee.Name)
+                        @Html.DisplayFor(modelItem => item.Employee.Surname)
                 </td>
-                <td>
-                    <vc:actions status="@item.Status" id="@item.Id" log-code="@item.LogCode"></vc:actions>
-                </td>
+                <td><a asp-action="Details" asp-route-id="@item.LogCode">Details</a></td>
             </tr>
         }
     </tbody>

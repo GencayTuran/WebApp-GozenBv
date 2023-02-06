@@ -491,6 +491,7 @@ namespace WebApp_GozenBv.Controllers
 
             StockLogDetailVM stockLogDetailVM = new StockLogDetailVM
             {
+                StockLogId = stockLog.Id,
                 StockLogDate = stockLog.StockLogDate,
                 EmployeeFullNameFirma = (stockLog.Employee.Name + " " + stockLog.Employee.Surname + " - " + stockLog.Employee.Firma.FirmaName).ToUpper(),
                 LogCode = stockLog.LogCode, //need to show?

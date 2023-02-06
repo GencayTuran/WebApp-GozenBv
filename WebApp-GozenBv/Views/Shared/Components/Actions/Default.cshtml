@@ -1,7 +1,0 @@
-﻿@model List<WebApp_GozenBv.ViewModels.ActionViewModel>
-
-
-        @foreach (var action in Model)
-        {
-            <a class="m-1" asp-action="@action.Action" asp-route-id="@action.RouteId">@action.Action</a>
-        }
