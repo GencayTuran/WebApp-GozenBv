@@ -9,7 +9,7 @@
     #trStockLog:hover {
         cursor: pointer;
         background: rgba(100,100,100,0.1);
-}
+    }
 </style>
 
 <h1>All logs</h1>
@@ -35,13 +35,15 @@
         @foreach (var item in Model)
         {
             <tr id="trStockLog" onclick="ToDetails(@item.Id)">
-                <vc:status-icon col="12" status="item.Status" is-damaged="item.Damaged"></vc:status-icon>
                 <td>
-                        @Html.DisplayFor(modelItem => item.StockLogDate)
+                    <vc:status-icon status="item.Status" is-damaged="item.Damaged"></vc:status-icon>
                 </td>
                 <td>
-                        @Html.DisplayFor(modelItem => item.Employee.Name)
-                        @Html.DisplayFor(modelItem => item.Employee.Surname)
+                    @Html.DisplayFor(modelItem => item.StockLogDate)
+                </td>
+                <td>
+                    @Html.DisplayFor(modelItem => item.Employee.Name)
+                    @Html.DisplayFor(modelItem => item.Employee.Surname)
                 </td>
                 <a hidden id="anchor_@item.Id" asp-action="Details" asp-route-id="@item.LogCode"></a>
             </tr>

@@ -48,7 +48,9 @@
         <tr>
             <td>@Html.DisplayFor(model => model.StockLogDate)</td>
             <td>@Html.DisplayFor(model => model.EmployeeFullNameFirma)</td>
-            <vc:status-icon col="6" status="@Model.Status" is-damaged="@Model.IsDamaged"></vc:status-icon>
+            <td>
+                <vc:status-icon status="@Model.Status" is-damaged="@Model.IsDamaged"></vc:status-icon>
+            </td>
             @if (Model.Status == StockLogStatusConst.Returned || Model.Status == StockLogStatusConst.DamagedAwaitingAction)
             {
                 <td>@Html.DisplayFor(model => model.ReturnDate)</td>

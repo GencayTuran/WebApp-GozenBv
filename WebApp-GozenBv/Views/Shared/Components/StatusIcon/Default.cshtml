@@ -1,23 +1,23 @@
 ﻿@using WebApp_GozenBv.Constants;
 @model WebApp_GozenBv.ViewModels.StatusIconViewModel;
 
-<td class="d-flex flex-row justify-content-start col-@Model.Col">
+<div class="d-flex flex-row justify-content-start">
     @if (Model.Status == StockLogStatusConst.Created)
     {
-        <img class="w-25" src="~/resources/icons/check-svgrepo-com.svg" />
+        <img width="20" src="~/resources/icons/check-svgrepo-com.svg" />
     }
 
     @if (Model.Status == StockLogStatusConst.DamagedAwaitingAction)
     {
-        <img class="w-25" src="~/resources/icons/red-exclamation-mark-svgrepo-com.svg" />
+        <img width="20" src="~/resources/icons/red-exclamation-mark-svgrepo-com.svg" />
     }
 
     @if (Model.Status == StockLogStatusConst.Returned)
     {
-        <img class="w-25" src="~/resources/icons/return-svgrepo-com.svg" />
+        <img width="20" src="~/resources/icons/return-svgrepo-com.svg" />
         if (Model.IsDamaged)
         {
-            <img class="w-25" src="~/resources/icons/close-bold-svgrepo-com.svg" />
+            <img width="20" src="~/resources/icons/close-bold-svgrepo-com.svg" />
         }
     }
-</td>
+</div>
