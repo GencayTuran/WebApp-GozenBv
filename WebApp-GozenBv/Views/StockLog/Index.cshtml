@@ -5,6 +5,13 @@
     ViewData["Title"] = "Index";
 }
 
+<style>
+    #trStockLog:hover {
+        cursor: pointer;
+        background: rgba(100,100,100,0.1);
+}
+</style>
+
 <h1>All logs</h1>
 
 <p>
@@ -16,10 +23,10 @@
         <tr>
             <th class="col-1">@Html.DisplayNameFor(model => model.Status)</th>
             <th>
-                @Html.DisplayNameFor(model => model.StockLogDate)
+                @Html.DisplayNameFor(model => model.Employee)
             </th>
             <th>
-                @Html.DisplayNameFor(model => model.Employee)
+                @Html.DisplayNameFor(model => model.StockLogDate)
             </th>
             <th></th>
         </tr>
@@ -27,8 +34,7 @@
     <tbody>
         @foreach (var item in Model)
         {
-            <tr>
-            
+            <tr id="trStockLog" onclick="ToDetails(@item.Id)">
                 <vc:status-icon col="12" status="item.Status" is-damaged="item.Damaged"></vc:status-icon>
                 <td>
                         @Html.DisplayFor(modelItem => item.StockLogDate)
@@ -37,7 +43,7 @@
                         @Html.DisplayFor(modelItem => item.Employee.Name)
                         @Html.DisplayFor(modelItem => item.Employee.Surname)
                 </td>
-                <td><a asp-action="Details" asp-route-id="@item.LogCode">Details</a></td>
+                <a hidden id="anchor_@item.Id" asp-action="Details" asp-route-id="@item.LogCode"></a>
             </tr>
         }
     </tbody>
@@ -46,3 +52,5 @@
 <div>
     <vc:user-log view="@ViewTypeConst.Controller" controller="@ControllerConst.StockLog" entity-id=""></vc:user-log>
 </div>
+
+<script src="~/js/StockLog_Index.js"></script>
