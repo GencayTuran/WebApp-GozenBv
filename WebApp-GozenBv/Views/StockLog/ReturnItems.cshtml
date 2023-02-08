@@ -45,8 +45,9 @@
                 <td><p>@item.StockAmount</p></td>
                 <td><input class="chkDamaged" type="checkbox" onclick="ChangeDamaged(this)" /></td>
                 <td>
-                    <input class="inputAmount w-25" disabled type="number" max="@item.StockAmount" value="@item.StockAmount" />
+                    <input class="inputDamagedAmount w-25" disabled type="number" max="@item.StockAmount" min="1"/>
                 </td>
+                <input class="inputStockAmount" value="@item.StockAmount" type="hidden" />
             </tr>
         }
     </tbody>
@@ -60,4 +61,4 @@
     <a asp-action="Index">Back to List</a>
 </form>
 
-<script src="~/js/StockLog_ReturnItems.js" />
+<script src="~/js/StockLog_ReturnItems.js"/>
