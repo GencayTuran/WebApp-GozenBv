@@ -18,15 +18,25 @@
     <a asp-action="Create">Create New Log</a>
 </p>
 
+<form asp-action="Index" method="get">
+    <p>
+        Find by name: <input type="text" name="searchString" value="@ViewBag.SearchString"/>
+        <input type="submit" value="Search" />
+    </p>
+</form>
+
+
 <table class="table">
     <thead>
         <tr>
-            <th class="col-1">@Html.DisplayNameFor(model => model.Status)</th>
-            <th>
-                @Html.DisplayNameFor(model => model.Employee)
+            <th class="col-1">
+                @Html.DisplayNameFor(model => model.Status)
             </th>
             <th>
-                @Html.DisplayNameFor(model => model.StockLogDate)
+                @Html.ActionLink(Html.DisplayNameFor(model => model.Employee), "Index", new { sortOrder = ViewBag.EmployeeSortParm })
+            </th>
+            <th>
+                @Html.ActionLink(Html.DisplayNameFor(model => model.StockLogDate), "Index", new { sortOrder = ViewBag.DateSortParm })
             </th>
             <th></th>
         </tr>
@@ -39,11 +49,11 @@
                     <vc:status-icon status="item.Status" is-damaged="item.Damaged"></vc:status-icon>
                 </td>
                 <td>
-                    @Html.DisplayFor(modelItem => item.StockLogDate)
-                </td>
-                <td>
                     @Html.DisplayFor(modelItem => item.Employee.Name)
                     @Html.DisplayFor(modelItem => item.Employee.Surname)
+                </td>
+                <td>
+                    @Html.DisplayFor(modelItem => item.StockLogDate)
                 </td>
                 <a hidden id="anchor_@item.Id" asp-action="Details" asp-route-id="@item.LogCode"></a>
             </tr>

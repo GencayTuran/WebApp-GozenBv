@@ -29,14 +29,59 @@ namespace WebApp_GozenBv.Controllers
 
         // GET: StockLog
         [HttpGet]
-        public async Task<IActionResult> Index()
+        public async Task<IActionResult> Index(string sortOrder, string searchString)
         {
-            var stockLogs = await _context.StockLogs
-                .Include(s => s.Employee)
-                .OrderByDescending(s => s.StockLogDate)
-                .ToListAsync();
+
+            ViewBag.DateSortParm = String.IsNullOrEmpty(sortOrder) ? "date_desc" : "";
+            ViewBag.EmployeeSortParm = sortOrder == "emp" ? "emp_desc" : "emp";
+
+            var stockLogsAll = _context.StockLogs
+                .Include(s => s.Employee);
+
+            List<StockLog> stockLogs = new();
+
+            switch (sortOrder)
+            {
+                case "date_desc":
+                    stockLogs = stockLogsAll.OrderBy(s => s.StockLogDate).ToList();
+                    break;
+                case "emp":
+                    stockLogs = stockLogsAll.OrderBy(s => s.Employee.Name).ToList();
+                    break;
+                case "emp_desc":
+                    stockLogs = stockLogsAll.OrderByDescending(s => s.Employee.Name).ToList();
+                    break;
+                default:
+                    stockLogs = stockLogsAll.OrderByDescending(s => s.StockLogDate).ToList();
+                    break;
+            }
+
+            stockLogs = CheckSearchString(stockLogs, searchString);
 
             return View(stockLogs);
+        }
+
+        private List<StockLog> CheckSearchString(List<StockLog> stockLogs, string searchString)
+        {
+            if (!String.IsNullOrEmpty(searchString))
+            {
+                searchString = searchString.Trim();
+                var capitalizedString = (char.ToUpper(searchString[0]) + searchString.Substring(1).ToLower());
+                var lowerString = searchString.ToLower();
+
+                stockLogs = stockLogs
+                        .Where(s => s.Employee.Name.Contains(searchString)
+                            || s.Employee.Surname.Contains(searchString)
+                            || s.Employee.Name.Contains(capitalizedString)
+                            || s.Employee.Surname.Contains(capitalizedString)
+                            || s.Employee.Name.Contains(lowerString)
+                            || s.Employee.Surname.Contains(lowerString))
+                        .ToList();
+
+                ViewBag.SearchString = searchString;
+            }
+
+            return stockLogs;
         }
 
         // GET: StockLog/Details/5
@@ -65,7 +110,6 @@ namespace WebApp_GozenBv.Controllers
         {
             GetCreateViewData();
 
-            //ViewData["dateToday"] = $"{DateTime.Today.Year}-{DateTime.Today.Month}-{DateTime.Today.Day}";
             ViewData["dateToday"] = DateTime.Today.ToString("yyyy-MM-dd");
             ViewData["employees"] = new SelectList(lstEmp, "EmployeeId", "EmployeeFullNameFirma");
             ViewData["stock"] = new SelectList(lstStock, "StockId", "ProductNameBrand");
