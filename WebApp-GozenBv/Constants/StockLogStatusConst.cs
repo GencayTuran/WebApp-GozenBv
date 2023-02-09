@@ -2,9 +2,9 @@
 {
     public static class StockLogStatusConst
     {
-        public const int Returned = 1;
-        public const int Created = 0;
-        public const int DamagedAwaitingAction = 2;
+        public const int Created = 1;
+        public const int Returned = 2;
+        public const int DamagedAwaitingAction = 3;
 
     }
 }
