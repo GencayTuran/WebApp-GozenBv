@@ -1,9 +1,12 @@
 ﻿using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Identity;
+using Microsoft.Data.SqlClient;
+using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Threading;
 using System.Threading.Tasks;
 using WebApp_GozenBv.Models;
 
@@ -29,10 +32,125 @@ namespace WebApp_GozenBv.Data
                 _context.WagenPark.AddRange(GetWagenPark());
                 _context.SaveChanges();
 
+                _context.StockLogs.AddRange(GetStockLogs());
+                _context.SaveChanges();
+                _context.StockLogItems.AddRange(GetStockLogItems());
+                _context.SaveChanges();
+
                 _context.Users.AddRange(GetUsers());
                 _context.SaveChanges();
             }
 
+        }
+
+        private static StockLog[] GetStockLogs()
+        {
+            var stockLogs = new List<StockLog>
+            {
+                new StockLog
+                {
+                    StockLogDate = new DateTime(2022, 1, 1),
+                    EmployeeId = 1,
+                    ReturnDate = new DateTime(2022, 2, 1),
+                    Damaged = false,
+                    Status = 1,
+                    LogCode = Guid.NewGuid().ToString(),
+                },
+                new StockLog
+                {
+                    StockLogDate = new DateTime(2022, 2, 1),
+                    EmployeeId = 2,
+                    ReturnDate = new DateTime(2022, 3, 1),
+                    Damaged = false,
+                    Status = 2,
+                    LogCode = Guid.NewGuid().ToString(),
+                },
+                new StockLog
+                {
+                    StockLogDate = new DateTime(2022, 3, 1),
+                    EmployeeId = 3,
+                    ReturnDate = new DateTime(2022, 4, 1),
+                    Damaged = true,
+                    Status = 3,
+                    LogCode = Guid.NewGuid().ToString(),
+                },
+                new StockLog
+                {
+                    StockLogDate = new DateTime(2022, 4, 1),
+                    EmployeeId = 1,
+                    ReturnDate = new DateTime(2022, 5, 1),
+                    Damaged = false,
+                    Status = 1,
+                    LogCode = Guid.NewGuid().ToString(),
+                },
+                new StockLog
+                {
+                    StockLogDate = new DateTime(2022, 5, 1),
+                    EmployeeId = 2,
+                    ReturnDate = new DateTime(2022, 6, 1),
+                    Damaged = true,
+                    Status = 2,
+                    LogCode = Guid.NewGuid().ToString(),
+                },
+                new StockLog
+                {
+                    StockLogDate = new DateTime(2022, 6, 1),
+                    EmployeeId = 3,
+                    ReturnDate = new DateTime(2022, 7, 1),
+                    Damaged = true,
+                    Status = 3,
+                    LogCode = Guid.NewGuid().ToString(),
+        }
+            };
+            return stockLogs.ToArray();
+        }
+
+
+        private static StockLogItem[] GetStockLogItems()
+        {
+            var stockLogItems = new List<StockLogItem>();
+            var stockLogs = _context.StockLogs.Select(s => s).ToList();
+
+            bool[] arrDamaged = new bool[4];
+            arrDamaged[0] = true;
+            arrDamaged[1] = true;
+            arrDamaged[2] = true;
+            arrDamaged[3] = false;
+
+            var rnd = new Random();
+            for (int i = 0; i < stockLogs.Count; i++)
+            {
+                int counter = 1;
+                do
+                {
+                    var rndStockId = rnd.Next(1, 6);
+                    var stock = _context.Stock.Where(s => s.Id == rndStockId).FirstOrDefault();
+                    string productNameBrand = (stock.ProductName + " " + stock.ProductBrand).ToUpper();
+                    int rndStockAmount = rnd.Next(1, 4);
+                    bool rndDamaged = arrDamaged[rnd.Next(0, 4)];
+                    bool damaged = stockLogs[i].Damaged ? rndDamaged : false;
+                    int rndDamagedAmount = stockLogs[i].Damaged == false ? 0 : rndDamaged ? rnd.Next(1, rndStockAmount + 1) : 0;
+                    int rndRepairedAmount = rndDamagedAmount != 0 ? rnd.Next(0, rndDamagedAmount + 1) : 0;
+                    int rndDeletedAmount = rndDamagedAmount - rndRepairedAmount;
+
+                    stockLogItems.Add(new StockLogItem
+                    {
+                        LogCode = stockLogs[i].LogCode,
+                        StockId = stock.Id,
+                        ProductNameBrand = productNameBrand,
+                        StockAmount = rndStockAmount,
+                        IsDamaged = damaged,
+                        Cost = stock.Cost,
+                        DamagedAmount = rndDamagedAmount,
+                        RepairedAmount = rndRepairedAmount,
+                        DeletedAmount = rndDeletedAmount,
+                    });
+
+                    counter++;
+                } while (counter <= 10);
+            }
+
+            return stockLogItems.ToArray();
         }
 
         private static User[] GetUsers()
@@ -48,14 +166,14 @@ namespace WebApp_GozenBv.Data
             return users;
         }
 
-            private static Stock[] GetStock()
+        private static Stock[] GetStock()
         {
             var stock = new Stock[5];
             stock[0] = new Stock
             {
                 ProductName = "Kniptang",
-                Quantity = 10,
-                MinQuantity = 5,
+                Quantity = 75,
+                MinQuantity = 50,
                 ProductBrand = "Knipex",
                 Cost = 20
             };
@@ -63,32 +181,32 @@ namespace WebApp_GozenBv.Data
             stock[1] = new Stock
             {
                 ProductName = "Boormachine",
-                Quantity = 5,
-                MinQuantity = 1,
+                Quantity = 80,
+                MinQuantity = 15,
                 ProductBrand = "Makita",
                 Cost = 50
             };
             stock[2] = new Stock
             {
                 ProductName = "Slijper",
-                Quantity = 5,
-                MinQuantity = 1,
+                Quantity = 50,
+                MinQuantity = 20,
                 ProductBrand = "Bosch",
                 Cost = 80
             };
             stock[3] = new Stock
             {
                 ProductName = "Hamer",
-                Quantity = 15,
-                MinQuantity = 1,
+                Quantity = 50,
+                MinQuantity = 50,
                 ProductBrand = "Hitachi",
                 Cost = 20
             };
             stock[4] = new Stock
             {
                 ProductName = "Kniptang",
-                Quantity = 5,
-                MinQuantity = 7,
+                Quantity = 50,
+                MinQuantity = 25,
                 ProductBrand = "Andere",
                 Cost = 20
             };
@@ -115,7 +233,7 @@ namespace WebApp_GozenBv.Data
             {
                 FirmaName = "FirmaY"
             };
-            return firmas;        
+            return firmas;
         }
 
         private static WagenPark[] GetWagenPark()
