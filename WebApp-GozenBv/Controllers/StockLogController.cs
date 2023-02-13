@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Text;
 using System.Threading.Tasks;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
@@ -29,31 +30,115 @@ namespace WebApp_GozenBv.Controllers
 
         // GET: StockLog
         [HttpGet]
-        public async Task<IActionResult> Index(string sortOrder, string searchString)
+        public async Task<IActionResult> Index(string searchString, int sortStatus, int sortOrder)
         {
-
-            ViewBag.DateSortParm = String.IsNullOrEmpty(sortOrder) ? "date_desc" : "";
-            ViewBag.EmployeeSortParm = sortOrder == "emp" ? "emp_desc" : "emp";
 
             var stockLogsAll = _context.StockLogs
                 .Include(s => s.Employee);
 
             List<StockLog> stockLogs = new();
+            List<SortViewModel> lstStatus = new()
+            {
+                new SortViewModel
+                {
+                    Id = StockLogStatusConst.Created,
+                    Name = StockLogStatusConst.CreatedName
+                },
+
+                new SortViewModel
+                {
+                    Id = StockLogStatusConst.Returned,
+                    Name = StockLogStatusConst.ReturnedName
+                },
+
+                new SortViewModel
+                {
+                    Id = StockLogStatusConst.DamagedAwaitingAction,
+                    Name = StockLogStatusConst.DamagedAwaitingActionName
+                }
+
+            };
+            List<SortViewModel> lstSortOrder = new()
+            {
+                new SortViewModel
+                {
+                    Id = SortOrderConst.DateDescendingId,
+                    Name = SortOrderConst.DateDescendingName
+                },
+
+                new SortViewModel
+                {
+                    Id = SortOrderConst.DateAscendingId,
+                    Name = SortOrderConst.DateAscendingName
+                },
+
+                new SortViewModel
+                {
+                    Id = SortOrderConst.EmpAzId,
+                    Name = SortOrderConst.EmpAzName
+                },
+
+                new SortViewModel
+                {
+                    Id = SortOrderConst.EmpZaId,
+                    Name = SortOrderConst.EmpZaName
+                }
+            };
+
+            ViewBag.StatusSortList = new SelectList(lstStatus, "Id", "Name");
+            ViewBag.SortOrderList = new SelectList(lstSortOrder, "Id", "Name");
+
+            foreach (var item in lstSortOrder)
+            {
+                if (item.Id == sortOrder)
+                { 
+                   ViewBag.SortOrderIdParam = item.Id; 
+                   ViewBag.SortOrderNameParam = item.Name; 
+                }
+            }
+
+            foreach (var item in lstStatus)
+            {
+                if (item.Id == sortStatus)
+                {
+                    ViewBag.SortStatusIdParam = item.Id;
+                    ViewBag.SortStatusNameParam = item.Name;
+                }
+            }
 
             switch (sortOrder)
             {
-                case "date_desc":
+                case SortOrderConst.DateDescendingId:
+                    stockLogs = stockLogsAll.OrderByDescending(s => s.StockLogDate).ToList();
+                    break;
+                case SortOrderConst.DateAscendingId:
                     stockLogs = stockLogsAll.OrderBy(s => s.StockLogDate).ToList();
                     break;
-                case "emp":
+                case SortOrderConst.EmpAzId:
                     stockLogs = stockLogsAll.OrderBy(s => s.Employee.Name).ToList();
                     break;
-                case "emp_desc":
+                case SortOrderConst.EmpZaId:
                     stockLogs = stockLogsAll.OrderByDescending(s => s.Employee.Name).ToList();
                     break;
                 default:
                     stockLogs = stockLogsAll.OrderByDescending(s => s.StockLogDate).ToList();
                     break;
+            }
+
+            if (sortStatus != 0)
+            {
+                switch (sortStatus)
+                {
+                    case StockLogStatusConst.Created:
+                        stockLogs = stockLogs.Where(s => s.Status == StockLogStatusConst.Created).ToList();
+                        break;
+                    case StockLogStatusConst.Returned:
+                        stockLogs = stockLogs.Where(s => s.Status == StockLogStatusConst.Returned).ToList();
+                        break;
+                    case StockLogStatusConst.DamagedAwaitingAction:
+                        stockLogs = stockLogs.Where(s => s.Status == StockLogStatusConst.DamagedAwaitingAction).ToList();
+                        break;
+                }
             }
 
             stockLogs = CheckSearchString(stockLogs, searchString);
@@ -126,12 +211,18 @@ namespace WebApp_GozenBv.Controllers
                            on e.FirmaId equals f.Id
                            select new { e.Id, e.Name, e.Surname, f.FirmaName };
 
+
             foreach (var employee in queryEmp)
             {
+                var sb = new StringBuilder();
+
+                sb.AppendFormat("{0,-10} | {1,-10} | {2,5}", employee.Name, employee.Surname, employee.FirmaName);
+                var empFullNameFirma = sb.ToString();
+
                 lstEmp.Add(new EmployeeVM
                 {
                     EmployeeId = employee.Id,
-                    EmployeeFullNameFirma = employee.Id + " " + employee.Name + " " + employee.Surname + " (" + employee.FirmaName + ")",
+                    EmployeeFullNameFirma =  empFullNameFirma,
                 });
             }
 
@@ -201,14 +292,14 @@ namespace WebApp_GozenBv.Controllers
             }
             else
             {
-                //TODO: this return will normally not be hit but needs to be better :)
-                GetCreateViewData();
+                //GetCreateViewData();
 
-                ViewData["employees"] = new SelectList(lstEmp, "EmployeeId", "EmployeeFullNameFirma");
-                ViewData["stock"] = new SelectList(lstStock, "StockId", "ProductNameBrand");
-                ViewData["stockQuantity"] = lstStock;
+                //ViewData["dateToday"] = DateTime.Today.ToString("yyyy-MM-dd");
+                //ViewData["employees"] = new SelectList(lstEmp, "EmployeeId", "EmployeeFullNameFirma");
+                //ViewData["stock"] = new SelectList(lstStock, "StockId", "ProductNameBrand");
+                //ViewData["stockQuantity"] = lstStock;
 
-                return View();
+                return RedirectToAction(nameof(Create));
             }
         }
 

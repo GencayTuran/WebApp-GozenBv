@@ -19,10 +19,24 @@
 </p>
 
 <form asp-action="Index" method="get">
-    <p>
-        Find by name: <input type="text" name="searchString" value="@ViewBag.SearchString"/>
-        <input type="submit" value="Search" />
-    </p>
+    <div class="d-flex justify-content-start flex-row">
+        <input class="mr-2" type="text" placeholder="Find by Name" name="searchString" value="@ViewBag.SearchString" />
+        <select class="mr-2" name="sortStatus" placeholder="Status" asp-items="@ViewBag.StatusSortList">
+            @if (ViewBag.SortStatusIdParam > 0)
+            {
+                <option value="@ViewBag.SortStatusIdParam" selected hidden>@ViewBag.SortStatusNameParam</option>
+            }
+            <option value="0">Status</option>
+        </select>
+        <select class="mr-2" name="sortOrder" asp-items="@ViewBag.SortOrderList">
+            @if (ViewBag.SortOrderIdParam > 0)
+            {
+                <option value="@ViewBag.SortOrderIdParam" selected hidden>@ViewBag.SortOrderNameParam</option>
+            }
+            <option value="0">Sort by</option>
+        </select>
+        <input class="btn btn-primary" type="submit" value="Search" />
+    </div>
 </form>
 
 
@@ -33,10 +47,10 @@
                 @Html.DisplayNameFor(model => model.Status)
             </th>
             <th>
-                @Html.ActionLink(Html.DisplayNameFor(model => model.Employee), "Index", new { sortOrder = ViewBag.EmployeeSortParm })
+                @Html.DisplayNameFor(model => model.Employee)
             </th>
             <th>
-                @Html.ActionLink(Html.DisplayNameFor(model => model.StockLogDate), "Index", new { sortOrder = ViewBag.DateSortParm })
+                @Html.DisplayNameFor(model => model.StockLogDate)
             </th>
             <th></th>
         </tr>
