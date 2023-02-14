@@ -21,12 +21,20 @@
                 </div>
                 <div class="form-group">
                     <label class="control-label">Werknemer</label>
-                    <select class="form-control" asp-for="EmployeeId" asp-items="ViewBag.employees"></select>
+                    @*<select class="form-control" asp-for="EmployeeId" asp-items="ViewBag.employees"></select>*@
+                    <input id="inputSelectedEmployee" type="search" placeholder="Select Employee" class="form-control" list="lstEmployees"></input>
+                    <datalist id="lstEmployees">
+                        @foreach (var emp in ViewBag.employees)
+                        {
+                            <option data-value="@emp.EmployeeId" value="@emp.EmployeeFullNameFirma"></option>
+                        }
+                    </datalist>
+                    <input id="inputEmployeeId" type="hidden" asp-for="EmployeeId" />
                 </div>
                 <div class="form-group">
                     <input type="submit" value="Create" class="btn btn-primary" />
                 </div>
-                <input class="d-none" id="productsResult" asp-for="SelectedProducts" />
+                <input id="productsResult" type="hidden" asp-for="SelectedProducts" />
             </div>
         </form>
     </div>
@@ -44,12 +52,19 @@
                 <div class="productRow">
                     <div class="form-group d-flex flex-row justify-content-between">
                         <div class="col-6">
-                            <select class="inputProduct form-control" asp-items="ViewBag.stock">
-                                <option value="">Selecteer materiaal</option>
-                            </select>
+                            @*<select class="inputProduct form-control" asp-items="ViewBag.stock">
+                            <option value="">Selecteer materiaal</option>
+                            </select>*@
+                            <input class="inputSelectedProduct form-control" placeholder="Select Stock" type="search" list="lstStock" />
+                            <datalist id="lstStock">
+                                @foreach (var stock in ViewBag.stock)
+                                {
+                                    <option data-value="@stock.StockId" value="@stock.ProductNameBrand"></option>
+                                }
+                            </datalist>
                         </div>
                         <div class="col-2 d-flex flex-row">
-                            <input class="form-control inputAmount" type="number" placeholder="Aantal" />
+                            <input class="form-control inputAmount" type="number" min="1" placeholder="Aantal" />
                             <p class="labelAlert display-4" style="color: red;"></p>
                         </div>
                         <div class="col-4">
@@ -70,10 +85,13 @@
 
 
 <script>
-    var stockQtyAndNames = @Html.Raw(Json.Serialize(ViewBag.stockQuantity));
+    var stockQtyAndNames = @Html.Raw(Json.Serialize(ViewBag.stock));
+    var employeeData = @Html.Raw(Json.Serialize(ViewBag.employees));
 </script>
 <script src="~/js/StockLog_Create.js"></script>
 
 @section Scripts {
-@{await Html.RenderPartialAsync("_ValidationScriptsPartial");}
+    @{
+        await Html.RenderPartialAsync("_ValidationScriptsPartial");
+    }
 }

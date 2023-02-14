@@ -91,9 +91,9 @@ namespace WebApp_GozenBv.Controllers
             foreach (var item in lstSortOrder)
             {
                 if (item.Id == sortOrder)
-                { 
-                   ViewBag.SortOrderIdParam = item.Id; 
-                   ViewBag.SortOrderNameParam = item.Name; 
+                {
+                    ViewBag.SortOrderIdParam = item.Id;
+                    ViewBag.SortOrderNameParam = item.Name;
                 }
             }
 
@@ -196,9 +196,8 @@ namespace WebApp_GozenBv.Controllers
             GetCreateViewData();
 
             ViewData["dateToday"] = DateTime.Today.ToString("yyyy-MM-dd");
-            ViewData["employees"] = new SelectList(lstEmp, "EmployeeId", "EmployeeFullNameFirma");
-            ViewData["stock"] = new SelectList(lstStock, "StockId", "ProductNameBrand");
-            ViewData["stockQuantity"] = lstStock;
+            ViewData["employees"] = lstEmp;
+            ViewData["stock"] = lstStock;
 
             return View();
         }
@@ -214,15 +213,13 @@ namespace WebApp_GozenBv.Controllers
 
             foreach (var employee in queryEmp)
             {
-                var sb = new StringBuilder();
 
-                sb.AppendFormat("{0,-10} | {1,-10} | {2,5}", employee.Name, employee.Surname, employee.FirmaName);
-                var empFullNameFirma = sb.ToString();
+                var empFullNameFirma = String.Format("{0,0}.  {1,0} {2,0} - ({3,0})", employee.Id, employee.Name, employee.Surname, employee.FirmaName.ToUpper());
 
                 lstEmp.Add(new EmployeeVM
                 {
                     EmployeeId = employee.Id,
-                    EmployeeFullNameFirma =  empFullNameFirma,
+                    EmployeeFullNameFirma = empFullNameFirma,
                 });
             }
 
@@ -236,7 +233,7 @@ namespace WebApp_GozenBv.Controllers
                 {
                     StockId = product.Id,
                     Quantity = product.Quantity,
-                    ProductNameBrand = product.ProductName + " - " + product.ProductBrand
+                    ProductNameBrand = product.Id + ". " + product.ProductName + " - " + product.ProductBrand
                 });
             }
 
