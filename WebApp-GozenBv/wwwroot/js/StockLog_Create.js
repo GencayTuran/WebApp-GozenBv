@@ -3,20 +3,22 @@ const row = document.querySelector(".productRow");
 var result = document.getElementById("productsResult");
 
 //single value input
-var inputSelectedProduct = document.querySelector(".inputSelectedProduct");
+// var inputSelectedProduct = document.querySelector(".inputSelectedProduct");
+var selectStock = document.querySelector(".selectStock");
 var inputAmount = document.querySelector(".inputAmount");
 
 //elements
 let rows;
-let inputProducts;
+let inputStocks;
 let inputAmounts;
 let labelAlerts;
 
 function GetElements()
 {
     //collection value of inputs
+    // inputProducts = document.querySelectorAll(".inputSelectedProduct");
     rows = document.querySelectorAll(".productRow");
-    inputProducts = document.querySelectorAll(".inputSelectedProduct");
+    selectStocks = document.querySelectorAll(".selectStock");
     inputAmounts = document.querySelectorAll(".inputAmount");
     labelAlerts = document.querySelectorAll(".labelAlert");
 }
@@ -24,7 +26,7 @@ function GetElements()
 Init();
 
 function Init() {
-    inputSelectedProduct.value = "";
+    selectStock.value = "";
     // SetMinValue();
 }
 
@@ -57,32 +59,32 @@ function ValidateForm(event) {
         event.preventDefault();
     }
     if (Success()) {
-            SetInputEmployee();
+            //SetInputEmployee();
             PassProducts();
     }
 }
 
-function SetInputEmployee() {
-    let value = $('#inputSelectedEmployee').val();
-    let $employeeId = $("#inputEmployeeId");
-    $employeeId.val($('#lstEmployees [value="' + value + '"]').data('value'));
-}
+// function SetInputEmployee() {
+//     let value = $('#inputSelectedEmployee').val();
+//     let $employeeId = $("#inputEmployeeId");
+//     $employeeId.val($('#lstEmployees [value="' + value + '"]').data('value'));
+// }
 
-function GetStockId(inputStock, index) {
-    let value = inputStock[index].value;
-    let stockId = $('#lstStock [value="' + value + '"]').data('value');
-    return stockId;
-}
+// function GetStockId(inputStock, index) {
+//     let value = inputStock[index].value;
+//     let stockId = $('#lstStock [value="' + value + '"]').data('value');
+//     return stockId;
+// }
 
 function PassProducts() {
     GetElements();
     var products = [];
 
-    for (var i = 0; i < inputProducts.length; i++) {
+    for (var i = 0; i < selectStocks.length; i++) {
 
-        let stockId = GetStockId(inputProducts, i);
-        products.push([stockId, inputAmounts[i].value]); //id, amount
-        // products.push([inputProducts[i].value, inputAmounts[i].value]); //id, amount
+        // let stockId = GetStockId(inputProducts, i);
+        // products.push([stockId, inputAmounts[i].value]); //id, amount
+        products.push([selectStocks[i].value, inputAmounts[i].value]); //id, amount
     }
     result.value = products;
 
@@ -96,7 +98,7 @@ function CheckQuantity()
 
    for (let i = 0; i < rows.length; i++) {
     stockQtyAndNames.forEach(data => {
-        if (GetStockId(inputProducts, i) == data.stockId) {
+        if (selectStocks[i] == data.stockId) {
             if (parseInt(inputAmounts[i].value) > data.quantity) {
                 let message = (`Product: ${data.productNameBrand} amount is too high! Max Qty: ${data.quantity}`);
                 alerts.push(message);
@@ -118,7 +120,7 @@ function CheckInputs() {
     check = true;
 
     for (let i = 0; i < rows.length; i++) {
-        if (inputProducts[i].value == "" || inputAmounts[i].value == "") {
+        if (selectStocks[i].value == "" || inputAmounts[i].value == "") {
             rows[i].style.backgroundColor = lightRed;
             check = false;
         }
@@ -131,12 +133,17 @@ function CheckInputs() {
 }
 
 function NewRow() {
+    $(row.querySelector(".selectStock")).select2("destroy");
+
     var clone = row.cloneNode(true);
-    clone.querySelector(".inputSelectedProduct").value = "";
+    $(clone.querySelector(".selectStock")).select2({width: '100%'});
+    clone.querySelector(".selectStock").value = "";
     clone.querySelector(".inputAmount").value = "";
     clone.style.backgroundColor = "transparent";
     clone.querySelector(".labelAlert").innerHTML = "";
     parentNode.appendChild(clone);
+
+    $(row.querySelector(".selectStock")).select2({width: '100%'});
 }
 
 function RemoveRow(obj) {
