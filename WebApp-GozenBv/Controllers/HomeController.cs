@@ -30,53 +30,6 @@ namespace WebApp_GozenBv.Controllers
         //[AuthorizeForScopes(ScopeKeySection = "DownstreamApi:Scopes")]
         public async Task<IActionResult> Index()
         {
-            List<string> lstAlertsCar = new List<string>();
-            var cars = _context.WagenPark.Include(w => w.Firma);
-
-            foreach (var car in cars)
-            {
-                if (DateTime.Now >= car.DeadlineKeuring.AddMonths(-1))
-                {
-                    if (DateTime.Now >= car.DeadlineKeuring)
-                    {
-                        lstAlertsCar.Add("(" + car.Id + ") "
-                        + car.LicencePlate
-                        + " (" + car.Brand
-                        + " - " + car.Model
-                        + ") KEURING VERLOPEN OP "
-                        + car.DeadlineKeuring.ToShortDateString());
-                    }
-                    else
-                    {
-                        int daysLeft = (car.DeadlineKeuring - DateTime.Now).Days + 1;
-                        lstAlertsCar.Add("(" + car.Id + ") "
-                            + car.LicencePlate
-                            + " (" + car.Brand
-                            + " - " + car.Model
-                            + ") KEURING VERLOOPT BINNEN "
-                            + daysLeft
-                            + " DAGEN! (" + car.DeadlineKeuring.ToShortDateString() + ")");
-                    }
-                }
-            }
-
-            List<string> lstAlertsStock = new List<string>();
-            var stock = _context.Stock.Select(x => x);
-
-            foreach (var product in stock)
-            {
-                if (product.Quantity < product.MinQuantity)
-                {
-                    lstAlertsStock.Add("PRODUCTNR "
-                    + product.Id
-                    + " " + product.ProductName
-                    + " - " + product.ProductBrand
-                    + " WEINIG IN STOCK! (" + product.Quantity + ")");
-                }
-            }
-
-            ViewData["alertsCar"] = lstAlertsCar;
-            ViewData["alertsStock"] = lstAlertsStock;
 
             //var user = await _graphServiceClient.Me.Request().GetAsync();
             //ViewData["ApiResult"] = user.DisplayName;
