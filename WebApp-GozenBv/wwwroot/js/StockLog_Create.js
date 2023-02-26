@@ -100,7 +100,7 @@ function CheckQuantity()
     stockQtyAndNames.forEach(data => {
         if (selectStocks[i] == data.stockId) {
             if (parseInt(inputAmounts[i].value) > data.quantity) {
-                let message = (`Product: ${data.productNameBrand} amount is too high! Max Qty: ${data.quantity}`);
+                let message = (`Product: ${data.productNameCode} amount is too high! Max Qty: ${data.quantity}`);
                 alerts.push(message);
                 labelAlerts[i].innerHTML = "*";
                 check = false;

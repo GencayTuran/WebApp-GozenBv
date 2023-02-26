@@ -174,11 +174,11 @@ namespace WebApp_GozenBv.Services
                 case ControllerConst.Firma:
                     controller = "Firma";
                     break;
-                case ControllerConst.WagenPark:
-                    controller = "Wagenpark";
+                case ControllerConst.CarPark:
+                    controller = "Carpark";
                     break;
-                case ControllerConst.WagenMaintenance:
-                    controller = "Wagenmaintenance";
+                case ControllerConst.CarMaintenance:
+                    controller = "Carmaintenance";
                     break;
                 default:
                     break;

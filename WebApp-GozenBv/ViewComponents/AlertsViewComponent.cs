@@ -22,29 +22,29 @@ namespace WebApp_GozenBv.ViewComponents
             List<CarAlertViewModel> carAlerts = new();
             List<StockAlertViewModel> stockAlerts = new();
 
-            var cars = _context.WagenPark.Include(w => w.Firma);
+            var cars = _context.CarPark.Select(x => x);
             var stock = _context.Stock.Select(x => x);
 
             foreach (var car in cars)
             {
-                if (DateTime.Now >= car.DeadlineKeuring.AddMonths(-1))
+                if (DateTime.Now >= car.DeadlineKeuringDate.AddMonths(-1))
                 {
-                    if (DateTime.Now >= car.DeadlineKeuring)
+                    if (DateTime.Now >= car.DeadlineKeuringDate)
                     {
                         carAlerts.Add(new CarAlertViewModel()
                         {
                             Status = CarAlertsConst.Outdated,
-                            WagenPark = car
+                            CarPark = car
                         });
                     }
                     else
                     {
-                        int daysLeft = (car.DeadlineKeuring - DateTime.Now).Days + 1;
+                        int daysLeft = (car.DeadlineKeuringDate - DateTime.Now).Days + 1;
 
                         carAlerts.Add(new CarAlertViewModel()
                         {
                             Status = CarAlertsConst.LessThanOneMonth,
-                            WagenPark = car
+                            CarPark = car
                         });
                     }
                 }

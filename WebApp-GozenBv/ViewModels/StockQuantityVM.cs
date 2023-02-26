@@ -4,6 +4,6 @@
     {
         public int StockId { get; set; }
         public int Quantity { get; set; }
-        public string ProductNameBrand { get; set; }
+        public string ProductNameCode { get; set; }
     }
 }

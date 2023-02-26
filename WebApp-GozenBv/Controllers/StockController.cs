@@ -53,7 +53,7 @@ namespace WebApp_GozenBv.Controllers
         public IActionResult Create()
         {
             var productBrands = _context.Stock
-                .Select(p => p.ProductBrand)
+                .Select(p => p.ProductCode)
                 .Distinct().ToList();
 
             ViewData["ProductBrands"] = productBrands;
@@ -62,10 +62,19 @@ namespace WebApp_GozenBv.Controllers
 
         [HttpPost]
         [ValidateAntiForgeryToken]
-        public async Task<IActionResult> Create([Bind("Id,ProductName,Quantity,MinQuantity,Used,Cost,ProductBrand")] Stock stock)
+        public async Task<IActionResult> Create(Stock stock)
         {
             if (ModelState.IsValid)
             {
+                if (stock.NoReturn)
+                {
+                    stock.Cost = null;
+                    stock.Used = null;
+                }
+                else
+                {
+                    stock.Used = false;
+                }
                 _context.Add(stock);
                 await _context.SaveChangesAsync();
 

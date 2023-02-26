@@ -12,24 +12,13 @@ namespace WebApp_GozenBv.Models
         [Required]
         public string ProductName { get; set; }
         [Required]
-        public string ProductBrand { get; set; }
+        public string ProductCode { get; set; }
         [Required]
         public int Quantity { get; set; }
         [Required]
         public int MinQuantity { get; set; }
-        [Required]
-        public double Cost { get; set; }
-        [Required]
+        public bool NoReturn { get; set; }
+        public double? Cost { get; set; }
         public bool Used { get; set; }
-
-        private string _productCode;
-        public string ProductCode
-        {
-            get
-            {
-                _productCode = (ProductName.Substring(0, 3) + "-" + ProductBrand.Substring(0, 3)).ToUpper();
-                return _productCode;
-            }
-        }
     }
 }

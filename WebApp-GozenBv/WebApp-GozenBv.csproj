@@ -5,6 +5,7 @@
 		<RootNamespace>WebApp_GozenBv</RootNamespace>
 	</PropertyGroup>
 
+	<PropertyGroup Condition=" '$(RunConfiguration)' == 'WebApp-GozenBv' " />
 	<ItemGroup>
 	  <Compile Remove="Views\Shared\Components\Actions\**" />
 	  <Content Remove="Views\Shared\Components\Actions\**" />

@@ -28,7 +28,7 @@ namespace WebApp_GozenBv.Controllers
         // GET: Employee
         public async Task<IActionResult> Index()
         {
-            var dataDbContext = _context.Employees.Include(e => e.Firma);
+            var dataDbContext = _context.Employees.Select(x => x);
             return View(await dataDbContext.ToListAsync());
         }
 
@@ -41,7 +41,6 @@ namespace WebApp_GozenBv.Controllers
             }
 
             var employee = await _context.Employees
-                .Include(e => e.Firma)
                 .FirstOrDefaultAsync(m => m.Id == id);
             if (employee == null)
             {
@@ -54,13 +53,12 @@ namespace WebApp_GozenBv.Controllers
         [HttpGet]
         public IActionResult Create()
         {
-            ViewData["FirmaId"] = new SelectList(_context.Firmas, "Id", "Id");
             return View();
         }
 
         [HttpPost]
         [ValidateAntiForgeryToken]
-        public async Task<IActionResult> Create([Bind("Id,Name,Surname,FirmaId")] Employee employee)
+        public async Task<IActionResult> Create(Employee employee)
         {
             if (ModelState.IsValid)
             {
@@ -71,7 +69,6 @@ namespace WebApp_GozenBv.Controllers
 
                 return RedirectToAction(nameof(Index));
             }
-            ViewData["FirmaId"] = new SelectList(_context.Firmas, "Id", "Id", employee.FirmaId);
             return View(employee);
         }
 
@@ -88,13 +85,12 @@ namespace WebApp_GozenBv.Controllers
             {
                 return NotFound();
             }
-            ViewData["FirmaId"] = new SelectList(_context.Firmas, "Id", "Id", employee.FirmaId);
             return View(employee);
         }
 
         [HttpPost]
         [ValidateAntiForgeryToken]
-        public async Task<IActionResult> Edit(int id, [Bind("Id,Name,Surname,FirmaId")] Employee employee)
+        public async Task<IActionResult> Edit(int id, Employee employee)
         {
             if (id != employee.Id)
             {
@@ -122,7 +118,6 @@ namespace WebApp_GozenBv.Controllers
                 }
                 return RedirectToAction(nameof(Index));
             }
-            ViewData["FirmaId"] = new SelectList(_context.Firmas, "Id", "Id", employee.FirmaId);
             return View(employee);
         }
 
@@ -135,7 +130,6 @@ namespace WebApp_GozenBv.Controllers
             }
 
             var employee = await _context.Employees
-                .Include(e => e.Firma)
                 .FirstOrDefaultAsync(m => m.Id == id);
             if (employee == null)
             {

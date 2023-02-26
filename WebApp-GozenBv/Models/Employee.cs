@@ -10,7 +10,5 @@ namespace WebApp_GozenBv.Models
         public int Id { get; set; }
         public string Name { get; set; }
         public string Surname { get; set; }
-        public int FirmaId { get; set; }
-        public Firma Firma { get; set; }
     }
 }

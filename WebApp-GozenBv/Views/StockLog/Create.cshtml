@@ -30,7 +30,7 @@
                     <datalist id="lstEmployees">
                         @foreach (var emp in ViewBag.employees)
                         {
-                            <option data-value="@emp.EmployeeId" value="@emp.EmployeeFullNameFirma"></option>
+                            <option data-value="@emp.EmployeeId" value="@emp.EmployeeFullName"></option>
                         }
                     </datalist>
                     <input id="inputEmployeeId" type="hidden" asp-for="EmployeeId" />*@
@@ -63,7 +63,7 @@
                             <datalist id="lstStock">
                                 @foreach (var stock in ViewBag.stock)
                                 {
-                                    <option data-value="@stock.StockId" value="@stock.ProductNameBrand"></option>
+                                    <option data-value="@stock.StockId" value="@stock.ProductNameCode"></option>
                                 }
                             </datalist>*@
                             <select class="form-control selectStock" asp-items="ViewBag.stock" allowClear>

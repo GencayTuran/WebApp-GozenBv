@@ -9,6 +9,6 @@ namespace WebApp_GozenBv.ViewModels
     public class EmployeeVM
     {
         public int EmployeeId { get; set; }
-        public string EmployeeFullNameFirma { get; set; }
+        public string EmployeeFullName { get; set; }
     }
 }

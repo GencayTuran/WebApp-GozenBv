@@ -25,11 +25,11 @@ namespace WebApp_GozenBv.Data
             {
                 _context.Stock.AddRange(GetStock());
                 _context.SaveChanges();
-                _context.Firmas.AddRange(GetFirmas());
-                _context.SaveChanges();
                 _context.Employees.AddRange(GetEmployees());
                 _context.SaveChanges();
-                _context.WagenPark.AddRange(GetWagenPark());
+                _context.CarPark.AddRange(GetCarPark());
+                _context.SaveChanges();
+                _context.CarMaintenances.AddRange(GetCarMaintenances());
                 _context.SaveChanges();
 
                 _context.StockLogs.AddRange(GetStockLogs());
@@ -125,7 +125,7 @@ namespace WebApp_GozenBv.Data
                 {
                     var rndStockId = rnd.Next(1, 6);
                     var stock = _context.Stock.Where(s => s.Id == rndStockId).FirstOrDefault();
-                    string productNameBrand = (stock.ProductName + " " + stock.ProductBrand).ToUpper();
+                    string productNameCode = (stock.ProductName + " " + stock.ProductCode).ToUpper();
                     int rndStockAmount = rnd.Next(1, 4);
                     bool rndDamaged = arrDamaged[rnd.Next(0, 4)];
                     bool damaged = stockLogs[i].Damaged ? rndDamaged : false;
@@ -137,7 +137,7 @@ namespace WebApp_GozenBv.Data
                     {
                         LogCode = stockLogs[i].LogCode,
                         StockId = stock.Id,
-                        ProductNameBrand = productNameBrand,
+                        ProductNameCode = productNameCode,
                         StockAmount = rndStockAmount,
                         IsDamaged = damaged,
                         Cost = stock.Cost,
@@ -174,7 +174,7 @@ namespace WebApp_GozenBv.Data
                 ProductName = "Kniptang",
                 Quantity = 75,
                 MinQuantity = 50,
-                ProductBrand = "Knipex",
+                ProductCode = "Knipex",
                 Cost = 20
             };
 
@@ -183,7 +183,7 @@ namespace WebApp_GozenBv.Data
                 ProductName = "Boormachine",
                 Quantity = 80,
                 MinQuantity = 15,
-                ProductBrand = "Makita",
+                ProductCode = "Makita",
                 Cost = 50
             };
             stock[2] = new Stock
@@ -191,7 +191,7 @@ namespace WebApp_GozenBv.Data
                 ProductName = "Slijper",
                 Quantity = 50,
                 MinQuantity = 20,
-                ProductBrand = "Bosch",
+                ProductCode = "Bosch",
                 Cost = 80
             };
             stock[3] = new Stock
@@ -199,80 +199,90 @@ namespace WebApp_GozenBv.Data
                 ProductName = "Hamer",
                 Quantity = 50,
                 MinQuantity = 50,
-                ProductBrand = "Hitachi",
-                Cost = 20
+                ProductCode = "Hitachi",
             };
             stock[4] = new Stock
             {
                 ProductName = "Kniptang",
                 Quantity = 50,
                 MinQuantity = 25,
-                ProductBrand = "Andere",
+                ProductCode = "Andere",
                 Cost = 20
             };
 
             return stock;
         }
 
-        private static Firma[] GetFirmas()
+        private static CarPark[] GetCarPark()
         {
-            var firmas = new Firma[4];
-            firmas[0] = new Firma
-            {
-                FirmaName = "Elektrobel"
-            };
-            firmas[1] = new Firma
-            {
-                FirmaName = "Infrux"
-            };
-            firmas[2] = new Firma
-            {
-                FirmaName = "FirmaX"
-            };
-            firmas[3] = new Firma
-            {
-                FirmaName = "FirmaY"
-            };
-            return firmas;
-        }
-
-        private static WagenPark[] GetWagenPark()
-        {
-            var wagenPark = new WagenPark[3];
-            wagenPark[0] = new WagenPark
+            var CarPark = new CarPark[4];
+            CarPark[0] = new CarPark
             {
                 LicencePlate = "1-ABC-123",
                 ChassisNumber = "ABCDEFGHIJ1234567",
-                Brand = "Volkswagen",
+                Brand = "VolksCar",
                 Model = "Polo",
                 Km = 90000,
-                FirmaId = 3,
                 KeuringDate = DateTime.Parse("01/01/2022"),
-                DeadlineKeuring = DateTime.Parse("01/01/2023")
+                DeadlineKeuringDate = DateTime.Parse("01/01/2023"),
+                DriverName = "Cemal Ercan",
+
             };
-            wagenPark[1] = new WagenPark
+            CarPark[1] = new CarPark
             {
                 LicencePlate = "2-CBA-321",
                 ChassisNumber = "KLMNOPQRST7654321",
                 Brand = "Ford",
                 Model = "Transit",
                 Km = 30000,
-                FirmaId = 3,
                 KeuringDate = DateTime.Parse("05/02/2020"),
-                DeadlineKeuring = DateTime.Parse("04/02/2021")
+                DeadlineKeuringDate = DateTime.Parse("04/02/2021"),
+                DriverName = "Ahmed Ahmedov"
             };
-            wagenPark[2] = new WagenPark
+            CarPark[2] = new CarPark
             {
                 LicencePlate = "1-XYZ-987",
                 ChassisNumber = "QRSTUVXYZA1234567",
-                Brand = "Volkswagen",
+                Brand = "VolksCar",
                 Model = "Transporter",
                 Km = 110000,
-                FirmaId = 4,
                 KeuringDate = DateTime.Parse("14/05/2022"),
-                DeadlineKeuring = DateTime.Parse("30/11/2022")
+                DeadlineKeuringDate = DateTime.Parse("30/11/2022"),
             };
-            return wagenPark;
+            CarPark[3] = new CarPark
+            {
+                LicencePlate = "1-XYZ-987",
+                ChassisNumber = "QRSTUVXYZA1234567",
+                Brand = "VolksCar",
+                Model = "Transporter",
+                Km = 110000,
+                KeuringDate = DateTime.Parse("14/05/2022"),
+                DeadlineKeuringDate = DateTime.Parse("30/11/2022"),
+            };
+            return CarPark;
+        }
+
+        private static CarMaintenance[] GetCarMaintenances()
+        {
+            var carMaintenances = new CarMaintenance[3];
+            carMaintenances[0] = new CarMaintenance
+            {
+                CarId = 1,
+                MaintenanceKm = 85000,
+            };
+            carMaintenances[1] = new CarMaintenance
+            {
+                CarId = 2,
+                MaintenanceDate = DateTime.Parse("15/05/2023"),
+                MaintenanceInfo = "Motorwissel"
+            };
+            carMaintenances[2] = new CarMaintenance
+            {
+                CarId = 4,
+                MaintenanceDate = DateTime.Parse("01/01/2023"),
+                MaintenanceInfo = "testpastdateinfo"
+            };
+            return carMaintenances;
         }
 
         private static Employee[] GetEmployees()
@@ -282,19 +292,16 @@ namespace WebApp_GozenBv.Data
             {
                 Name = "Aydin",
                 Surname = "Ahmet",
-                FirmaId = 1
             };
             employees[1] = new Employee
             {
                 Name = "Turan",
                 Surname = "Gencay",
-                FirmaId = 1
             };
             employees[2] = new Employee
             {
                 Name = "Janssens",
                 Surname = "Jan",
-                FirmaId = 2
             };
             return employees;
         }

@@ -8,6 +8,7 @@ using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.Rendering;
 using Microsoft.AspNetCore.Routing;
 using Microsoft.EntityFrameworkCore;
+using Microsoft.Graph;
 using WebApp_GozenBv.Constants;
 using WebApp_GozenBv.Data;
 using WebApp_GozenBv.Helpers;
@@ -184,7 +185,7 @@ namespace WebApp_GozenBv.Controllers
                 return PartialView("_EntityNotFound");
             }
 
-            var stockLogDetailVM = GetStockLogDetails(logCode, false);
+            var stockLogDetailVM = GetStockLogDetails(logCode);
             return View(stockLogDetailVM);
         }
 
@@ -197,37 +198,31 @@ namespace WebApp_GozenBv.Controllers
 
             ViewData["dateToday"] = DateTime.Today.ToString("yyyy-MM-dd");
             //ViewData["employees"] = lstEmp;
-            ViewData["employees"] = new SelectList(lstEmp, "EmployeeId", "EmployeeFullNameFirma"); ;
+            ViewData["employees"] = new SelectList(lstEmp, "EmployeeId", "EmployeeFullName"); ;
             //ViewData["stock"] = lstStock;
-            ViewData["stock"] = new SelectList(lstStock, "StockId", "ProductNameBrand");
+            ViewData["stock"] = new SelectList(lstStock, "StockId", "ProductNameCode");
 
             return View();
         }
 
         private void GetCreateViewData()
         {
-            //employees
-            var queryEmp = from e in _context.Employees
-                           join f in _context.Firmas
-                           on e.FirmaId equals f.Id
-                           select new { e.Id, e.Name, e.Surname, f.FirmaName };
+            var employees = _context.Employees.Select(x => x);
 
-
-            foreach (var employee in queryEmp)
+            foreach (var emp in employees)
             {
-
-                var empFullNameFirma = String.Format("{0,0} {1,0} - ({2,0})", employee.Name, employee.Surname, employee.FirmaName.ToUpper());
+                var empFullName = String.Format("{0,0} {1,0}", emp.Name, emp.Surname);
 
                 lstEmp.Add(new EmployeeVM
                 {
-                    EmployeeId = employee.Id,
-                    EmployeeFullNameFirma = empFullNameFirma,
+                    EmployeeId = emp.Id,
+                    EmployeeFullName = empFullName,
                 });
             }
 
             //stock
             var queryStock = from s in _context.Stock
-                             select new { s.Id, s.ProductName, s.ProductBrand, s.Quantity };
+                             select new { s.Id, s.ProductName, s.ProductCode, s.Quantity };
 
             foreach (var product in queryStock)
             {
@@ -235,7 +230,7 @@ namespace WebApp_GozenBv.Controllers
                 {
                     StockId = product.Id,
                     Quantity = product.Quantity,
-                    ProductNameBrand = product.ProductName + " - " + product.ProductBrand
+                    ProductNameCode = product.ProductName + " - " + product.ProductCode
                 });
             }
 
@@ -254,17 +249,31 @@ namespace WebApp_GozenBv.Controllers
                 Guid guid = Guid.NewGuid();
                 string logCode = guid.ToString();
 
+                //new stocklog
+                stockLogCreateVM.LogCode = logCode;
+                StockLog stockLog = stockLogCreateVM;
+                stockLog.Status = StockLogStatusConst.Created;
+
+                _context.Add(stockLog);
+
                 //new StockLogItem
                 for (int x = 0; x < selectedProducts.Length; x++)
                 {
                     StockLogItem stockLogItem = new StockLogItem();
                     var stock = _context.Stock.Where(s => s.Id == selectedProducts[x]).FirstOrDefault();
-                    stockLogItem.LogCode = logCode;
+                    if (stock.NoReturn)
+                    {
+                        stockLogItem.DamagedAmount = null;
+                        stockLogItem.RepairedAmount = null;
+                        stockLogItem.DeletedAmount = null;
+                    }
+
                     stockLogItem.Cost = stock.Cost;
+                    stockLogItem.LogCode = logCode;
                     stockLogItem.StockId = selectedProducts[x];
                     x++;
                     stockLogItem.StockAmount = selectedProducts[x];
-                    stockLogItem.ProductNameBrand = (stock.ProductName + " " + stock.ProductBrand).ToUpper();
+                    stockLogItem.ProductNameCode = (stock.ProductName + " " + stock.ProductCode).ToUpper();
 
                     _context.Add(stockLogItem);
                 }
@@ -277,12 +286,6 @@ namespace WebApp_GozenBv.Controllers
                     s++;
                 }
 
-                //new stocklog
-                stockLogCreateVM.LogCode = logCode;
-                StockLog stockLog = stockLogCreateVM;
-                stockLog.Status = StockLogStatusConst.Created;
-
-                _context.Add(stockLog);
                 await _context.SaveChangesAsync();
 
                 await _userLogService.CreateAsync(ControllerConst.StockLog, ActionConst.Create, logCode);
@@ -294,8 +297,8 @@ namespace WebApp_GozenBv.Controllers
                 //GetCreateViewData();
 
                 //ViewData["dateToday"] = DateTime.Today.ToString("yyyy-MM-dd");
-                //ViewData["employees"] = new SelectList(lstEmp, "EmployeeId", "EmployeeFullNameFirma");
-                //ViewData["stock"] = new SelectList(lstStock, "StockId", "ProductNameBrand");
+                //ViewData["employees"] = new SelectList(lstEmp, "EmployeeId", "EmployeeFullName");
+                //ViewData["stock"] = new SelectList(lstStock, "StockId", "ProductNameCode");
                 //ViewData["stockQuantity"] = lstStock;
 
                 return RedirectToAction(nameof(Create));
@@ -375,7 +378,7 @@ namespace WebApp_GozenBv.Controllers
                 return NotFound();
             }
 
-            var stockLogDetailVM = GetStockLogDetails(logCode, false);
+            var stockLogDetailVM = GetStockLogDetails(logCode);
 
             return View(stockLogDetailVM);
         }
@@ -462,7 +465,7 @@ namespace WebApp_GozenBv.Controllers
                 return NotFound();
             }
 
-            var stockLogDetailVM = GetStockLogDetails(logCode, true);
+            var stockLogDetailVM = GetStockLogDetails(logCode);
 
             return View(stockLogDetailVM);
         }
@@ -529,7 +532,7 @@ namespace WebApp_GozenBv.Controllers
                     foreach (var item in stockLogItems)
                     {
                         var notDamagedItems = item.StockAmount - item.DamagedAmount;
-                        await StockHelper.UpdateStockQty(item.StockId, -notDamagedItems, _context);
+                        await StockHelper.UpdateStockQty(item.StockId, -(int)notDamagedItems, _context);
                         item.DamagedAmount = 0;
 
                         _context.Update(item);
@@ -546,16 +549,16 @@ namespace WebApp_GozenBv.Controllers
                         {
                             if (item.RepairedAmount > 0)
                             {
-                                await StockHelper.UpdateStockQty(item.StockId, -item.RepairedAmount, _context);
+                                await StockHelper.UpdateStockQty(item.StockId, -(int)item.RepairedAmount, _context);
                             }
 
                             if (item.DeletedAmount > 0)
                             {
-                                await StockHelper.UpdateStockQty(item.StockId, item.DeletedAmount, _context);
+                                await StockHelper.UpdateStockQty(item.StockId, (int)item.DeletedAmount, _context);
                             }
 
                             var notDamagedItems = item.StockAmount - item.DamagedAmount;
-                            await StockHelper.UpdateStockQty(item.StockId, -notDamagedItems, _context);
+                            await StockHelper.UpdateStockQty(item.StockId, -(int)notDamagedItems, _context);
 
                             item.RepairedAmount = 0;
                             item.DeletedAmount = 0;
@@ -592,47 +595,34 @@ namespace WebApp_GozenBv.Controllers
             return _context.StockLogs.Any(e => e.Id == id);
         }
 
-        private StockLogDetailVM GetStockLogDetails(string logCode, bool damagedOnly)
+        private StockLogDetailVM GetStockLogDetails(string logCode)
         {
             StockLog stockLog = _context.StockLogs
                 .Include(s => s.Employee)
-                .Include(s => s.Employee.Firma)
                 .FirstOrDefault(s => s.LogCode == logCode);
 
-            List<StockLogItem> stockLogItems;
-            if (!damagedOnly)
-            {
-                stockLogItems = _context.StockLogItems
-                .Where(s => s.LogCode == logCode).ToList();
-            }
-            else
-            {
+            List<StockLogItem> stockLogItems = new();
                 stockLogItems = _context.StockLogItems
                     .Where(s => s.LogCode == logCode)
-                    .Where(s => s.DamagedAmount > 0)
+                    .Where(s => s.IsDamaged == false || s.NoReturn == true).ToList();
+
+            List<StockLogItem> stockLogItemsDamaged = new();
+            if (stockLog.Damaged)
+            {
+                stockLogItemsDamaged = _context.StockLogItems
+                    .Where(s => s.LogCode == logCode)
+                    .Where(s => s.IsDamaged == true)
                     .ToList();
             }
 
-            List<StockLogItem> lstStockLogItems = new List<StockLogItem>();
-            foreach (var item in stockLogItems)
-            {
-                lstStockLogItems.Add(new StockLogItem
-                {
-                    Id = item.Id,
-                    LogCode = item.LogCode,
-                    StockAmount = item.StockAmount,
-                    StockId = item.StockId,
-                    ProductNameBrand = item.ProductNameBrand,
-                });
-            }
-
-            StockLogDetailVM stockLogDetailVM = new StockLogDetailVM
+            StockLogDetailVM stockLogDetailVM = new()
             {
                 StockLogId = stockLog.Id,
                 StockLogDate = stockLog.StockLogDate,
-                EmployeeFullNameFirma = (stockLog.Employee.Name + " " + stockLog.Employee.Surname + " - " + stockLog.Employee.Firma.FirmaName).ToUpper(),
-                LogCode = stockLog.LogCode, //need to show?
+                EmployeeFullName = (stockLog.Employee.Name + " " + stockLog.Employee.Surname).ToUpper(),
+                LogCode = stockLog.LogCode,
                 StockLogItems = stockLogItems,
+                StockLogItemsDamaged = stockLogItemsDamaged,
                 ReturnDate = stockLog.ReturnDate,
                 Status = stockLog.Status,
                 IsDamaged = stockLog.Damaged,
@@ -655,7 +645,7 @@ namespace WebApp_GozenBv.Controllers
                 .Select(s => s.LogCode)
                 .FirstOrDefault();
 
-            var stockLogDetailVM = GetStockLogDetails(logCode, false);
+            var stockLogDetailVM = GetStockLogDetails(logCode);
 
             return View(stockLogDetailVM);
         }
