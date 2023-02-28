@@ -1,76 +1,118 @@
 ﻿@using WebApp_GozenBv.Constants;
-@model IEnumerable<WebApp_GozenBv.Models.CarPark>
+@model IEnumerable<WebApp_GozenBv.ViewModels.CarIndexViewModel>
 
 @{
     ViewData["Title"] = "Index";
 }
 
+<style>
+    .hoverInfo {
+        position: absolute;
+        background-color: white;
+        padding: 2em;
+        width: max-content;
+        border: 1px solid black;
+        z-index: 1;
+    }
+</style>
+
 <h1>Index</h1>
 
 <p>
-    <a asp-action="Create">Create New</a>
+    <a asp-action="Create">Add New Car</a>
 </p>
 <table class="table">
     <thead>
         <tr>
             <th>
-                @Html.DisplayNameFor(model => model.LicencePlate)
+                @Html.DisplayNameFor(model => model.Car.LicencePlate)
             </th>
             <th>
-                @Html.DisplayNameFor(model => model.ChassisNumber)
+                @Html.DisplayNameFor(model => model.Car.ChassisNumber)
             </th>
             <th>
-                @Html.DisplayNameFor(model => model.Brand)
+                @Html.DisplayNameFor(model => model.Car.Brand)
             </th>
             <th>
-                @Html.DisplayNameFor(model => model.Model)
+                @Html.DisplayNameFor(model => model.Car.Model)
             </th>
             <th>
-                @Html.DisplayNameFor(model => model.Km)
+                @Html.DisplayNameFor(model => model.Car.Km)
             </th>
             <th>
-                @Html.DisplayNameFor(model => model.KeuringDate)
+                @Html.DisplayNameFor(model => model.Car.KeuringDate)
             </th>
             <th>
-                @Html.DisplayNameFor(model => model.DriverName)
+                @Html.DisplayNameFor(model => model.Car.DriverName)
+            </th>
+            <th>
+                Next Maintenances
             </th>
             <th></th>
         </tr>
     </thead>
     <tbody>
-@foreach (var item in Model) {
-        <tr>
-            <td>
-                @Html.DisplayFor(modelItem => item.LicencePlate)
-            </td>
-            <td>
-                @Html.DisplayFor(modelItem => item.ChassisNumber)
-            </td>
-            <td>
-                @Html.DisplayFor(modelItem => item.Brand)
-            </td>
-            <td>
-                @Html.DisplayFor(modelItem => item.Model)
-            </td>
-            <td>
-                @Html.DisplayFor(modelItem => item.Km)
-            </td>
-            <td>
-                @Html.DisplayFor(modelItem => item.KeuringDate) - @Html.DisplayFor(modelItem => item.DeadlineKeuringDate)
-            </td>
-            <td>
-                @Html.DisplayFor(modelItem => item.DriverName)
-            </td>
-            <td>
-                <a asp-action="Edit" asp-route-id="@item.Id">Edit</a> |
-                <a asp-action="Details" asp-route-id="@item.Id">Details</a> |
-                <a asp-action="Delete" asp-route-id="@item.Id">Delete</a>
-            </td>
-        </tr>
-}
+        @foreach (var item in Model)
+        {
+            <tr>
+                <td>
+                    @Html.DisplayFor(modelItem => item.Car.LicencePlate)
+                </td>
+                <td>
+                    @Html.DisplayFor(modelItem => item.Car.ChassisNumber)
+                </td>
+                <td>
+                    @Html.DisplayFor(modelItem => item.Car.Brand)
+                </td>
+                <td>
+                    @Html.DisplayFor(modelItem => item.Car.Model)
+                </td>
+                <td>
+                    @Html.DisplayFor(modelItem => item.Car.Km)
+                </td>
+                <td>
+                    @Html.DisplayFor(modelItem => item.Car.KeuringDate) - @Html.DisplayFor(modelItem => item.Car.DeadlineKeuringDate)
+                </td>
+                <td>
+                    @Html.DisplayFor(modelItem => item.Car.DriverName)
+                </td>
+                <td>
+                    @if (item.CarMaintenances.Count > 0)
+                    {
+                        <img width="20" class="imgInfo" onmouseover="ShowInfo(@item.Car.Id)" onmouseleave="HideInfo(@item.Car.Id)" src="resources/icons/info-circle-svgrepo-com.svg" />
+                        <div class="hoverInfo" style="display: none" id="maintenanceInfo-@(item.Car.Id)">
+                            @foreach (var maintenance in item.CarMaintenances)
+                            {
+                                if (maintenance.MaintenanceKm != null)
+                                {
+                                    <p>Control on @maintenance.MaintenanceKm Km</p>
+                                }
+
+                                if (maintenance.MaintenanceDate != null)
+                                {
+                                    <p>Control on @maintenance.MaintenanceDate - @maintenance.MaintenanceInfo</p>
+                                }
+                            }
+                        </div>
+                    }
+                </td>
+                <td>
+                    <a asp-action="Edit" asp-route-id="@item.Car.Id">Edit</a> |
+                    <a asp-action="Details" asp-route-id="@item.Car.Id">Details</a> |
+                    <a asp-action="Delete" asp-route-id="@item.Car.Id">Delete</a>
+                </td>
+            </tr>
+        }
     </tbody>
 </table>
 
 <div>
     <vc:user-log view="@ViewTypeConst.Controller" controller="@ControllerConst.CarPark" entity-id=""></vc:user-log>
 </div>
+
+<script>function ShowInfo(id) {
+        $(`#maintenanceInfo-${id}`).css("display", "block");
+    }
+    function HideInfo(id) {
+        $(`#maintenanceInfo-${id}`).css("display", "none");
+    }</script>

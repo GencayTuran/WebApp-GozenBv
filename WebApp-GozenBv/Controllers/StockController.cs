@@ -69,12 +69,8 @@ namespace WebApp_GozenBv.Controllers
                 if (stock.NoReturn)
                 {
                     stock.Cost = null;
-                    stock.Used = null;
                 }
-                else
-                {
-                    stock.Used = false;
-                }
+
                 _context.Add(stock);
                 await _context.SaveChangesAsync();
 

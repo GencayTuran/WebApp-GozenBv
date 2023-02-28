@@ -10,6 +10,7 @@ using WebApp_GozenBv.Constants;
 using WebApp_GozenBv.Data;
 using WebApp_GozenBv.Models;
 using WebApp_GozenBv.Services;
+using WebApp_GozenBv.ViewModels;
 
 namespace WebApp_GozenBv.Controllers
 {
@@ -28,26 +29,25 @@ namespace WebApp_GozenBv.Controllers
         [HttpGet]
         public async Task<IActionResult> Index()
         {
-            var dataDbContext = _context.CarPark.Select(x => x);
-            return View(await dataDbContext.ToListAsync());
+            return View(await GetCarsAndMaintenances());
         }
 
         [HttpGet]
-        public async Task<IActionResult> Details(int? id)
+        public IActionResult Details(int? id)
         {
             if (id == null)
             {
                 return NotFound();
             }
 
-            var carPark = await _context.CarPark
-                .FirstOrDefaultAsync(m => m.Id == id);
-            if (carPark == null)
+            var car = GetCarDetails(id);
+
+            if (car == null)
             {
                 return PartialView("_EntityNotFound");
             }
 
-            return View(carPark);
+            return View(car);
         }
 
         [HttpGet]
@@ -58,18 +58,39 @@ namespace WebApp_GozenBv.Controllers
 
         [HttpPost]
         [ValidateAntiForgeryToken]
-        public async Task<IActionResult> Create(CarPark carPark)
+        public async Task<IActionResult> Create(CarCreateViewModel carCreate)
         {
             if (ModelState.IsValid)
             {
-                _context.Add(carPark);
+                _context.Add(carCreate.Car);
+                _context.SaveChanges();
+
+                if (carCreate.CarMaintenance.MaintenanceDate != null && !String.IsNullOrEmpty(carCreate.CarMaintenance.MaintenanceInfo))
+                {
+                    var maintenance = new CarMaintenance
+                    {
+                        CarId = carCreate.Car.Id,
+                        MaintenanceDate = carCreate.CarMaintenance.MaintenanceDate,
+                        MaintenanceInfo = carCreate.CarMaintenance.MaintenanceInfo
+                    };
+                    _context.Add(maintenance);
+                }
+
+                if (carCreate.CarMaintenance.MaintenanceKm != null)
+                {
+                    var maintenance = new CarMaintenance
+                    {
+                        CarId = carCreate.Car.Id,
+                        MaintenanceKm = carCreate.CarMaintenance.MaintenanceKm,
+                    };
+                    _context.Add(maintenance);
+                }
                 await _context.SaveChangesAsync();
-                
-                await _userLogService.CreateAsync(ControllerConst.CarPark, ActionConst.Create, carPark.Id.ToString());
+                await _userLogService.CreateAsync(ControllerConst.CarPark, ActionConst.Create, carCreate.Car.Id.ToString());
 
                 return RedirectToAction(nameof(Index));
             }
-            return View(carPark);
+            return View(carCreate);
         }
 
         [HttpGet]
@@ -158,5 +179,45 @@ namespace WebApp_GozenBv.Controllers
         {
             return _context.CarPark.Any(e => e.Id == id);
         }
+
+        private async Task<List<CarIndexViewModel>> GetCarsAndMaintenances()
+        {
+            var cars = _context.CarPark.Select(x => x);
+
+            List<CarIndexViewModel> carIndexViewModel = new();
+
+            foreach (var car in cars)
+            {
+                var maintenances = await _context.CarMaintenances
+                        .Where(c => c.CarId == car.Id && c.Done == false)
+                        .ToListAsync();
+
+                carIndexViewModel.Add(new CarIndexViewModel
+                {
+                    Car = car,
+                    CarMaintenances = maintenances
+                });
+            }
+
+            return carIndexViewModel;
+        }
+
+        private CarDetailsViewModel GetCarDetails(int? id)
+        {
+            var car = _context.CarPark
+                .Where(c => c.Id == id)
+                .FirstOrDefault();
+            IEnumerable<CarMaintenance> maintenances = _context.CarMaintenances
+                .Where(c => c.CarId == id);
+
+            CarDetailsViewModel carDetailsViewModel = new CarDetailsViewModel
+            {
+                Car = car,
+                CarMaintenances = maintenances
+            };
+
+            return carDetailsViewModel;
+        }
+
     }
 }

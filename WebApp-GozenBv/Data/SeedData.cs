@@ -264,7 +264,7 @@ namespace WebApp_GozenBv.Data
 
         private static CarMaintenance[] GetCarMaintenances()
         {
-            var carMaintenances = new CarMaintenance[3];
+            var carMaintenances = new CarMaintenance[4];
             carMaintenances[0] = new CarMaintenance
             {
                 CarId = 1,
@@ -277,6 +277,13 @@ namespace WebApp_GozenBv.Data
                 MaintenanceInfo = "Motorwissel"
             };
             carMaintenances[2] = new CarMaintenance
+            {
+                CarId = 3,
+                MaintenanceDate = DateTime.Parse("01/01/2023"),
+                MaintenanceInfo = "testDone",
+                Done = true
+            };
+            carMaintenances[3] = new CarMaintenance
             {
                 CarId = 4,
                 MaintenanceDate = DateTime.Parse("01/01/2023"),

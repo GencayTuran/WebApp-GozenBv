@@ -10,8 +10,11 @@ namespace WebApp_GozenBv.Models
     {
         public int Id { get; set; }
         [Required]
+        [RegularExpression("^[a-zA-Z0-9]*$", ErrorMessage = "Alleen Nummers en Letters ingeven!" )]
         public string LicencePlate { get; set; }
-        [Required]
+        [MinLength(17)]
+        [MaxLength(17)]
+        [RegularExpression("^[a-zA-Z0-9]*$", ErrorMessage = "Alleen Nummers en Letters toegestaan!")]
         public string ChassisNumber { get; set; }
         [Required]
         public string Brand { get; set; }
@@ -25,6 +28,5 @@ namespace WebApp_GozenBv.Models
         public DateTime KeuringDate { get; set; }
         [DataType(DataType.Date)]
         public DateTime DeadlineKeuringDate { get; set; }
-
     }
 }
