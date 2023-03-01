@@ -7,6 +7,7 @@ using WebApp_GozenBv.Data;
 using System.Linq;
 using WebApp_GozenBv.Constants;
 using WebApp_GozenBv.ViewModels;
+using WebApp_GozenBv.Models;
 
 namespace WebApp_GozenBv.ViewComponents
 {
@@ -22,8 +23,9 @@ namespace WebApp_GozenBv.ViewComponents
             List<CarAlertViewModel> carAlerts = new();
             List<StockAlertViewModel> stockAlerts = new();
 
-            var cars = _context.CarPark.Select(x => x);
-            var stock = _context.Stock.Select(x => x);
+            var cars = _context.CarPark.Select(x => x).ToList();
+            var stock = _context.Stock.Select(x => x).ToList();
+            var maintenances = _context.CarMaintenances.Where(x => !x.Done).ToList();
 
             foreach (var car in cars)
             {
@@ -33,7 +35,7 @@ namespace WebApp_GozenBv.ViewComponents
                     {
                         carAlerts.Add(new CarAlertViewModel()
                         {
-                            Status = CarAlertsConst.Outdated,
+                            Status = CarAlertsConst.KeuringOutdated,
                             CarPark = car
                         });
                     }
@@ -43,8 +45,40 @@ namespace WebApp_GozenBv.ViewComponents
 
                         carAlerts.Add(new CarAlertViewModel()
                         {
-                            Status = CarAlertsConst.LessThanOneMonth,
+                            Status = CarAlertsConst.KeuringOneMonth,
                             CarPark = car
+                        });
+                    }
+                }
+            }
+
+            foreach (var maintenance in maintenances)
+            {
+                var car = _context.CarPark.Where(c => c.Id == maintenance.CarId)
+                    .FirstOrDefault();
+
+                if (maintenance.MaintenanceDate != null)
+                {
+                    if (DateTime.Now >= maintenance.MaintenanceDate.Value.AddMonths(-1))
+                    {
+                        carAlerts.Add(new CarAlertViewModel()
+                        {
+                            Status = CarAlertsConst.MaintenanceOneMonth,
+                            CarPark = car,
+                            CarMaintenance = maintenance
+                        });
+                    }
+                }
+
+                if (maintenance.MaintenanceKm != null)
+                { 
+                    if (car.Km >= (maintenance.MaintenanceKm - 5000))
+                    {
+                        carAlerts.Add(new CarAlertViewModel()
+                        {
+                            Status = CarAlertsConst.MaintenanceKm,
+                            CarPark = car,
+                            CarMaintenance = maintenance
                         });
                     }
                 }

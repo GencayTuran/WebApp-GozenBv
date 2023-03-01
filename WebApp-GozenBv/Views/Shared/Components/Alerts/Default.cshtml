@@ -27,7 +27,6 @@
 
                         @if ((Model.CarAlerts.Count + Model.StockAlerts.Count) > 0)
                         {
-
                             @if (Model.CarAlerts.Count > 0)
                             {
                                 <h5>Car Alerts</h5>
@@ -35,29 +34,31 @@
                                     @foreach (var carAlert in Model.CarAlerts)
                                     {
                                         <a class="btn btn-light w-100 mb-1" asp-action="Details" asp-controller="CarPark" asp-route-id="@carAlert.CarPark.Id">
-                                            @if (carAlert.Status == CarAlertsConst.LessThanOneMonth)
-                                            {
-                                                int daysLeft = (carAlert.CarPark.DeadlineKeuringDate - DateTime.Now).Days + 1;
-                                                <div class="d-flex">
-                                                    <p class="col-2 mb-0">@carAlert.CarPark.Brand</p>
-                                                    <p class="col-2 mb-0">@carAlert.CarPark.Model</p>
-                                                    <p class="col-2 mb-0">@carAlert.CarPark.LicencePlate</p>
-                                                    <div class="col-6 ">
-                                                        <b><p class="mb-0">Keuring expires in @daysLeft days (@carAlert.CarPark.DeadlineKeuringDate.ToShortDateString())</p></b>
-                                                    </div>
+                                            <div class="d-flex">
+                                                <p class="col-2 mb-0">@carAlert.CarPark.Brand</p>
+                                                <p class="col-2 mb-0">@carAlert.CarPark.Model</p>
+                                                <p class="col-2 mb-0">@carAlert.CarPark.LicencePlate</p>
+                                                <div class="col-6 ">
+                                                    <p class="mb-0">
+                                                        @switch (carAlert.Status)
+                                                        {
+                                                            case CarAlertsConst.KeuringOneMonth:
+                                                                int daysLeft = (carAlert.CarPark.DeadlineKeuringDate - DateTime.Now).Days + 1;
+                                                                <b>Keuring expires in @daysLeft days(@carAlert.CarPark.DeadlineKeuringDate.ToShortDateString())</b>
+                                                                break;
+                                                            case CarAlertsConst.KeuringOutdated:
+                                                                <b>Keuring expired on @carAlert.CarPark.DeadlineKeuringDate.ToShortDateString()</b>
+                                                                break;
+                                                            case CarAlertsConst.MaintenanceOneMonth:
+                                                                <b>Maintenance on (@carAlert.CarMaintenance.MaintenanceDate.Value.ToShortDateString()) @carAlert.CarMaintenance.MaintenanceInfo</b>
+                                                                break;
+                                                            case CarAlertsConst.MaintenanceKm:
+                                                                <b>Maintenance on @carAlert.CarMaintenance.MaintenanceKm (current: @carAlert.CarPark.Km)</b>
+                                                                break;
+                                                        }
+                                                    </p>
                                                 </div>
-                                            }
-                                            else if (carAlert.Status == CarAlertsConst.Outdated)
-                                            {
-                                                <div class="d-flex">
-                                                    <p class="col-2 mb-0">@carAlert.CarPark.Brand</p>
-                                                    <p class="col-2 mb-0">@carAlert.CarPark.Model</p>
-                                                    <p class="col-2 mb-0">@carAlert.CarPark.LicencePlate</p>
-                                                    <div class="col-6">
-                                                        <b><p class="mb-0">Keuring expired on @carAlert.CarPark.DeadlineKeuringDate.ToShortDateString()</p></b>
-                                                    </div>
-                                                </div>
-                                            }
+                                            </div>
                                         </a>
                                     }
                                 </div>
@@ -70,27 +71,23 @@
                                     @foreach (var stockAlert in Model.StockAlerts)
                                     {
                                         <a class="btn btn-light w-100 mb-1" asp-action="Details" asp-controller="Stock" asp-route-id="@stockAlert.Stock.Id">
-                                            @if (stockAlert.Status == StockAlertsConst.LessThanMinimum)
-                                            {
-                                                <div class="d-flex">
-                                                    <p class="col-1 mb-0">@stockAlert.Stock.Id.</p>
-                                                    <p class="col-2 mb-0">@stockAlert.Stock.ProductName</p>
-                                                    <p class="col-2 mb-0">@stockAlert.Stock.ProductCode</p>
-                                                    <div class="col-7">
-                                                        <b><p class="mb-0">Amount less than minimum (current Qty: @stockAlert.Stock.Quantity)</p></b>
-                                                    </div>
+                                            <div class="d-flex">
+                                                <p class="col-1 mb-0">@stockAlert.Stock.Id.</p>
+                                                <p class="col-2 mb-0">@stockAlert.Stock.ProductName</p>
+                                                <p class="col-2 mb-0">@stockAlert.Stock.ProductCode</p>
+                                                <div class="col-7">
+                                                    <p class="mb-0">
+                                                        @if (stockAlert.Status == StockAlertsConst.LessThanMinimum)
+                                                        {
+                                                            <b>Amount less than minimum (current Qty: @stockAlert.Stock.Quantity)</b>
+                                                        }
+                                                        else if (stockAlert.Status == StockAlertsConst.Empty)
+                                                        {
+                                                            <b>Item is out of stock!</b>
+                                                        }
+                                                    </p>
                                                 </div>
-                                            }
-                                            else if (stockAlert.Status == StockAlertsConst.Empty)
-                                            {
-                                                <div class="d-flex flex-row justify-content-between">
-                                                    <p class="col-1 mb-0">@stockAlert.Stock.Id.</p>
-                                                    <p class="col-2 mb-0">@stockAlert.Stock.ProductName</p>
-                                                    <p class="col-2 mb-0">@stockAlert.Stock.ProductCode</p>
-                                                    <div class="col-7">
-                                                        <b><p class="mb-0">Item is empty</p></b>
-                                                    </div>
-                                                </div>
+                                            </div>
                                             }
                                         </a>
                                     }

@@ -7,5 +7,6 @@ namespace WebApp_GozenBv.ViewModels
     {
         public int Status { get; set; }
         public CarPark CarPark { get; set; }
+        public CarMaintenance CarMaintenance { get; set; }
     }
 }
