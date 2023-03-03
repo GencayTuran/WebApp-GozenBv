@@ -14,18 +14,20 @@ namespace WebApp_GozenBv.ViewComponents
     public class AlertsViewComponent : ViewComponent
     {
         private readonly DataDbContext _context;
+
         public AlertsViewComponent(DataDbContext context)
         {
             _context = context;
         }
+
         public async Task<IViewComponentResult> InvokeAsync()
         {
             List<CarAlertViewModel> carAlerts = new();
             List<StockAlertViewModel> stockAlerts = new();
 
-            var cars = _context.CarPark.Select(x => x).ToList();
-            var stock = _context.Stock.Select(x => x).ToList();
-            var maintenances = _context.CarMaintenances.Where(x => !x.Done).ToList();
+            var cars = await _context.CarPark.Select(x => x).ToListAsync();
+            var stock = await _context.Stock.Select(x => x).ToListAsync();
+            var maintenances = await _context.CarMaintenances.Where(x => !x.Done).ToListAsync();
 
             foreach (var car in cars)
             {

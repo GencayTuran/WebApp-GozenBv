@@ -62,32 +62,45 @@
     </dl>
 
     <h5>Maintenances</h5>
-    <table>
-        <thead>
-            <tr>
-                <th>
-                    Maintenance
-                </th>
-                <th></th>
-            </tr>
-        </thead>
-        <tbody>
-            @foreach (var maintenance in Model.CarMaintenances)
-            {
+    @if (Model.CarMaintenances.Count > 0)
+    {
+        <table>
+            <thead>
                 <tr>
-                    @if (maintenance.MaintenanceDate != null)
-                    {
-                        <td>@maintenance.MaintenanceInfo</td>
-                        <td>@maintenance.MaintenanceDate</td>
-                    }
-                    else
-                    {
-                        <td>@maintenance.MaintenanceKm Km</td>
-                    }
+                    <th>
+                        Maintenance
+                    </th>
+                    <th></th>
                 </tr>
-            }
-        </tbody>
-    </table>
+            </thead>
+            <tbody>
+
+                @foreach (var maintenance in Model.CarMaintenances)
+                {
+                    <tr>
+                        @if (maintenance.MaintenanceDate != null)
+                        {
+                            <td>@maintenance.MaintenanceInfo</td>
+                            <td>@maintenance.MaintenanceDate.Value.ToShortDateString()</td>
+                        }
+                        else
+                        {
+                            <td>@maintenance.MaintenanceKm Km</td>
+                        }
+                        <td>
+                            <a class="btn btn-primary" asp-action="CompleteAlert" asp-controller="CarPark" asp-route-id="@maintenance.Id">
+                                Complete
+                            </a>
+                        </td>
+                    </tr>
+                }
+            </tbody>
+        </table>
+    }
+    else
+    {
+        <p>No future maintenances</p>
+    }
 </div>
 
 <div>

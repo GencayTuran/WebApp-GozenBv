@@ -5,6 +5,7 @@ using System.Threading.Tasks;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.Rendering;
+using Microsoft.AspNetCore.Routing;
 using Microsoft.EntityFrameworkCore;
 using WebApp_GozenBv.Constants;
 using WebApp_GozenBv.Data;
@@ -33,14 +34,14 @@ namespace WebApp_GozenBv.Controllers
         }
 
         [HttpGet]
-        public IActionResult Details(int? id)
+        public async Task<IActionResult> Details(int? id)
         {
             if (id == null)
             {
                 return NotFound();
             }
 
-            var car = GetCarDetails(id);
+            var car = await GetCarDetails(id);
 
             if (car == null)
             {
@@ -175,6 +176,20 @@ namespace WebApp_GozenBv.Controllers
             return RedirectToAction(nameof(Index));
         }
 
+        public async Task<IActionResult> CompleteAlert(int id)
+        {
+            var maintenance = await _context.CarMaintenances
+                .Where(m => m.Id == id).FirstOrDefaultAsync();
+
+            maintenance.Done = true;
+
+            _context.Update(maintenance);
+            await _context.SaveChangesAsync();
+
+            return RedirectToAction("Details", new RouteValueDictionary(
+                new { ControllerContext = "CarPark", Action = "Details", Id = maintenance.CarId }));
+        }
+
         private bool CarParkExists(int id)
         {
             return _context.CarPark.Any(e => e.Id == id);
@@ -182,14 +197,14 @@ namespace WebApp_GozenBv.Controllers
 
         private async Task<List<CarIndexViewModel>> GetCarsAndMaintenances()
         {
-            var cars = _context.CarPark.Select(x => x);
+            var cars = await _context.CarPark.Select(x => x).ToListAsync();
 
             List<CarIndexViewModel> carIndexViewModel = new();
 
             foreach (var car in cars)
             {
                 var maintenances = await _context.CarMaintenances
-                        .Where(c => c.CarId == car.Id && c.Done == false)
+                        .Where(c => c.CarId == car.Id && !c.Done)
                         .ToListAsync();
 
                 carIndexViewModel.Add(new CarIndexViewModel
@@ -202,13 +217,14 @@ namespace WebApp_GozenBv.Controllers
             return carIndexViewModel;
         }
 
-        private CarDetailsViewModel GetCarDetails(int? id)
+        private async Task<CarDetailsViewModel> GetCarDetails(int? id)
         {
-            var car = _context.CarPark
+            var car = await _context.CarPark
                 .Where(c => c.Id == id)
-                .FirstOrDefault();
-            IEnumerable<CarMaintenance> maintenances = _context.CarMaintenances
-                .Where(c => c.CarId == id);
+                .FirstOrDefaultAsync();
+            var maintenances = await _context.CarMaintenances
+                .Where(c => c.CarId == id && !c.Done)
+                .ToListAsync();
 
             CarDetailsViewModel carDetailsViewModel = new CarDetailsViewModel
             {
