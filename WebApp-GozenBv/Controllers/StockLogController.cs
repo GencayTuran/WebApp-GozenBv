@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
+using System.Text.Json;
 using System.Threading.Tasks;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
@@ -222,7 +223,7 @@ namespace WebApp_GozenBv.Controllers
 
             //stock
             var queryStock = from s in _context.Stock
-                             select new { s.Id, s.ProductName, s.ProductCode, s.Quantity };
+                             select new { s.Id, s.ProductName, s.ProductCode, s.Quantity, s.QuantityUsed };
 
             foreach (var product in queryStock)
             {
@@ -230,6 +231,7 @@ namespace WebApp_GozenBv.Controllers
                 {
                     StockId = product.Id,
                     Quantity = product.Quantity,
+                    QuantityUsed = product.QuantityUsed,
                     ProductNameCode = product.ProductName + " - " + product.ProductCode
                 });
             }
@@ -243,24 +245,32 @@ namespace WebApp_GozenBv.Controllers
 
             if (ModelState.IsValid && stockLogCreateVM.SelectedProducts != null)
             {
-
-                var selectedProducts = ConvertStringToIntArray(stockLogCreateVM.SelectedProducts);
+                var selectedItems = JsonSerializer.Deserialize<List<StockLogSelectedItemViewModel>>(stockLogCreateVM.SelectedProducts,
+                    new JsonSerializerOptions
+                    {
+                        PropertyNameCaseInsensitive = true
+                    });
 
                 Guid guid = Guid.NewGuid();
                 string logCode = guid.ToString();
 
                 //new stocklog
-                stockLogCreateVM.LogCode = logCode;
-                StockLog stockLog = stockLogCreateVM;
-                stockLog.Status = StockLogStatusConst.Created;
-
+                StockLog stockLog = new()
+                {
+                    LogCode = logCode,
+                    Status = StockLogStatusConst.Created,
+                    StockLogDate = stockLogCreateVM.StockLogDate,
+                    EmployeeId = stockLogCreateVM.EmployeeId
+                };
+                
                 _context.Add(stockLog);
 
-                //new StockLogItem
-                for (int x = 0; x < selectedProducts.Length; x++)
+                foreach (var item in selectedItems)
                 {
-                    StockLogItem stockLogItem = new StockLogItem();
-                    var stock = _context.Stock.Where(s => s.Id == selectedProducts[x]).FirstOrDefault();
+                    //new StockLogItem
+                    StockLogItem stockLogItem = new();
+                    var stock = _context.Stock.Where(s => s.Id == item.StockId).FirstOrDefault();
+
                     if (stock.NoReturn)
                     {
                         stockLogItem.DamagedAmount = null;
@@ -268,22 +278,18 @@ namespace WebApp_GozenBv.Controllers
                         stockLogItem.DeletedAmount = null;
                     }
 
+                    stockLogItem.StockId = item.StockId;
+                    stockLogItem.StockAmount = item.Amount;
+                    stockLogItem.Used = item.Used;
+
                     stockLogItem.Cost = stock.Cost;
                     stockLogItem.LogCode = logCode;
-                    stockLogItem.StockId = selectedProducts[x];
-                    x++;
-                    stockLogItem.StockAmount = selectedProducts[x];
                     stockLogItem.ProductNameCode = (stock.ProductName + " " + stock.ProductCode).ToUpper();
 
                     _context.Add(stockLogItem);
-                }
 
-                //update stock amount
-                for (int s = 0; s < selectedProducts.Length; s++)
-                {
-                    var stock = await StockHelper.UpdateStockQty(selectedProducts[s], -selectedProducts[s + 1], _context);
-                    _context.Update(stock);
-                    s++;
+                    //update stock amount
+                    _context.Update(await StockHelper.UpdateStockQty(item.StockId, item.Amount, _context));
                 }
 
                 await _context.SaveChangesAsync();

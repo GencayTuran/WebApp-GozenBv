@@ -20,6 +20,7 @@ function GetElements()
     rows = document.querySelectorAll(".productRow");
     selectStocks = document.querySelectorAll(".selectStock");
     inputAmounts = document.querySelectorAll(".inputAmount");
+    chkUsed = document.querySelectorAll(".chkUsed");
     labelAlerts = document.querySelectorAll(".labelAlert");
 }
 
@@ -59,34 +60,28 @@ function ValidateForm(event) {
         event.preventDefault();
     }
     if (Success()) {
-            //SetInputEmployee();
             PassProducts();
     }
 }
 
-// function SetInputEmployee() {
-//     let value = $('#inputSelectedEmployee').val();
-//     let $employeeId = $("#inputEmployeeId");
-//     $employeeId.val($('#lstEmployees [value="' + value + '"]').data('value'));
-// }
-
-// function GetStockId(inputStock, index) {
-//     let value = inputStock[index].value;
-//     let stockId = $('#lstStock [value="' + value + '"]').data('value');
-//     return stockId;
-// }
-
 function PassProducts() {
     GetElements();
-    var products = [];
-
+    let products = [];
+    let isUsed;
+    
     for (var i = 0; i < selectStocks.length; i++) {
+        let selectedItem = new Object();
+        isUsed = chkUsed[i].checked ? true : false;
 
-        // let stockId = GetStockId(inputProducts, i);
-        // products.push([stockId, inputAmounts[i].value]); //id, amount
-        products.push([selectStocks[i].value, inputAmounts[i].value]); //id, amount
+        selectedItem.stockId = +selectStocks[i].value;
+        selectedItem.amount = +inputAmounts[i].value;
+        selectedItem.used = isUsed;
+        products.push(selectedItem)
     }
-    result.value = products;
+
+    let jsonStock = JSON.stringify(products);
+
+    result.value = jsonStock;
 
 }
 
@@ -99,14 +94,27 @@ function CheckQuantity()
    for (let i = 0; i < rows.length; i++) {
     stockQtyAndNames.forEach(data => {
         if (selectStocks[i] == data.stockId) {
-            if (parseInt(inputAmounts[i].value) > data.quantity) {
-                let message = (`Product: ${data.productNameCode} amount is too high! Max Qty: ${data.quantity}`);
-                alerts.push(message);
-                labelAlerts[i].innerHTML = "*";
-                check = false;
+            if (chkUsed[i].checked) {
+                if (parseInt(inputAmounts[i].value) > data.quantityUsed) {
+                    let message = (`Product: ${data.productNameCode} amount is too high! Max Used Qty: ${data.quantityUsed}`);
+                    alerts.push(message);
+                    labelAlerts[i].innerHTML = "*";
+                    check = false;
+                }
+                else{
+                    labelAlerts[i].innerHTML = "";
+                }
             }
             else{
-                labelAlerts[i].innerHTML = "";
+                if (parseInt(inputAmounts[i].value) > data.quantity) {
+                    let message = (`Product: ${data.productNameCode} amount is too high! Max Qty: ${data.quantity}`);
+                    alerts.push(message);
+                    labelAlerts[i].innerHTML = "*";
+                    check = false;
+                }
+                else{
+                    labelAlerts[i].innerHTML = "";
+                }
             }
         }
     })
@@ -139,6 +147,7 @@ function NewRow() {
     $(clone.querySelector(".selectStock")).select2({width: '100%'});
     clone.querySelector(".selectStock").value = "";
     clone.querySelector(".inputAmount").value = "";
+    clone.querySelector(".chkUsed").checked = false;
     clone.style.backgroundColor = "transparent";
     clone.querySelector(".labelAlert").innerHTML = "";
     parentNode.appendChild(clone);
@@ -156,15 +165,12 @@ function RemoveRow(obj) {
 function BothFalse() {
     return !CheckInputs() && !CheckQuantity();
 }
-
 function InputFalseOnly() {
     return !CheckInputs() && CheckQuantity();
 }
-
 function QtyFalseOnly() {
     return CheckInputs() && !CheckQuantity();
 }
-
 function Success() {
     return CheckInputs() && CheckQuantity();
 }
