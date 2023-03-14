@@ -12,7 +12,7 @@ using WebApp_GozenBv.Data;
 namespace WebApp_GozenBv.Migrations
 {
     [DbContext(typeof(DataDbContext))]
-    [Migration("20230226185926_init")]
+    [Migration("20230311153926_init")]
     partial class init
     {
         protected override void BuildTargetModel(ModelBuilder modelBuilder)
@@ -65,8 +65,8 @@ namespace WebApp_GozenBv.Migrations
                         .HasColumnType("nvarchar(max)");
 
                     b.Property<string>("ChassisNumber")
-                        .IsRequired()
-                        .HasColumnType("nvarchar(max)");
+                        .HasMaxLength(17)
+                        .HasColumnType("nvarchar(17)");
 
                     b.Property<DateTime>("DeadlineKeuringDate")
                         .HasColumnType("datetime2");
@@ -140,8 +140,8 @@ namespace WebApp_GozenBv.Migrations
                     b.Property<int>("Quantity")
                         .HasColumnType("int");
 
-                    b.Property<bool>("Used")
-                        .HasColumnType("bit");
+                    b.Property<int>("QuantityUsed")
+                        .HasColumnType("int");
 
                     b.HasKey("Id");
 
@@ -218,6 +218,9 @@ namespace WebApp_GozenBv.Migrations
 
                     b.Property<int>("StockId")
                         .HasColumnType("int");
+
+                    b.Property<bool>("Used")
+                        .HasColumnType("bit");
 
                     b.HasKey("Id");
 

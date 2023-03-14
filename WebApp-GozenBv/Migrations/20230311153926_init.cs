@@ -33,7 +33,7 @@ namespace WebApp_GozenBv.Migrations
                     Id = table.Column<int>(type: "int", nullable: false)
                         .Annotation("SqlServer:Identity", "1, 1"),
                     LicencePlate = table.Column<string>(type: "nvarchar(max)", nullable: false),
-                    ChassisNumber = table.Column<string>(type: "nvarchar(max)", nullable: false),
+                    ChassisNumber = table.Column<string>(type: "nvarchar(17)", maxLength: 17, nullable: true),
                     Brand = table.Column<string>(type: "nvarchar(max)", nullable: false),
                     Model = table.Column<string>(type: "nvarchar(max)", nullable: false),
                     Km = table.Column<double>(type: "float", nullable: false),
@@ -70,9 +70,9 @@ namespace WebApp_GozenBv.Migrations
                     ProductCode = table.Column<string>(type: "nvarchar(max)", nullable: false),
                     Quantity = table.Column<int>(type: "int", nullable: false),
                     MinQuantity = table.Column<int>(type: "int", nullable: false),
+                    QuantityUsed = table.Column<int>(type: "int", nullable: false),
                     NoReturn = table.Column<bool>(type: "bit", nullable: false),
-                    Cost = table.Column<double>(type: "float", nullable: true),
-                    Used = table.Column<bool>(type: "bit", nullable: false)
+                    Cost = table.Column<double>(type: "float", nullable: true)
                 },
                 constraints: table =>
                 {
@@ -91,6 +91,7 @@ namespace WebApp_GozenBv.Migrations
                     ProductNameCode = table.Column<string>(type: "nvarchar(max)", nullable: true),
                     NoReturn = table.Column<bool>(type: "bit", nullable: false),
                     Cost = table.Column<double>(type: "float", nullable: true),
+                    Used = table.Column<bool>(type: "bit", nullable: false),
                     IsDamaged = table.Column<bool>(type: "bit", nullable: false),
                     DamagedAmount = table.Column<int>(type: "int", nullable: true),
                     RepairedAmount = table.Column<int>(type: "int", nullable: true),

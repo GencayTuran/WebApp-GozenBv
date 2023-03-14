@@ -63,8 +63,8 @@ namespace WebApp_GozenBv.Migrations
                         .HasColumnType("nvarchar(max)");
 
                     b.Property<string>("ChassisNumber")
-                        .IsRequired()
-                        .HasColumnType("nvarchar(max)");
+                        .HasMaxLength(17)
+                        .HasColumnType("nvarchar(17)");
 
                     b.Property<DateTime>("DeadlineKeuringDate")
                         .HasColumnType("datetime2");
@@ -138,8 +138,8 @@ namespace WebApp_GozenBv.Migrations
                     b.Property<int>("Quantity")
                         .HasColumnType("int");
 
-                    b.Property<bool>("Used")
-                        .HasColumnType("bit");
+                    b.Property<int>("QuantityUsed")
+                        .HasColumnType("int");
 
                     b.HasKey("Id");
 
@@ -216,6 +216,9 @@ namespace WebApp_GozenBv.Migrations
 
                     b.Property<int>("StockId")
                         .HasColumnType("int");
+
+                    b.Property<bool>("Used")
+                        .HasColumnType("bit");
 
                     b.HasKey("Id");
 
