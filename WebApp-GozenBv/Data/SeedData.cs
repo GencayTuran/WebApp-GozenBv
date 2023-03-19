@@ -132,6 +132,8 @@ namespace WebApp_GozenBv.Data
                     int rndDamagedAmount = stockLogs[i].Damaged == false ? 0 : rndDamaged ? rnd.Next(1, rndStockAmount + 1) : 0;
                     int rndRepairedAmount = rndDamagedAmount != 0 ? rnd.Next(0, rndDamagedAmount + 1) : 0;
                     int rndDeletedAmount = rndDamagedAmount - rndRepairedAmount;
+                    var rndUsed = rnd.Next(0, 2);
+                    bool used = rndUsed == 1 ? true : false;
 
                     stockLogItems.Add(new StockLogItem
                     {
@@ -144,6 +146,7 @@ namespace WebApp_GozenBv.Data
                         DamagedAmount = rndDamagedAmount,
                         RepairedAmount = rndRepairedAmount,
                         DeletedAmount = rndDeletedAmount,
+                        Used = used
                     });
 
                     counter++;

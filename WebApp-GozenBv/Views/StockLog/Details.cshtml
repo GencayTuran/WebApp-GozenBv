@@ -159,6 +159,7 @@
             <th>@Html.DisplayNameFor(model => model.StockLogItem.StockId)</th>
             <th>@Html.DisplayNameFor(model => model.StockLogItem)</th>
             <th>@Html.DisplayNameFor(model => model.StockLogItem.StockAmount)</th>
+            <th>@Html.DisplayNameFor(model => model.StockLogItem.Used)</th>
         </tr>
     </thead>
     <tbody>
@@ -168,6 +169,7 @@
                 <td>@item.StockId</td>
                 <td>@item.ProductNameCode</td>
                 <td>@item.StockAmount</td>
+                <td>@item.Used</td>
             </tr>
         }
     </tbody>
@@ -185,6 +187,7 @@
                 <th>@Html.DisplayNameFor(model => model.StockLogItem)</th>
                 <th>@Html.DisplayNameFor(model => model.StockLogItem.StockAmount)</th>
                 <th>@Html.DisplayNameFor(model => model.StockLogItem.Cost)</th>
+                <th>@Html.DisplayNameFor(model => model.StockLogItem.Used)</th>
                 @if (Model.Status == StockLogStatusConst.DamagedAwaitingAction)
                 {
                     <th>@Html.DisplayNameFor(model => model.StockLogItem.DamagedAmount)</th>
@@ -205,6 +208,7 @@
                     <td>@item.ProductNameCode</td>
                     <td>@item.StockAmount</td>
                     <td>@item.Cost</td>
+                    <td>@item.Used</td>
                     @if (Model.Status == StockLogStatusConst.DamagedAwaitingAction)
                     {
                         <td>@item.DamagedAmount</td>

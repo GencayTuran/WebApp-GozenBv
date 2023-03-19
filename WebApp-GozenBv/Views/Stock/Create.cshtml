@@ -32,6 +32,11 @@
                 <input asp-for="MinQuantity" class="form-control" />
                 <span asp-validation-for="MinQuantity" class="text-danger"></span>
             </div>
+            <div class="form-group">
+                <label asp-for="QuantityUsed" class="control-label"></label>
+                <input asp-for="QuantityUsed" class="form-control" />
+                <span asp-validation-for="QuantityUsed" class="text-danger"></span>
+            </div>
             <div class="form-group d-flex flex-column">
                 <div>
                     <label class="form-check-label">@Html.DisplayNameFor(model => model.NoReturn)</label>

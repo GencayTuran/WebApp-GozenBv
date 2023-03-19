@@ -1,4 +1,4 @@
-﻿
+﻿    
 function ChangeDamaged(obj) {
     let stockAmount = obj.parentNode.parentNode.querySelector(".inputStockAmount");
     let inputDamaged = obj.parentNode.parentNode.querySelector(".inputDamagedAmount");
@@ -17,23 +17,31 @@ function ChangeDamaged(obj) {
 
 }
 
-
 let result = document.getElementById("damagedStockResult");
 function PassDamagedItems() {
-    
+
+    let inputReturnDamaged = document.querySelector("#isDamaged");
+    let returnDamaged = false;
+
     let damagedStock = [];
     let rows = document.querySelectorAll(".stockLogItemRow")
 
     rows.forEach(row => {
-        let isDamaged = row.querySelector(".chkDamaged").checked;
+        let itemDamaged = row.querySelector(".chkDamaged").checked;
+        let stockLogItem = new Object();
 
-        if (isDamaged) {
+        if (itemDamaged) {
+            returnDamaged = true;
             let stockId = row.querySelector(".labelStockId").innerHTML;
             let damagedAmount = row.querySelector(".inputDamagedAmount").value;
 
-            damagedStock.push([stockId, damagedAmount]);
+            stockLogItem.stockId = +stockId;
+            stockLogItem.damagedAmount = +damagedAmount;
+
+            damagedStock.push(stockLogItem);
         }
     });
-
-    result.value = damagedStock;
+    let jsonDamagedStock = JSON.stringify(damagedStock);
+    result.value = jsonDamagedStock;
+    inputReturnDamaged.checked = returnDamaged;
 }

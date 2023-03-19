@@ -17,8 +17,8 @@ namespace WebApp_GozenBv.Models
         public int Quantity { get; set; }
         [Required]
         public int MinQuantity { get; set; }
+        public int QuantityUsed { get; set; }
         public bool NoReturn { get; set; }
         public double? Cost { get; set; }
-        public bool Used { get; set; }
     }
 }

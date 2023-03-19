@@ -47,7 +47,8 @@
             <div class="d-flex flex-row justify-content-end bg-secondary">
                 <div class="col-6">Materiaal</div>
                 <div class="col-2">Aantal</div>
-                <div class="col-4">
+                <div class="col-2">Used?</div>
+                <div class="col-2">
                     <button onclick="NewRow()" class="btn btn-primary">Add</button>
                 </div>
             </div>
@@ -67,12 +68,15 @@
                                 }
                             </datalist>*@
                             <select class="form-control selectStock" asp-items="ViewBag.stock" allowClear>
-                                <option value="">Select Stock</option>
+                                <option value="">Select Materiaal</option>
                             </select>
                         </div>
                         <div class="col-2 d-flex flex-row">
                             <input class="form-control inputAmount" type="number" min="1" placeholder="Aantal" />
                             <p class="labelAlert display-4" style="color: red;"></p>
+                        </div>
+                        <div class="col-2">
+                            <input class="chkUsed" type="checkbox" />
                         </div>
                         <div class="col-4">
                             <button onclick="RemoveRow(this)" value="Remove" class="btn btn-primary">Remove</button>

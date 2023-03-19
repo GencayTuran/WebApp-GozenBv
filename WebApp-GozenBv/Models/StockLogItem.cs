@@ -14,6 +14,7 @@ namespace WebApp_GozenBv.Models
         public string ProductNameCode { get; set; }
         public bool NoReturn { get; set; }
         public double? Cost { get; set; }
+        public bool Used { get; set; }
         public bool IsDamaged { get; set; }
         public int? DamagedAmount { get; set; }
         public int? RepairedAmount { get; set; }

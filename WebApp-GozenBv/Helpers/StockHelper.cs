@@ -9,42 +9,49 @@ namespace WebApp_GozenBv.Helpers
 {
     public static class StockHelper
     {
-        //TODO: change parameters to one param: Stock. Do the update in the controller. no need to call context here.
-        public static async Task<Stock> UpdateStockQty(int stockId, int amount, DataDbContext context)
+        public static Stock UpdateStockQty(Stock stock, int amount, bool isUsed)
         {
-            var stock = await context.Stock.FindAsync(stockId);
-
+            //TODO: check for this problem with check underneath. stock != null ??
             if (stock != null || amount == 0)
             {
-                if (amount < 0)
+                if (isUsed)
                 {
-                    amount *= -1;
-
-                    if (stock.Quantity >= amount)
+                    if (amount < 0)
                     {
-                        stock.Quantity -= amount;
-                        return stock;
-                    }
-                    return null;
-                    //TODO: add errorModel or try catch
-                }
-                stock.Quantity += amount;
+                        amount *= -1;
 
-                return stock;
+                        if (stock.QuantityUsed >= amount)
+                        {
+                            stock.QuantityUsed -= amount;
+                            return stock;
+                        }
+                        return null;
+                        //TODO: add errorModel or try catch
+                    }
+                    stock.QuantityUsed += amount;
+
+                    return stock;
+                }
+                else
+                {
+                    if (amount < 0)
+                    {
+                        amount *= -1;
+
+                        if (stock.Quantity >= amount)
+                        {
+                            stock.Quantity -= amount;
+                            return stock;
+                        }
+                        return null;
+                        //TODO: add errorModel or try catch
+                    }
+                    stock.Quantity += amount;
+
+                    return stock;
+                }
             }
             return null;
         }
-
-        //private static async Task<Stock> SetUsed(int stockId, DataDbContext context)
-        //{
-        //    var usedExists = context.Stock.Where(s => s.Id == stockId && s.Used).Any();
-
-        //    if (usedExists)
-        //    {
-
-        //    }
-
-        //    return stock;
-        //}
     }
 }

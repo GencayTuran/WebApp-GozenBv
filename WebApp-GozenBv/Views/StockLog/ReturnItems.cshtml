@@ -55,9 +55,10 @@
 
 <form asp-action="ReturnItems">
     <input type="hidden" asp-for="LogCode" />
+    <input id="isDamaged" hidden type="checkbox" asp-for="IsDamaged" />
     <input id="damagedStockResult" type="hidden" asp-for="DamagedStock" />
     <input id="btnSubmit" onclick="PassDamagedItems()" type="submit" value="Complete" class="btn btn-primary" /> |
     <a asp-action="Index">Back to List</a>
 </form>
 
-<script src="~/js/StockLog_ReturnItems.js"/>
+<script src="~/js/StockLog_ReturnItems.js"></script>
