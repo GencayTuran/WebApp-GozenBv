@@ -68,7 +68,7 @@ namespace WebApp_GozenBv.Migrations
                         .Annotation("SqlServer:Identity", "1, 1"),
                     ProductName = table.Column<string>(type: "nvarchar(max)", nullable: false),
                     ProductCode = table.Column<string>(type: "nvarchar(max)", nullable: false),
-                    Quantity = table.Column<int>(type: "int", nullable: false),
+                    QuantityNew = table.Column<int>(type: "int", nullable: false),
                     MinQuantity = table.Column<int>(type: "int", nullable: false),
                     QuantityUsed = table.Column<int>(type: "int", nullable: false),
                     NoReturn = table.Column<bool>(type: "bit", nullable: false),

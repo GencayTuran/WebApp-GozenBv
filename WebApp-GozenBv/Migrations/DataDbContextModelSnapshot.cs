@@ -135,7 +135,7 @@ namespace WebApp_GozenBv.Migrations
                         .IsRequired()
                         .HasColumnType("nvarchar(max)");
 
-                    b.Property<int>("Quantity")
+                    b.Property<int>("QuantityNew")
                         .HasColumnType("int");
 
                     b.Property<int>("QuantityUsed")
