@@ -14,7 +14,7 @@ namespace WebApp_GozenBv.Models
         [Required]
         public string ProductCode { get; set; }
         [Required]
-        public int Quantity { get; set; }
+        public int QuantityNew { get; set; }
         [Required]
         public int MinQuantity { get; set; }
         public int QuantityUsed { get; set; }

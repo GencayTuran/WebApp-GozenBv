@@ -38,15 +38,15 @@ namespace WebApp_GozenBv.Helpers
                     {
                         amount *= -1;
 
-                        if (stock.Quantity >= amount)
+                        if (stock.QuantityNew >= amount)
                         {
-                            stock.Quantity -= amount;
+                            stock.QuantityNew -= amount;
                             return stock;
                         }
                         return null;
                         //TODO: add errorModel or try catch
                     }
-                    stock.Quantity += amount;
+                    stock.QuantityNew += amount;
 
                     return stock;
                 }

@@ -88,9 +88,9 @@ namespace WebApp_GozenBv.ViewComponents
 
             foreach (var item in stock)
             {
-                if (item.Quantity < item.MinQuantity)
+                if (item.QuantityNew < item.MinQuantity)
                 {
-                    if (item.Quantity != 0)
+                    if (item.QuantityNew != 0)
                     {
                         stockAlerts.Add(new StockAlertViewModel()
                         {

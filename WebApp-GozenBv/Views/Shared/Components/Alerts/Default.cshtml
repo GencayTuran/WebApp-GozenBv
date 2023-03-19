@@ -79,7 +79,7 @@
                                                     <p class="mb-0">
                                                         @if (stockAlert.Status == StockAlertsConst.LessThanMinimum)
                                                         {
-                                                            <b>Amount less than minimum (current Qty: @stockAlert.Stock.Quantity)</b>
+                                                            <b>Amount less than minimum (current Qty: @stockAlert.Stock.QuantityNew)</b>
                                                         }
                                                         else if (stockAlert.Status == StockAlertsConst.Empty)
                                                         {

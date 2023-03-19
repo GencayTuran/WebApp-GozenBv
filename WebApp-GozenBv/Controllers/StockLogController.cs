@@ -220,18 +220,16 @@ namespace WebApp_GozenBv.Controllers
                 });
             }
 
-            //stock
-            var queryStock = from s in _context.Stock
-                             select new { s.Id, s.ProductName, s.ProductCode, s.Quantity, s.QuantityUsed };
+            var stockVM = _context.Stock.Select(s => new { s.Id, s.ProductName, s.ProductCode, s.QuantityNew, s.QuantityUsed });
 
-            foreach (var product in queryStock)
+            foreach (var stock in stockVM)
             {
                 lstStock.Add(new StockQuantityVM
                 {
-                    StockId = product.Id,
-                    Quantity = product.Quantity,
-                    QuantityUsed = product.QuantityUsed,
-                    ProductNameCode = product.ProductName + " - " + product.ProductCode
+                    StockId = stock.Id,
+                    QuantityNew = stock.QuantityNew,
+                    QuantityUsed = stock.QuantityUsed,
+                    ProductNameCode = stock.ProductName + " - " + stock.ProductCode
                 });
             }
 
