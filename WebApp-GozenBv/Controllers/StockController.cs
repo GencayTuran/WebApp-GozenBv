@@ -97,8 +97,7 @@ namespace WebApp_GozenBv.Controllers
         }
 
         [HttpPost]
-        [ValidateAntiForgeryToken]
-        public async Task<IActionResult> Edit(int id, [Bind("Id,ProductName,Quantity,MinQuantity,Used,Cost,ProductBrand")] Stock stock)
+        public async Task<IActionResult> Edit(int id, Stock stock)
         {
             if (id != stock.Id)
             {
