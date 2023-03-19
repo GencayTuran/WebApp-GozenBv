@@ -17,7 +17,7 @@
     {
         case StockLogStatusConst.Created:
             <a asp-action="Edit" asp-route-id="@Model.StockLogId">Edit</a>
-            <a asp-action="Delete" asp-route-id="@Model.StockLogId">Delete</a>
+            <a asp-action="Delete" asp-route-id="@Model.LogCode">Delete</a>
             <a asp-action="ReturnItems" asp-route-id="@Model.LogCode">Return Items</a>
             break;
 

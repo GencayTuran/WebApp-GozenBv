@@ -286,7 +286,7 @@ namespace WebApp_GozenBv.Controllers
                     _context.Add(stockLogItem);
 
                     //update stock amount
-                    _context.Update(StockHelper.UpdateStockQty(stock, item.Amount, item.Used));
+                    _context.Update(StockHelper.TakeStock(stock, item.Amount, item.Used));
                 }
 
                 await _context.SaveChangesAsync();
@@ -395,8 +395,8 @@ namespace WebApp_GozenBv.Controllers
             if (stockLog == null)
             {
                 return NotFound();
-            }   
-            
+            }
+
             var stockLogItems = await GetStockLogItems(stockLog);
             stockLog.ReturnDate = DateTime.Now;
 
@@ -427,11 +427,11 @@ namespace WebApp_GozenBv.Controllers
                             _context.Update(stocklogItem);
 
                             var notDamagedAmount = stocklogItem.StockAmount - damagedItem.DamagedAmount;
-                            _context.Update(StockHelper.UpdateStockQty(stock, notDamagedAmount, stocklogItem.Used));
+                            _context.Update(StockHelper.AddToUsed(stock, notDamagedAmount));
                         }
                         else
                         {
-                            _context.Update(StockHelper.UpdateStockQty(stock, stocklogItem.StockAmount, stocklogItem.Used));
+                            _context.Update(StockHelper.AddToUsed(stock, stocklogItem.StockAmount));
                         }
                     }
                 }
@@ -450,7 +450,7 @@ namespace WebApp_GozenBv.Controllers
             foreach (var item in stockLogItems)
             {
                 var stock = await GetStockAsync(item.StockId);
-                _context.Update(StockHelper.UpdateStockQty(stock, item.StockAmount, item.Used));
+                _context.Update(StockHelper.AddToUsed(stock, item.StockAmount));
             }
 
             _context.SaveChanges();
@@ -479,8 +479,8 @@ namespace WebApp_GozenBv.Controllers
         {
             string logCode = stockLogDetail.LogCode;
 
-            StockLog stockLog = _context.StockLogs
-                        .FirstOrDefault(s => s.LogCode == stockLogDetail.LogCode);
+            var stockLog = await GetStockLog(logCode);
+            var stockLogItems = await GetStockLogItems(stockLog);
 
             if (stockLog == null)
             {
@@ -495,8 +495,6 @@ namespace WebApp_GozenBv.Controllers
                         PropertyNameCaseInsensitive = true
                     });
 
-            var stockLogItems = _context.StockLogItems.Where(s => s.LogCode == logCode);
-
             //update StockLogItems
             foreach (var damagedItem in completeDamagedStock)
             {
@@ -507,7 +505,7 @@ namespace WebApp_GozenBv.Controllers
                         var stock = await GetStockAsync(damagedItem.StockId);
                         stockLogItem.RepairedAmount = damagedItem.RepairedAmount;
                         stockLogItem.DeletedAmount = damagedItem.DeletedAmount;
-                        _context.Update(StockHelper.UpdateStockQty(stock, damagedItem.RepairedAmount, stockLogItem.Used));
+                        _context.Update(StockHelper.AddToUsed(stock, damagedItem.RepairedAmount));
                     }
                 }
             }
@@ -522,13 +520,10 @@ namespace WebApp_GozenBv.Controllers
         public async Task<IActionResult> Undo(string id)
         {
             var logCode = id;
-            var stockLog = await _context.StockLogs
-                .Where(s => s.LogCode == logCode)
-                .FirstOrDefaultAsync();
 
-            var stockLogItems = await _context.StockLogItems
-                .Where(s => s.LogCode == logCode).ToListAsync();
-            
+            var stockLog = await GetStockLog(logCode);
+            var stockLogItems = await GetStockLogItems(stockLog);
+
             switch (stockLog.Status)
             {
                 case StockLogStatusConst.DamagedAwaitingAction:
@@ -541,13 +536,14 @@ namespace WebApp_GozenBv.Controllers
                         _context.Update(item);
 
                         var stock = await GetStockAsync(item.StockId);
-                        _context.Update(StockHelper.UpdateStockQty(stock, -(int)notDamagedItems, item.Used));
-                    } 
+                        _context.Update(StockHelper.UndoAddToUsed(stock, (int)notDamagedItems));
+                    }
                     stockLog.Status = StockLogStatusConst.Created;
                     stockLog.Damaged = false;
                     break;
 
                 case StockLogStatusConst.Returned:
+
                     if (stockLog.Damaged)
                     {
                         foreach (var item in stockLogItems)
@@ -555,22 +551,14 @@ namespace WebApp_GozenBv.Controllers
                             var stock = await GetStockAsync(item.StockId);
                             if (item.RepairedAmount > 0)
                             {
-                                _context.Update(StockHelper.UpdateStockQty(stock, -(int)item.RepairedAmount, item.Used));
+                                _context.Update(StockHelper.UndoAddToUsed(stock, (int)item.RepairedAmount));
+                                item.RepairedAmount = 0;
                             }
-
-                            if (item.DeletedAmount > 0)
-                            {
-                                _context.Update(StockHelper.UpdateStockQty(stock, (int)item.DeletedAmount, item.Used));
-                            }
-
-                            var notDamagedItems = item.StockAmount - item.DamagedAmount;
-                            _context.Update(StockHelper.UpdateStockQty(stock, -(int)notDamagedItems, item.Used));
-
-                            item.RepairedAmount = 0;
                             item.DeletedAmount = 0;
-
                             _context.Update(item);
 
+                            var notDamagedItems = item.StockAmount - item.DamagedAmount;
+                            _context.Update(StockHelper.UndoAddToUsed(stock, (int)notDamagedItems));
                         }
                         stockLog.Status = StockLogStatusConst.DamagedAwaitingAction;
                     }
@@ -579,7 +567,7 @@ namespace WebApp_GozenBv.Controllers
                         foreach (var item in stockLogItems)
                         {
                             var stock = await GetStockAsync(item.StockId);
-                            _context.Update(StockHelper.UpdateStockQty(stock, -item.StockAmount, item.Used));
+                            _context.Update(StockHelper.UndoAddToUsed(stock, item.StockAmount));
                         }
                         stockLog.Status = StockLogStatusConst.Created;
                     }
@@ -602,12 +590,11 @@ namespace WebApp_GozenBv.Controllers
 
         private async Task<StockLogDetailVM> GetStockLogDetails(string logCode)
         {
-            StockLog stockLog = await _context.StockLogs
+            var stockLog = await _context.StockLogs
                 .Include(s => s.Employee)
                 .FirstOrDefaultAsync(s => s.LogCode == logCode);
 
-            List<StockLogItem> stockLogItems = new();
-            stockLogItems = await _context.StockLogItems
+            var stockLogItems = await _context.StockLogItems
                 .Where(s => s.LogCode == logCode)
                 .Where(s => s.IsDamaged == false || s.NoReturn == true).ToListAsync();
 
@@ -620,7 +607,7 @@ namespace WebApp_GozenBv.Controllers
                     .ToListAsync();
             }
 
-            StockLogDetailVM stockLogDetailVM = new()
+            return new StockLogDetailVM
             {
                 StockLogId = stockLog.Id,
                 StockLogDate = stockLog.StockLogDate,
@@ -632,30 +619,23 @@ namespace WebApp_GozenBv.Controllers
                 Status = stockLog.Status,
                 IsDamaged = stockLog.Damaged,
             };
-
-            return stockLogDetailVM;
         }
 
         // GET: StockLog/Delete/5
         [HttpGet]
-        public async Task<IActionResult> Delete(int? id)
+        public async Task<IActionResult> Delete(string id)
         {
             if (id == null)
             {
                 return NotFound();
             }
 
-            var logCode = await _context.StockLogs
-                .Where(s => s.Id == id)
-                .Select(s => s.LogCode)
-                .FirstOrDefaultAsync();
-
-            return View(await GetStockLogDetails(logCode));
+            return View(await GetStockLogDetails(id));
         }
 
         // POST: StockLog/Delete/5
-        [HttpPost]
-        public async Task<IActionResult> Delete(string id)
+        [HttpPost, ActionName("Delete")]
+        public async Task<IActionResult> DeleteConfirmed(string id)
         {
             var logCode = id;
 
@@ -679,6 +659,11 @@ namespace WebApp_GozenBv.Controllers
             await _userLogService.CreateAsync(ControllerConst.StockLog, ActionConst.Delete, stockLog.LogCode);
 
             return RedirectToAction(nameof(Index));
+        }
+
+        private async Task<StockLog> GetStockLog(string logCode)
+        {
+            return await _context.StockLogs.Where(s => s.LogCode == logCode).FirstOrDefaultAsync();
         }
 
         private async Task<List<StockLogItem>> GetStockLogItems(StockLog stockLog)

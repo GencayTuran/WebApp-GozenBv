@@ -53,5 +53,30 @@ namespace WebApp_GozenBv.Helpers
             }
             return null;
         }
+
+        public static Stock TakeStock(Stock stock, int amount, bool isUsed)
+        {
+            if (isUsed)
+            {
+                stock.QuantityUsed -= amount;
+                return stock;
+            }
+
+            stock.QuantityNew -= amount;
+            return stock;
+        }
+
+        public static Stock AddToUsed(Stock stock, int amount)
+        {
+            stock.QuantityUsed += amount;
+            return stock;
+        }
+
+        public static Stock UndoAddToUsed(Stock stock, int amount)
+        {
+            stock.QuantityUsed -= amount;
+            return stock;
+        }
+
     }
 }

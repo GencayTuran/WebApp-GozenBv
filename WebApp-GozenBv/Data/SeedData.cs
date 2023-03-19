@@ -177,6 +177,7 @@ namespace WebApp_GozenBv.Data
                 ProductName = "Kniptang",
                 QuantityNew = 75,
                 MinQuantity = 50,
+                QuantityUsed = 20,
                 ProductCode = "Knipex",
                 Cost = 20
             };
@@ -186,6 +187,7 @@ namespace WebApp_GozenBv.Data
                 ProductName = "Boormachine",
                 QuantityNew = 80,
                 MinQuantity = 15,
+                QuantityUsed = 20,
                 ProductCode = "Makita",
                 Cost = 50
             };
@@ -194,6 +196,7 @@ namespace WebApp_GozenBv.Data
                 ProductName = "Slijper",
                 QuantityNew = 50,
                 MinQuantity = 20,
+                QuantityUsed = 20,
                 ProductCode = "Bosch",
                 Cost = 80
             };
@@ -202,6 +205,7 @@ namespace WebApp_GozenBv.Data
                 ProductName = "Hamer",
                 QuantityNew = 50,
                 MinQuantity = 50,
+                QuantityUsed = 20,
                 ProductCode = "Hitachi",
             };
             stock[4] = new Stock
@@ -209,6 +213,7 @@ namespace WebApp_GozenBv.Data
                 ProductName = "Kniptang",
                 QuantityNew = 50,
                 MinQuantity = 25,
+                QuantityUsed = 20,
                 ProductCode = "Andere",
                 Cost = 20
             };
