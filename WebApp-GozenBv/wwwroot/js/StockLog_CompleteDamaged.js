@@ -20,7 +20,7 @@ function FillData(event) {
         damagedStock.deletedAmount = deleted[i].value == '' ? 0 : +deleted[i].value
         data.push(damagedStock);
     }
-
+  
     let jsonData = JSON.stringify(data);
     result.value = jsonData;
 }

@@ -384,7 +384,6 @@ namespace WebApp_GozenBv.Controllers
         }
 
         [HttpPost]
-        [ValidateAntiForgeryToken]
         public async Task<IActionResult> ReturnItems(StockLogDetailVM stockLogDetailVM)
         {
             string logCode = stockLogDetailVM.LogCode;
@@ -416,21 +415,24 @@ namespace WebApp_GozenBv.Controllers
                 //update StockLogItems
                 foreach (var stocklogItem in stockLogItems)
                 {
-                    var stock = await GetStockAsync(stocklogItem.StockId);
-
                     foreach (var damagedItem in damagedStocks)
                     {
                         if (stocklogItem.StockId == damagedItem.StockId)
                         {
+                            var stock = await GetStockAsync(damagedItem.StockId);
                             stocklogItem.DamagedAmount = damagedItem.DamagedAmount;
                             stocklogItem.IsDamaged = true;
                             _context.Update(stocklogItem);
 
                             var notDamagedAmount = stocklogItem.StockAmount - damagedItem.DamagedAmount;
-                            _context.Update(StockHelper.AddToUsed(stock, notDamagedAmount));
+                            if (notDamagedAmount != 0)
+                            {
+                                _context.Update(StockHelper.AddToUsed(stock, notDamagedAmount));
+                            }
                         }
                         else
                         {
+                            var stock = await GetStockAsync(stocklogItem.StockId);
                             _context.Update(StockHelper.AddToUsed(stock, stocklogItem.StockAmount));
                         }
                     }
