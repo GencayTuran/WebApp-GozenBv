@@ -16,7 +16,7 @@
                     </button>
                     @if (Model.CarAlerts.Count > 0 || Model.StockAlerts.Count > 0)
                     {
-                        <div class="rounded-circle btn-danger d-flex justify-content-center align-middle" style="width: 25px; height: 25px"><small>@(Model.CarAlerts.Count + Model.StockAlerts.Count)</small></div>
+                        <div class="rounded-circle btn-danger d-flex justify-content-center align-items-center" style="width: 25px; height: 25px"><small style=>@(Model.CarAlerts.Count + Model.StockAlerts.Count)</small></div>
                     }
                 </div>
             </div>
