@@ -248,6 +248,29 @@ namespace WebApp_GozenBv.Controllers
                         PropertyNameCaseInsensitive = true
                     });
 
+                //validate stock qty
+                foreach (var stock in selectedItems)
+                {
+                    //used stock will be seperated from input so there is no check needed if used or not.
+
+                    if (stock.Used)
+                    {
+                        var maxStock = _context.Stock.Where(s => s.Id == stock.StockId).Select(s => s.QuantityUsed).FirstOrDefault();
+                        if (stock.Amount > maxStock)
+                        {
+                            return RedirectToAction(nameof(Create));
+                        }
+                    }
+                    else
+                    {
+                        var maxStock = _context.Stock.Where(s => s.Id == stock.StockId).Select(s => s.QuantityNew).FirstOrDefault();
+                        if (stock.Amount > maxStock)
+                        {
+                            return RedirectToAction(nameof(Create));
+                        }
+                    }
+                }
+
                 Guid guid = Guid.NewGuid();
                 string logCode = guid.ToString();
 
