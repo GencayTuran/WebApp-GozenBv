@@ -2,46 +2,41 @@
 
 @{
     ViewData["Title"] = "Create";
-
 }
 
 <h1>Formulier</h1>
 
 <h4>StockLog</h4>
 <hr />
+
 <div class="row">
     <div class="col-md-4">
         <form asp-action="Create" onsubmit="ValidateForm(event)" autocomplete="off">
             <div>
                 <div asp-validation-summary="ModelOnly" class="text-danger"></div>
+
                 <div class="form-group">
                     <label class="control-label">Datum</label>
                     <input value="@ViewBag.dateToday" asp-for="StockLogDate" class="form-control" />
                     <span asp-validation-for="StockLogDate" class="text-danger"></span>
                 </div>
+
                 <div class="form-group">
                     <label class="control-label">Werknemer</label>
-
                     <select id="selectEmployee" class="form-control" asp-for="EmployeeId" asp-items="ViewBag.employees" allowClear>
                         <option value="">Select Employee</option>
                     </select>
-                    @*<select class="form-control" asp-for="EmployeeId" asp-items="ViewBag.employees"></select>*@
-                    @*<input id="inputSelectedEmployee" type="search" placeholder="Select Employee" class="form-control" list="lstEmployees"></input>
-                    <datalist id="lstEmployees">
-                        @foreach (var emp in ViewBag.employees)
-                        {
-                            <option data-value="@emp.EmployeeId" value="@emp.EmployeeFullName"></option>
-                        }
-                    </datalist>
-                    <input id="inputEmployeeId" type="hidden" asp-for="EmployeeId" />*@
                 </div>
+
                 <div class="form-group">
                     <input type="submit" value="Create" class="btn btn-primary" />
                 </div>
+
                 <input id="productsResult" type="hidden" asp-for="SelectedProducts" />
             </div>
         </form>
     </div>
+
     <div class="col-md-8">
         <div id="SelectedProducts">
             <div class="d-flex flex-row justify-content-end bg-secondary">
@@ -57,16 +52,6 @@
                 <div class="productRow">
                     <div class="form-group d-flex flex-row justify-content-between">
                         <div class="col-6">
-                            @*<select class="inputProduct form-control" asp-items="ViewBag.stock">
-                            <option value="">Selecteer materiaal</option>
-                            </select>*@
-@*                            <input class="inputSelectedProduct form-control" placeholder="Select Stock" type="search" list="lstStock" />
-                            <datalist id="lstStock">
-                                @foreach (var stock in ViewBag.stock)
-                                {
-                                    <option data-value="@stock.StockId" value="@stock.ProductNameCode"></option>
-                                }
-                            </datalist>*@
                             <select class="form-control selectStock" asp-items="ViewBag.stock" allowClear>
                                 <option value="">Select Materiaal</option>
                             </select>
@@ -84,8 +69,6 @@
                     </div>
                 </div>
             </div>
-            <div>
-            </div>
         </div>
     </div>
 </div>
@@ -94,14 +77,14 @@
     <a asp-action="Index">Back to List</a>
 </div>
 
-
 <script>
     var stockQtyAndNames = @Html.Raw(Json.Serialize(ViewBag.stock));
     var employeeData = @Html.Raw(Json.Serialize(ViewBag.employees));
 
-    $('#selectEmployee').select2({width: '100%'});
+    $('#selectEmployee').select2({ width: '100%' });
     $('.selectStock').select2({ width: '100%' });
 </script>
+
 <script src="~/js/StockLog_Create.js"></script>
 
 @section Scripts {
