@@ -10,6 +10,7 @@ using WebApp_GozenBv.Constants;
 using WebApp_GozenBv.Data;
 using WebApp_GozenBv.Models;
 using WebApp_GozenBv.Services;
+using WebApp_GozenBv.ViewModels;
 
 namespace WebApp_GozenBv.Controllers
 {
@@ -27,8 +28,26 @@ namespace WebApp_GozenBv.Controllers
         [HttpGet]
         public async Task<IActionResult> Index()
         {
-            var dataDbContext = _context.Stock.Select(s => s);
-            return View(await dataDbContext.ToListAsync());
+            var stock = await _context.Stock.Select(s => s).ToListAsync();
+            List<StockViewModel> lstStockViewModel = new();
+
+            foreach (var item in stock)
+            {
+                lstStockViewModel.Add(new StockViewModel
+                {
+                    Id = item.Id,
+                    ProductName = item.ProductName,
+                    ProductCode = item.ProductCode,
+                    QuantityNew = item.QuantityNew,
+                    MinQuantity = item.MinQuantity,
+                    QuantityUsed = item.QuantityUsed,
+                    NoReturn = item.NoReturn,
+                    Cost = item.Cost,
+                    TotalQty = item.QuantityNew + item.QuantityUsed
+                });
+            }
+
+            return View(lstStockViewModel);
         }
         
         [HttpGet]
@@ -41,12 +60,26 @@ namespace WebApp_GozenBv.Controllers
 
             var stock = await _context.Stock
                 .FirstOrDefaultAsync(m => m.Id == id);
+
+            StockViewModel stockViewModel = new()
+            {
+                Id = stock.Id,
+                ProductName = stock.ProductName,
+                ProductCode = stock.ProductCode,
+                QuantityNew = stock.QuantityNew,
+                MinQuantity = stock.MinQuantity,
+                QuantityUsed = stock.QuantityUsed,
+                NoReturn = stock.NoReturn,
+                Cost = stock.Cost,
+                TotalQty = stock.QuantityNew + stock.QuantityUsed
+            };
+
             if (stock == null)
             {
                 return PartialView("_EntityNotFound");
             }
 
-            return View(stock);
+            return View(stockViewModel);
         }
 
         [HttpGet]

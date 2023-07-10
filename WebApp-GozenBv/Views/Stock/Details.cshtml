@@ -1,5 +1,5 @@
 ﻿@using WebApp_GozenBv.Constants;
-@model WebApp_GozenBv.Models.Stock
+@model WebApp_GozenBv.ViewModels.StockViewModel
 
 @{
     ViewData["Title"] = "Details";
@@ -30,16 +30,22 @@
             @Html.DisplayFor(model => model.QuantityNew)
         </dd>
         <dt class="col-sm-2">
-            @Html.DisplayNameFor(model => model.MinQuantity)
-        </dt>
-        <dd class="col-sm-10">
-            @Html.DisplayFor(model => model.MinQuantity)
-        </dd>
-        <dt class="col-sm-2">
             @Html.DisplayNameFor(model => model.QuantityUsed)
         </dt>
         <dd class="col-sm-10">
             @Html.DisplayFor(model => model.QuantityUsed)
+        </dd>
+        <dt class="col-sm-2">
+            @Html.DisplayNameFor(model => model.TotalQty)
+        </dt>
+        <dd class="col-sm-10">
+            @Html.DisplayFor(model => model.TotalQty)
+        </dd>
+        <dt class="col-sm-2">
+            @Html.DisplayNameFor(model => model.MinQuantity)
+        </dt>
+        <dd class="col-sm-10">
+            @Html.DisplayFor(model => model.MinQuantity)
         </dd>
         <dt class="col-sm-2">
             @Html.DisplayNameFor(model => model.NoReturn)
