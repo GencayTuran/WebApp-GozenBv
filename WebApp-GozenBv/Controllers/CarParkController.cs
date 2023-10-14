@@ -9,6 +9,7 @@ using Microsoft.AspNetCore.Routing;
 using Microsoft.EntityFrameworkCore;
 using WebApp_GozenBv.Constants;
 using WebApp_GozenBv.Data;
+using WebApp_GozenBv.DataHandlers;
 using WebApp_GozenBv.Models;
 using WebApp_GozenBv.Services;
 using WebApp_GozenBv.ViewModels;
@@ -18,12 +19,12 @@ namespace WebApp_GozenBv.Controllers
     //[Authorize]
     public class CarParkController : Controller
     {
-        private readonly DataDbContext _context;
         private readonly IUserLogService _userLogService;
+        private readonly ICarParkDataHandler _carParkData;
 
-        public CarParkController(DataDbContext context, IUserLogService userLogService)
+        public CarParkController(ICarParkDataHandler carParkData, IUserLogService userLogService)
         {
-            _context = context;
+            _carParkData = carParkData;
             _userLogService = userLogService;
         }
 
@@ -195,27 +196,7 @@ namespace WebApp_GozenBv.Controllers
             return _context.CarPark.Any(e => e.Id == id);
         }
 
-        private async Task<List<CarIndexViewModel>> GetCarsAndMaintenances()
-        {
-            var cars = await _context.CarPark.Select(x => x).ToListAsync();
-
-            List<CarIndexViewModel> carIndexViewModel = new();
-
-            foreach (var car in cars)
-            {
-                var maintenances = await _context.CarMaintenances
-                        .Where(c => c.CarId == car.Id && !c.Done)
-                        .ToListAsync();
-
-                carIndexViewModel.Add(new CarIndexViewModel
-                {
-                    Car = car,
-                    CarMaintenances = maintenances
-                });
-            }
-
-            return carIndexViewModel;
-        }
+        
 
         private async Task<CarDetailsViewModel> GetCarDetails(int? id)
         {
