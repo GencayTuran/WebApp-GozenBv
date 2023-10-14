@@ -6,13 +6,6 @@
 	</PropertyGroup>
 
 	<PropertyGroup Condition=" '$(RunConfiguration)' == 'WebApp-GozenBv' " />
-	<ItemGroup>
-	  <Compile Remove="Views\Shared\Components\Actions\**" />
-	  <Content Remove="Views\Shared\Components\Actions\**" />
-	  <EmbeddedResource Remove="Views\Shared\Components\Actions\**" />
-	  <None Remove="Views\Shared\Components\Actions\**" />
-	  <None Remove="Microsoft.AspNetCore.Mvc.Razor.RuntimeCompilation" />
-	</ItemGroup>
 
 	<ItemGroup>
 		<PackageReference Include="Microsoft.AspNetCore.Authentication.OpenIdConnect" Version="6.0.0" />
@@ -29,4 +22,10 @@
 		<PackageReference Include="Microsoft.AspNetCore.Mvc.Razor.RuntimeCompilation" Version="6.0.0" />
 	</ItemGroup>
 
+	<ItemGroup>
+	  <Folder Include="Managers\" />
+	  <Folder Include="DataHandlers\" />
+	  <Folder Include="Managers\Interfaces\" />
+	  <Folder Include="DataHandlers\Interfaces\" />
+	</ItemGroup>
 </Project>
