@@ -8,6 +8,7 @@ using WebApp_GozenBv.Services;
 using System.Linq;
 using WebApp_GozenBv.Models;
 using System.Linq.Expressions;
+using WebApp_GozenBv.DataHandlers.Interfaces;
 
 namespace WebApp_GozenBv.DataHandlers
 {
@@ -20,14 +21,15 @@ namespace WebApp_GozenBv.DataHandlers
             _context = context;
         }
 
-        public async Task<IEnumerable<CarMaintenance>> GetCarMaintenances(Expression<Func<CarMaintenance, bool>> filterExpression)
-        {
-            return filterExpression != null ?
-                await _context.CarMaintenances.Where(filterExpression).ToListAsync()
-                : await _context.CarMaintenances.Select(x => x).ToListAsync();
-        }
-
         public async Task<IEnumerable<CarPark>> GetCars() => await _context.CarPark.Select(x => x).ToListAsync();
+
+        public async Task<CarPark> GetCarById(int? id) => await _context.CarPark.FindAsync(id);
+
+        public async Task CreateCar(CarPark car)
+        {
+            await _context.AddAsync(car);
+            await _context.SaveChangesAsync();
+        }
     }
 }
 

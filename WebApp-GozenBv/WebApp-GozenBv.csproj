@@ -24,8 +24,6 @@
 
 	<ItemGroup>
 	  <Folder Include="Managers\" />
-	  <Folder Include="DataHandlers\" />
 	  <Folder Include="Managers\Interfaces\" />
-	  <Folder Include="DataHandlers\Interfaces\" />
 	</ItemGroup>
 </Project>

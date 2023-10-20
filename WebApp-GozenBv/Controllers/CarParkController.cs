@@ -10,6 +10,7 @@ using Microsoft.EntityFrameworkCore;
 using WebApp_GozenBv.Constants;
 using WebApp_GozenBv.Data;
 using WebApp_GozenBv.DataHandlers;
+using WebApp_GozenBv.Managers.Interfaces;
 using WebApp_GozenBv.Models;
 using WebApp_GozenBv.Services;
 using WebApp_GozenBv.ViewModels;
@@ -20,18 +21,18 @@ namespace WebApp_GozenBv.Controllers
     public class CarParkController : Controller
     {
         private readonly IUserLogService _userLogService;
-        private readonly ICarParkDataHandler _carParkData;
+        private readonly ICarParkManager _manager;
 
-        public CarParkController(ICarParkDataHandler carParkData, IUserLogService userLogService)
+        public CarParkController(ICarParkManager manager, IUserLogService userLogService)
         {
-            _carParkData = carParkData;
+            _manager = manager;
             _userLogService = userLogService;
         }
 
         [HttpGet]
         public async Task<IActionResult> Index()
         {
-            return View(await GetCarsAndMaintenances());
+            return View(await _manager.MapCarsAndFutureMaintenances());
         }
 
         [HttpGet]
@@ -42,7 +43,7 @@ namespace WebApp_GozenBv.Controllers
                 return NotFound();
             }
 
-            var car = await GetCarDetails(id);
+            var car = await _manager.MapCarDetails(id);
 
             if (car == null)
             {
@@ -64,31 +65,10 @@ namespace WebApp_GozenBv.Controllers
         {
             if (ModelState.IsValid)
             {
-                _context.Add(carCreate.Car);
-                _context.SaveChanges();
+                //maps car and possible maintenances
+                await _manager.MapNewCar(carCreate);
 
-                if (carCreate.CarMaintenance.MaintenanceDate != null && !String.IsNullOrEmpty(carCreate.CarMaintenance.MaintenanceInfo))
-                {
-                    var maintenance = new CarMaintenance
-                    {
-                        CarId = carCreate.Car.Id,
-                        MaintenanceDate = carCreate.CarMaintenance.MaintenanceDate,
-                        MaintenanceInfo = carCreate.CarMaintenance.MaintenanceInfo
-                    };
-                    _context.Add(maintenance);
-                }
-
-                if (carCreate.CarMaintenance.MaintenanceKm != null)
-                {
-                    var maintenance = new CarMaintenance
-                    {
-                        CarId = carCreate.Car.Id,
-                        MaintenanceKm = carCreate.CarMaintenance.MaintenanceKm,
-                    };
-                    _context.Add(maintenance);
-                }
-                await _context.SaveChangesAsync();
-                await _userLogService.CreateAsync(ControllerConst.CarPark, ActionConst.Create, carCreate.Car.Id.ToString());
+                await _userLogService.CreateAsync(ControllerConst.CarPark, ActionConst.Create, carCreate.Car.Id.ToString());\
 
                 return RedirectToAction(nameof(Index));
             }
@@ -102,12 +82,16 @@ namespace WebApp_GozenBv.Controllers
             {
                 return NotFound();
             }
+            //TODO: this could be mapped to CarEditViewModel or is CarDetailsViewModel the same?
+            //TODO: edit view for car & maintenance unfinished.
+            var carPark = await _manager.MapCarDetails(id);
 
-            var carPark = await _context.CarPark.FindAsync(id);
             if (carPark == null)
             {
                 return NotFound();
             }
+
+            //TODO: currently it should return car only.
             return View(carPark);
         }
 
@@ -198,23 +182,7 @@ namespace WebApp_GozenBv.Controllers
 
         
 
-        private async Task<CarDetailsViewModel> GetCarDetails(int? id)
-        {
-            var car = await _context.CarPark
-                .Where(c => c.Id == id)
-                .FirstOrDefaultAsync();
-            var maintenances = await _context.CarMaintenances
-                .Where(c => c.CarId == id && !c.Done)
-                .ToListAsync();
-
-            CarDetailsViewModel carDetailsViewModel = new CarDetailsViewModel
-            {
-                Car = car,
-                CarMaintenances = maintenances
-            };
-
-            return carDetailsViewModel;
-        }
+        
 
     }
 }

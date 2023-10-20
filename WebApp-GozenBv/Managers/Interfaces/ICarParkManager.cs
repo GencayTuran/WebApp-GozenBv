@@ -7,8 +7,10 @@ namespace WebApp_GozenBv.Managers.Interfaces
 {
     public interface ICarParkManager
     {
-        Task<List<CarIndexViewModel>> GetCarsAndMaintenances();
-
+        Task<List<CarIndexViewModel>> MapCarsAndFutureMaintenances();
+        Task<List<CarIndexViewModel>> MapCarsAndAllMaintenances();
+        Task<CarDetailsViewModel> MapCarDetails(int? id);
+        Task MapNewCar(CarCreateViewModel carCreate);
     }
 }
 
