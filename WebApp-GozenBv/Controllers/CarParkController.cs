@@ -43,7 +43,7 @@ namespace WebApp_GozenBv.Controllers
                 return NotFound();
             }
 
-            var car = await _manager.MapCarAndMaintenance(id);
+            var car = await _manager.MapCarAndAllMaintenances(id);
 
             if (car == null)
             {
@@ -86,24 +86,21 @@ namespace WebApp_GozenBv.Controllers
             {
                 return NotFound();
             }
-            //TODO: this could be mapped to CarEditViewModel or is CarDetailsViewModel the same?
-            //TODO: edit view for car & maintenance unfinished.
-            var carPark = await _manager.MapCarAndMaintenance(id);
+
+            var carPark = await _manager.MapCarAndAllMaintenances(id);
 
             if (carPark == null)
             {
                 return NotFound();
             }
 
-            //TODO: currently it should return car only.
             return View(carPark);
         }
 
         [HttpPost]
-        [ValidateAntiForgeryToken]
-        public async Task<IActionResult> Edit(int id, CarPark car)
+        public async Task<IActionResult> Edit(int id, CarDetailsViewModel carDetails)
         {
-            if (id != car.Id)
+            if (id != carDetails.Car.Id)
             {
                 return NotFound();
             }
@@ -112,15 +109,18 @@ namespace WebApp_GozenBv.Controllers
             {
                 try
                 {
-                    await _manager.ManageCar(car, EntityOperation.Update);
+                    await _manager.ManageCar(carDetails.Car, EntityOperation.Update);
 
-                    //TODO: add update of maintenances (new viewmodel)
+                    if (carDetails.CarMaintenances != null)
+                    {
+                        await _manager.ManageCarMaintenances(carDetails.CarMaintenances, EntityOperation.Update);
+                    }
 
-                    await _userLogService.CreateAsync(ControllerConst.CarPark, ActionConst.Edit, car.Id.ToString());
+                    await _userLogService.CreateAsync(ControllerConst.CarPark, ActionConst.Edit, carDetails.Car.Id.ToString());
                 }
                 catch (DbUpdateConcurrencyException)
                 {
-                    if (!CarParkExists(car.Id))
+                    if (!CarParkExists(carDetails.Car.Id))
                     {
                         return NotFound();
                     }
@@ -131,7 +131,7 @@ namespace WebApp_GozenBv.Controllers
                 }
                 return RedirectToAction(nameof(Index));
             }
-            return View(car);
+            return View(carDetails);
         }
 
         // GET: CarPark/Delete/5

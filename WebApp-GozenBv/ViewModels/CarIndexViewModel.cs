@@ -6,10 +6,9 @@ namespace WebApp_GozenBv.ViewModels
 {
     public class CarIndexViewModel
     {
-
+        //is the view for the CarPark Index.
         public CarPark Car { get; set; }
         public List<CarMaintenance> CarMaintenances { get; set; }
-        public CarMaintenance CarMaintenance { get; set; }
 
     }
 }

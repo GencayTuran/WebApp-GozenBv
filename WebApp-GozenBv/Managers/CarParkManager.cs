@@ -43,7 +43,7 @@ namespace WebApp_GozenBv.Managers
             return carIndexViewModel;
         }
 
-        public async Task<CarDetailsViewModel> MapCarAndMaintenance(int? id)
+        public async Task<CarDetailsViewModel> MapCarAndAllMaintenances(int? id)
         {
             var car = await _carData.GetCarById(id);
             var maintenances = (await _maintenanceData.GetCarMaintenances(c => c.CarId == id && !c.Done)).ToList();
@@ -62,18 +62,6 @@ namespace WebApp_GozenBv.Managers
             return await _carData.GetCarById(id);
         }
 
-        public async Task<CarIndexViewModel> MapCarAndAllMaintenances(int? id)
-        {
-            var car = await _carData.GetCarById(id);
-            var maintenances = (await _maintenanceData.GetCarMaintenances(m => m.CarId == id)).ToList();
-
-            return new CarIndexViewModel
-            {
-                Car = car,
-                CarMaintenances = maintenances,
-            };
-        }
-
         public async Task ManageCar(CarPark car, EntityOperation operation)
         {
             switch (operation)
@@ -86,7 +74,13 @@ namespace WebApp_GozenBv.Managers
                     break;
                 case EntityOperation.Delete:
                     await _carData.DeleteCar(car);
-                    //TODO: check if related maintenances get deleted as well, else we have to implement it also.
+
+                    //deleting all maintenances realted to this car
+                    var maintenances = await _maintenanceData.GetCarMaintenances(m => m.CarId == car.Id);
+                    foreach (var maintenance in maintenances)
+                    {
+                        await _maintenanceData.DeleteCarMaintenance(maintenance);
+                    }
                     break;
                 default:
                     break;
@@ -127,6 +121,53 @@ namespace WebApp_GozenBv.Managers
                 case EntityOperation.Delete:
                     //is for deleting certain maintenances.
                     await _maintenanceData.DeleteCarMaintenance(carMaintenance);
+                    break;
+                default:
+                    break;
+            }
+        }
+
+        public async Task ManageCarMaintenances(List<CarMaintenance> carMaintenances, EntityOperation operation)
+        {
+            switch (operation)
+            {
+                case EntityOperation.Create:
+
+                    var carId = (await _carData.GetCars()).LastOrDefault().Id;
+
+                    foreach (var maintenance in carMaintenances)
+                    {
+                        if (maintenance.MaintenanceDate != null && !String.IsNullOrEmpty(maintenance.MaintenanceInfo))
+                        {
+                            await _maintenanceData.CreateCarMaintenance(new CarMaintenance
+                            {
+                                CarId = carId,
+                                MaintenanceDate = maintenance.MaintenanceDate,
+                                MaintenanceInfo = maintenance.MaintenanceInfo
+                            });
+                        }
+
+                        if (maintenance.MaintenanceKm != null)
+                        {
+                            await _maintenanceData.CreateCarMaintenance(new CarMaintenance
+                            {
+                                CarId = carId,
+                                MaintenanceKm = maintenance.MaintenanceKm,
+                            });
+                        }
+                    }
+                    break;
+                case EntityOperation.Update:
+                    foreach (var maintenance in carMaintenances)
+                    {
+                        await _maintenanceData.UpdateCarMaintenance(maintenance);
+                    }
+                    break;
+                case EntityOperation.Delete:
+                    foreach (var maintenance in carMaintenances)
+                    {
+                        await _maintenanceData.DeleteCarMaintenance(maintenance);
+                    }
                     break;
                 default:
                     break;
