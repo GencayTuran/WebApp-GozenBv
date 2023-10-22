@@ -42,7 +42,7 @@ namespace WebApp_GozenBv.Managers
             return carIndexViewModel;
         }
 
-        public async Task<CarDetailsViewModel> MapCarDetails(int? id)
+        public async Task<CarDetailsViewModel> MapCarAndMaintenance(int? id)
         {
             var car = await _carData.GetCarById(id);
             var maintenances = await _maintenanceData.GetCarMaintenances(c => c.CarId == id && !c.Done);
@@ -56,33 +56,83 @@ namespace WebApp_GozenBv.Managers
             return carDetailsViewModel;
         }
 
-        public async Task<List<CarIndexViewModel>> MapCarsAndAllMaintenances()
+        public async Task<CarPark> MapCar(int? id)
         {
-            throw new NotImplementedException();
+            return await _carData.GetCarById(id);
         }
 
-        public async Task MapNewCar(CarCreateViewModel carCreate)
+        public async Task<CarIndexViewModel> MapCarAndAllMaintenances(int? id)
         {
-            await _carData.CreateCar(carCreate.Car);
+            var car = await _carData.GetCarById(id);
+            var maintenances = await _maintenanceData.GetCarMaintenances(m => m.CarId == id);
 
-            if (carCreate.CarMaintenance.MaintenanceDate != null && !String.IsNullOrEmpty(carCreate.CarMaintenance.MaintenanceInfo))
+            return new CarIndexViewModel
             {
-                await _maintenanceData.CreateCarMaintenance(new CarMaintenance
-                {
-                    CarId = carCreate.Car.Id,
-                    MaintenanceDate = carCreate.CarMaintenance.MaintenanceDate,
-                    MaintenanceInfo = carCreate.CarMaintenance.MaintenanceInfo
-                });
-            }
+                Car = car,
+                CarMaintenances = maintenances.ToList(),
+            };
+        }
 
-            if (carCreate.CarMaintenance.MaintenanceKm != null)
+        public async Task ManageCar(CarPark car, EntityOperation operation)
+        {
+            switch (operation)
             {
-                await _maintenanceData.CreateCarMaintenance(new CarMaintenance
-                {
-                    CarId = carCreate.Car.Id,
-                    MaintenanceKm = carCreate.CarMaintenance.MaintenanceKm,
-                });
+                case EntityOperation.Create:
+                    await _carData.CreateCar(car);
+                    break;
+                case EntityOperation.Update:
+                    await _carData.UpdateCar(car);
+                    break;
+                case EntityOperation.Delete:
+                    await _carData.DeleteCar(car);
+                    //TODO: check if related maintenances get deleted as well, else we have to implement it also.
+                    break;
+                default:
+                    break;
             }
+        }
+
+        public async Task ManageCarMaintenance(CarMaintenance carMaintenance, EntityOperation operation)
+        {
+            switch (operation)
+            {
+                case EntityOperation.Create:
+
+                    if (carMaintenance.MaintenanceDate != null && !String.IsNullOrEmpty(carMaintenance.MaintenanceInfo))
+                    {
+                        await _maintenanceData.CreateCarMaintenance(new CarMaintenance
+                        {
+                            CarId = carMaintenance.Id,
+                            MaintenanceDate = carMaintenance.MaintenanceDate,
+                            MaintenanceInfo = carMaintenance.MaintenanceInfo
+                        });
+                    }
+
+                    if (carMaintenance.MaintenanceKm != null)
+                    {
+                        await _maintenanceData.CreateCarMaintenance(new CarMaintenance
+                        {
+                            CarId = carMaintenance.Id,
+                            MaintenanceKm = carMaintenance.MaintenanceKm,
+                        });
+                    }
+
+                    break;
+                case EntityOperation.Update:
+                    await _maintenanceData.UpdateCarMaintenance(carMaintenance);
+                    break;
+                case EntityOperation.Delete:
+                    //is for deleting certain maintenances.
+                    await _maintenanceData.DeleteCarMaintenance(carMaintenance);
+                    break;
+                default:
+                    break;
+            }
+        }
+
+        public async Task<CarMaintenance> MapCarMaintenance(int? id)
+        {
+            return await _maintenanceData.GetCarMaintenanceById(id);
         }
     }
 }

@@ -26,10 +26,29 @@ namespace WebApp_GozenBv.DataHandlers
                 : await _context.CarMaintenances.Select(x => x).ToListAsync();
         }
 
+        public async Task<CarMaintenance> GetCarMaintenanceById(int? id)
+        {
+            return await _context.CarMaintenances.FindAsync(id);
+        }
+
         public async Task CreateCarMaintenance(CarMaintenance maintenance)
         {
             await _context.AddAsync(maintenance);
             await _context.SaveChangesAsync();
         }
+
+        public async Task UpdateCarMaintenance(CarMaintenance maintenance)
+        {
+            _context.Update(maintenance);
+            await _context.SaveChangesAsync();
+        }
+
+        public async Task DeleteCarMaintenance(CarMaintenance maintenance)
+        {
+            _context.Remove(maintenance);
+            await _context.SaveChangesAsync();
+        }
+
+        
     }
 }

@@ -8,6 +8,10 @@ using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
 using WebApp_GozenBv.Data;
+using WebApp_GozenBv.DataHandlers;
+using WebApp_GozenBv.DataHandlers.Interfaces;
+using WebApp_GozenBv.Managers;
+using WebApp_GozenBv.Managers.Interfaces;
 using WebApp_GozenBv.Services;
 
 namespace WebApp_GozenBv
@@ -29,10 +33,14 @@ namespace WebApp_GozenBv
             services.AddDbContext<DataDbContext>(opts =>
             {
                 opts.UseSqlServer(Configuration.GetConnectionString("AZURE_SQL_CONNECTIONSTRING"));
+                //local db here
             });
 
             services.AddTransient<IUserLogService, UserLogService>();
             services.AddTransient<IUserService, UserService>();
+
+            services.AddTransient<ICarParkManager, CarParkManager>();
+            services.AddTransient<ICarParkDataHandler, CarParkDataHandler>();
         }
 
         public void Configure(IApplicationBuilder app, IWebHostEnvironment env)

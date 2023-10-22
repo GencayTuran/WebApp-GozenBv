@@ -13,6 +13,8 @@ namespace WebApp_GozenBv.DataHandlers.Interfaces
 		Task<IEnumerable<CarPark>> GetCars();
 		Task<CarPark> GetCarById(int? id);
 		Task CreateCar(CarPark car);
+		Task UpdateCar(CarPark car);
+        Task DeleteCar(CarPark car);
     }
 }
 

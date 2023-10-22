@@ -30,6 +30,18 @@ namespace WebApp_GozenBv.DataHandlers
             await _context.AddAsync(car);
             await _context.SaveChangesAsync();
         }
+
+        public async Task UpdateCar(CarPark car)
+        {
+            _context.Update(car);
+            await _context.SaveChangesAsync();
+        }
+
+        public async Task DeleteCar(CarPark car)
+        {
+            _context.Remove(car);
+            await _context.SaveChangesAsync();
+        }
     }
 }
 

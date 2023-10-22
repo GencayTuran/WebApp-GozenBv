@@ -43,7 +43,7 @@ namespace WebApp_GozenBv.Controllers
                 return NotFound();
             }
 
-            var car = await _manager.MapCarDetails(id);
+            var car = await _manager.MapCarAndMaintenance(id);
 
             if (car == null)
             {
@@ -65,10 +65,14 @@ namespace WebApp_GozenBv.Controllers
         {
             if (ModelState.IsValid)
             {
-                //maps car and possible maintenances
-                await _manager.MapNewCar(carCreate);
+                await _manager.ManageCar(carCreate.Car, EntityOperation.Create);
 
-                await _userLogService.CreateAsync(ControllerConst.CarPark, ActionConst.Create, carCreate.Car.Id.ToString());\
+                if (carCreate.CarMaintenance != null)
+                {
+                    await _manager.ManageCarMaintenance(carCreate.CarMaintenance, EntityOperation.Create);
+                }
+
+                await _userLogService.CreateAsync(ControllerConst.CarPark, ActionConst.Create, carCreate.Car.Id.ToString());
 
                 return RedirectToAction(nameof(Index));
             }
@@ -84,7 +88,7 @@ namespace WebApp_GozenBv.Controllers
             }
             //TODO: this could be mapped to CarEditViewModel or is CarDetailsViewModel the same?
             //TODO: edit view for car & maintenance unfinished.
-            var carPark = await _manager.MapCarDetails(id);
+            var carPark = await _manager.MapCarAndMaintenance(id);
 
             if (carPark == null)
             {
@@ -97,9 +101,9 @@ namespace WebApp_GozenBv.Controllers
 
         [HttpPost]
         [ValidateAntiForgeryToken]
-        public async Task<IActionResult> Edit(int id, CarPark carPark)
+        public async Task<IActionResult> Edit(int id, CarPark car)
         {
-            if (id != carPark.Id)
+            if (id != car.Id)
             {
                 return NotFound();
             }
@@ -108,13 +112,15 @@ namespace WebApp_GozenBv.Controllers
             {
                 try
                 {
-                    _context.Update(carPark);
-                    await _context.SaveChangesAsync();
-                    await _userLogService.CreateAsync(ControllerConst.CarPark, ActionConst.Edit, carPark.Id.ToString());
+                    await _manager.ManageCar(car, EntityOperation.Update);
+
+                    //TODO: add update of maintenances (new viewmodel)
+
+                    await _userLogService.CreateAsync(ControllerConst.CarPark, ActionConst.Edit, car.Id.ToString());
                 }
                 catch (DbUpdateConcurrencyException)
                 {
-                    if (!CarParkExists(carPark.Id))
+                    if (!CarParkExists(car.Id))
                     {
                         return NotFound();
                     }
@@ -125,7 +131,7 @@ namespace WebApp_GozenBv.Controllers
                 }
                 return RedirectToAction(nameof(Index));
             }
-            return View(carPark);
+            return View(car);
         }
 
         // GET: CarPark/Delete/5
@@ -136,15 +142,14 @@ namespace WebApp_GozenBv.Controllers
                 return NotFound();
             }
 
-            var carPark = await _context.CarPark
-                .FirstOrDefaultAsync(m => m.Id == id);
+            var car = await _manager.MapCar(id);
 
-            if (carPark == null)
+            if (car == null)
             {
                 return NotFound();
             }
 
-            return View(carPark);
+            return View(car);
         }
 
         // POST: CarPark/Delete/5
@@ -152,24 +157,25 @@ namespace WebApp_GozenBv.Controllers
         [ValidateAntiForgeryToken]
         public async Task<IActionResult> DeleteConfirmed(int id)
         {
-            var carPark = await _context.CarPark.FindAsync(id);
-            _context.CarPark.Remove(carPark);
-            await _context.SaveChangesAsync();
+            var car = await _manager.MapCar(id);
+            if (car == null)
+            {
+                return NotFound();
+            }
 
-            await _userLogService.CreateAsync(ControllerConst.CarPark, ActionConst.Delete, carPark.Id.ToString());
+            await _manager.ManageCar(car, EntityOperation.Delete);
+
+            await _userLogService.CreateAsync(ControllerConst.CarPark, ActionConst.Delete, car.Id.ToString());
 
             return RedirectToAction(nameof(Index));
         }
 
         public async Task<IActionResult> CompleteAlert(int id)
         {
-            var maintenance = await _context.CarMaintenances
-                .Where(m => m.Id == id).FirstOrDefaultAsync();
-
+            var maintenance = await _manager.MapCarMaintenance(id);
             maintenance.Done = true;
 
-            _context.Update(maintenance);
-            await _context.SaveChangesAsync();
+            await _manager.ManageCarMaintenance(maintenance, EntityOperation.Update);
 
             return RedirectToAction("Details", new RouteValueDictionary(
                 new { ControllerContext = "CarPark", Action = "Details", Id = maintenance.CarId }));
@@ -177,12 +183,7 @@ namespace WebApp_GozenBv.Controllers
 
         private bool CarParkExists(int id)
         {
-            return _context.CarPark.Any(e => e.Id == id);
+            return _manager.MapCar(id) != null;
         }
-
-        
-
-        
-
     }
 }
