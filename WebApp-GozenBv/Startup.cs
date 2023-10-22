@@ -32,8 +32,8 @@ namespace WebApp_GozenBv
 
             services.AddDbContext<DataDbContext>(opts =>
             {
-                opts.UseSqlServer(Configuration.GetConnectionString("AZURE_SQL_CONNECTIONSTRING"));
-                //local db here
+                //opts.UseSqlServer(Configuration.GetConnectionString("AZURE_SQL_CONNECTIONSTRING"));
+                opts.UseSqlServer(Configuration.GetConnectionString("DbConnection"));
             });
 
             services.AddTransient<IUserLogService, UserLogService>();
@@ -41,6 +41,7 @@ namespace WebApp_GozenBv
 
             services.AddTransient<ICarParkManager, CarParkManager>();
             services.AddTransient<ICarParkDataHandler, CarParkDataHandler>();
+            services.AddTransient<ICarMaintenanceDataHandler, CarMaintenanceDataHandler>();
         }
 
         public void Configure(IApplicationBuilder app, IWebHostEnvironment env)

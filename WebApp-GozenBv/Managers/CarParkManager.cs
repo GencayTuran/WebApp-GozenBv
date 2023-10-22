@@ -19,9 +19,10 @@ namespace WebApp_GozenBv.Managers
         private readonly ICarMaintenanceDataHandler _maintenanceData;
 
 
-        public CarParkManager(ICarParkDataHandler carParkData)
+        public CarParkManager(ICarParkDataHandler carParkData, ICarMaintenanceDataHandler carMaintenanceData)
         {
             _carData = carParkData;
+            _maintenanceData = carMaintenanceData;
         }
 
         public async Task<List<CarIndexViewModel>> MapCarsAndFutureMaintenances()
@@ -31,11 +32,11 @@ namespace WebApp_GozenBv.Managers
 
             foreach (var car in cars)
             {
-                var carMaintenaces = await _maintenanceData.GetCarMaintenances(maintenance => maintenance.CarId == car.Id && !maintenance.Done);
+                var carMaintenaces = (await _maintenanceData.GetCarMaintenances(maintenance => maintenance.CarId == car.Id && !maintenance.Done)).ToList();
                 carIndexViewModel.Add(new CarIndexViewModel
                 {
                     Car = car,
-                    CarMaintenances = carMaintenaces.ToList()
+                    CarMaintenances = carMaintenaces
                 });
             }
 
@@ -45,12 +46,12 @@ namespace WebApp_GozenBv.Managers
         public async Task<CarDetailsViewModel> MapCarAndMaintenance(int? id)
         {
             var car = await _carData.GetCarById(id);
-            var maintenances = await _maintenanceData.GetCarMaintenances(c => c.CarId == id && !c.Done);
+            var maintenances = (await _maintenanceData.GetCarMaintenances(c => c.CarId == id && !c.Done)).ToList();
 
             CarDetailsViewModel carDetailsViewModel = new CarDetailsViewModel
             {
                 Car = car,
-                CarMaintenances = maintenances.ToList()
+                CarMaintenances = maintenances
             };
 
             return carDetailsViewModel;
@@ -64,12 +65,12 @@ namespace WebApp_GozenBv.Managers
         public async Task<CarIndexViewModel> MapCarAndAllMaintenances(int? id)
         {
             var car = await _carData.GetCarById(id);
-            var maintenances = await _maintenanceData.GetCarMaintenances(m => m.CarId == id);
+            var maintenances = (await _maintenanceData.GetCarMaintenances(m => m.CarId == id)).ToList();
 
             return new CarIndexViewModel
             {
                 Car = car,
-                CarMaintenances = maintenances.ToList(),
+                CarMaintenances = maintenances,
             };
         }
 
@@ -98,11 +99,13 @@ namespace WebApp_GozenBv.Managers
             {
                 case EntityOperation.Create:
 
+                    var carId = (await _carData.GetCars()).LastOrDefault().Id;
+
                     if (carMaintenance.MaintenanceDate != null && !String.IsNullOrEmpty(carMaintenance.MaintenanceInfo))
                     {
                         await _maintenanceData.CreateCarMaintenance(new CarMaintenance
                         {
-                            CarId = carMaintenance.Id,
+                            CarId = carId,
                             MaintenanceDate = carMaintenance.MaintenanceDate,
                             MaintenanceInfo = carMaintenance.MaintenanceInfo
                         });
@@ -112,7 +115,7 @@ namespace WebApp_GozenBv.Managers
                     {
                         await _maintenanceData.CreateCarMaintenance(new CarMaintenance
                         {
-                            CarId = carMaintenance.Id,
+                            CarId = carId,
                             MaintenanceKm = carMaintenance.MaintenanceKm,
                         });
                     }
