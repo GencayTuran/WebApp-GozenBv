@@ -19,12 +19,8 @@ namespace WebApp_GozenBv.Controllers
     //[Authorize]
     public class HomeController : Controller
     {
-        private readonly DataDbContext _context;
-
-        public HomeController(
-            DataDbContext context)
+        public HomeController()
         {
-            _context = context;
         }
 
         //[AuthorizeForScopes(ScopeKeySection = "DownstreamApi:Scopes")]

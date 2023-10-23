@@ -49,6 +49,9 @@ namespace WebApp_GozenBv.DataHandlers
             await _context.SaveChangesAsync();
         }
 
-        
+        public Task<List<CarMaintenance>> GetCarMaintenances()
+        {
+            return _context.CarMaintenances.ToListAsync();
+        }
     }
 }

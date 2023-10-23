@@ -9,6 +9,7 @@ namespace WebApp_GozenBv.DataHandlers.Interfaces
     public interface ICarMaintenanceDataHandler
     {
         Task<IEnumerable<CarMaintenance>> GetCarMaintenances(Expression<Func<CarMaintenance, bool>> filterExpression);
+        Task<List<CarMaintenance>> GetCarMaintenances();
         Task<CarMaintenance> GetCarMaintenanceById(int? id);
         Task CreateCarMaintenance(CarMaintenance maintenance);
         Task UpdateCarMaintenance(CarMaintenance maintenance);

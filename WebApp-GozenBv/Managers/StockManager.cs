@@ -5,14 +5,15 @@ using WebApp_GozenBv.Constants;
 using WebApp_GozenBv.DataHandlers;
 using WebApp_GozenBv.Managers.Interfaces;
 using WebApp_GozenBv.Models;
+using WebApp_GozenBv.ViewModels;
 
 namespace WebApp_GozenBv.Managers
 {
-	public class StockManager : IStockManager
-	{
+    public class StockManager : IStockManager
+    {
         private readonly IStockDataHandler _stockData;
-		public StockManager(IStockDataHandler stockData)
-		{
+        public StockManager(IStockDataHandler stockData)
+        {
             _stockData = stockData;
         }
 
@@ -40,6 +41,38 @@ namespace WebApp_GozenBv.Managers
         public Task<List<Stock>> MapMaterials()
         {
             return _stockData.GetAllMaterials();
+        }
+
+        public async Task<List<StockAlertViewModel>> MapMaterialAlerts()
+        {
+            List<StockAlertViewModel> stockAlerts = new();
+
+            var stock = await _stockData.GetAllMaterials();
+
+            foreach (var item in stock)
+            {
+                if (item.QuantityNew < item.MinQuantity)
+                {
+                    if (item.QuantityNew != 0)
+                    {
+                        stockAlerts.Add(new StockAlertViewModel()
+                        {
+                            Status = StockAlertsConst.LessThanMinimum,
+                            Stock = item
+                        });
+                    }
+                    else
+                    {
+                        stockAlerts.Add(new StockAlertViewModel()
+                        {
+                            Status = StockAlertsConst.Empty,
+                            Stock = item
+                        });
+                    }
+                }
+            }
+
+            return stockAlerts;
         }
     }
 }

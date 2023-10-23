@@ -174,6 +174,72 @@ namespace WebApp_GozenBv.Managers
         {
             return await _maintenanceData.GetCarMaintenanceById(id);
         }
+
+        #region alerts
+        public async Task<List<CarAlertViewModel>> MapCarAlerts()
+        {
+            List<CarAlertViewModel> carAlerts = new();
+
+            var cars = await _carData.GetCars();
+            var maintenances = await _maintenanceData.GetCarMaintenances();
+
+            foreach (var car in cars)
+            {
+                if (DateTime.Now >= car.DeadlineKeuringDate.AddMonths(-1))
+                {
+                    if (DateTime.Now >= car.DeadlineKeuringDate)
+                    {
+                        carAlerts.Add(new CarAlertViewModel()
+                        {
+                            Status = CarAlertsConst.KeuringOutdated,
+                            CarPark = car
+                        });
+                    }
+                    else
+                    {
+                        carAlerts.Add(new CarAlertViewModel()
+                        {
+                            Status = CarAlertsConst.KeuringOneMonth,
+                            CarPark = car
+                        });
+                    }
+                }
+            }
+
+            foreach (var maintenance in maintenances)
+            {
+                var car = await _carData.GetCarById(maintenance.CarId);
+
+                if (maintenance.MaintenanceDate != null)
+                {
+                    if (DateTime.Now >= maintenance.MaintenanceDate.Value.AddMonths(-1))
+                    {
+                        carAlerts.Add(new CarAlertViewModel()
+                        {
+                            Status = CarAlertsConst.MaintenanceOneMonth,
+                            CarPark = car,
+                            CarMaintenance = maintenance
+                        });
+                    }
+                }
+
+                if (maintenance.MaintenanceKm != null)
+                {
+                    if (car.Km >= (maintenance.MaintenanceKm - 5000))
+                    {
+                        carAlerts.Add(new CarAlertViewModel()
+                        {
+                            Status = CarAlertsConst.MaintenanceKm,
+                            CarPark = car,
+                            CarMaintenance = maintenance
+                        });
+                    }
+                }
+            }
+
+            return carAlerts;
+        }
+        #endregion
     }
 }
 
