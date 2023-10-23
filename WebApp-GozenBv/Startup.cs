@@ -42,6 +42,12 @@ namespace WebApp_GozenBv
             services.AddTransient<ICarParkManager, CarParkManager>();
             services.AddTransient<ICarParkDataHandler, CarParkDataHandler>();
             services.AddTransient<ICarMaintenanceDataHandler, CarMaintenanceDataHandler>();
+
+            services.AddTransient<IEmployeeManager, EmployeeManager>();
+            services.AddTransient<IEmployeeDataHandler, EmployeeDataHandler>();
+
+            services.AddTransient<IStockManager, StockManager>();
+            services.AddTransient<IStockDataHandler, StockDataHandler>();
         }
 
         public void Configure(IApplicationBuilder app, IWebHostEnvironment env)

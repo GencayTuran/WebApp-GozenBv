@@ -69,6 +69,9 @@
                     @Html.DisplayFor(modelItem => item.MinQuantity)
                 </td>
                 <td>
+                    @Html.CheckBoxFor(modelItem => item.NoReturn, new { @disabled = "disabled" })
+                </td>
+                <td>
                     @Html.DisplayFor(modelItem => item.Cost)
                 </td>
                 <td>

@@ -10,7 +10,7 @@ namespace WebApp_GozenBv.DataHandlers.Interfaces
 {
 	public interface ICarParkDataHandler
 	{
-		Task<IEnumerable<CarPark>> GetCars();
+		Task<List<CarPark>> GetCars();
 		Task<CarPark> GetCarById(int? id);
 		Task CreateCar(CarPark car);
 		Task UpdateCar(CarPark car);

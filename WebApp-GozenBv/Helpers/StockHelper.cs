@@ -68,6 +68,12 @@ namespace WebApp_GozenBv.Helpers
 
         public static Stock AddToUsed(Stock stock, int amount)
         {
+            if (stock != null)
+            {
+                throw new NullReferenceException("Material is null because it has probably been deleted via Materials");
+            }
+            //TODO: catch this on higher level
+
             stock.QuantityUsed += amount;
             return stock;
         }

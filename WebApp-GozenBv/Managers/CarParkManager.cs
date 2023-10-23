@@ -82,8 +82,6 @@ namespace WebApp_GozenBv.Managers
                         await _maintenanceData.DeleteCarMaintenance(maintenance);
                     }
                     break;
-                default:
-                    break;
             }
         }
 
@@ -121,8 +119,6 @@ namespace WebApp_GozenBv.Managers
                 case EntityOperation.Delete:
                     //is for deleting certain maintenances.
                     await _maintenanceData.DeleteCarMaintenance(carMaintenance);
-                    break;
-                default:
                     break;
             }
         }

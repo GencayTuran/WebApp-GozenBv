@@ -8,6 +8,8 @@ using Microsoft.AspNetCore.Mvc.Rendering;
 using Microsoft.EntityFrameworkCore;
 using WebApp_GozenBv.Constants;
 using WebApp_GozenBv.Data;
+using WebApp_GozenBv.DataHandlers;
+using WebApp_GozenBv.Managers.Interfaces;
 using WebApp_GozenBv.Models;
 using WebApp_GozenBv.Services;
 using WebApp_GozenBv.ViewModels;
@@ -17,33 +19,33 @@ namespace WebApp_GozenBv.Controllers
     //[Authorize]
     public class StockController : Controller
     {
-        private readonly DataDbContext _context;
+        private readonly IStockManager _manager;
         private readonly IUserLogService _userLogService;
-        public StockController(DataDbContext context, IUserLogService userLogService)
+        public StockController(IStockManager manager, IUserLogService userLogService)
         {
-            _context = context;
+            _manager = manager;
             _userLogService = userLogService;
         }
 
         [HttpGet]
         public async Task<IActionResult> Index()
         {
-            var stock = await _context.Stock.Select(s => s).ToListAsync();
+            var materials = await _manager.MapMaterials();
             List<StockViewModel> lstStockViewModel = new();
 
-            foreach (var item in stock)
+            foreach (var material in materials)
             {
                 lstStockViewModel.Add(new StockViewModel
                 {
-                    Id = item.Id,
-                    ProductName = item.ProductName,
-                    ProductCode = item.ProductCode,
-                    QuantityNew = item.QuantityNew,
-                    MinQuantity = item.MinQuantity,
-                    QuantityUsed = item.QuantityUsed,
-                    NoReturn = item.NoReturn,
-                    Cost = item.Cost,
-                    TotalQty = item.QuantityNew + item.QuantityUsed
+                    Id = material.Id,
+                    ProductName = material.ProductName,
+                    ProductCode = material.ProductCode,
+                    QuantityNew = material.QuantityNew,
+                    MinQuantity = material.MinQuantity,
+                    QuantityUsed = material.QuantityUsed,
+                    NoReturn = material.NoReturn,
+                    Cost = material.Cost,
+                    TotalQty = material.QuantityNew + material.QuantityUsed
                 });
             }
 
@@ -58,8 +60,7 @@ namespace WebApp_GozenBv.Controllers
                 return NotFound();
             }
 
-            var stock = await _context.Stock
-                .FirstOrDefaultAsync(m => m.Id == id);
+            var stock = await _manager.MapMaterial(id);
 
             StockViewModel stockViewModel = new()
             {
@@ -85,11 +86,9 @@ namespace WebApp_GozenBv.Controllers
         [HttpGet]
         public IActionResult Create()
         {
-            var productBrands = _context.Stock
-                .Select(p => p.ProductCode)
-                .Distinct().ToList();
+            //var productBrands = _manager.MapProductBrands();
 
-            ViewData["ProductBrands"] = productBrands;
+            //ViewData["ProductBrands"] = productBrands;
             return View();
         }
 
@@ -104,8 +103,7 @@ namespace WebApp_GozenBv.Controllers
                     stock.Cost = null;
                 }
 
-                _context.Add(stock);
-                await _context.SaveChangesAsync();
+                await _manager.ManageMaterial(stock, EntityOperation.Create);
 
                 await _userLogService.CreateAsync(ControllerConst.Stock, ActionConst.Create, stock.Id.ToString());
 
@@ -121,7 +119,7 @@ namespace WebApp_GozenBv.Controllers
                 return NotFound();
             }
 
-            var stock = await _context.Stock.FindAsync(id);
+            var stock = await _manager.MapMaterial(id);
             if (stock == null)
             {
                 return NotFound();
@@ -139,23 +137,10 @@ namespace WebApp_GozenBv.Controllers
 
             if (ModelState.IsValid)
             {
-                try
-                {
-                    _context.Update(stock);
-                    await _context.SaveChangesAsync();
-                    await _userLogService.CreateAsync(ControllerConst.Stock, ActionConst.Edit, stock.Id.ToString());
-                }
-                catch (DbUpdateConcurrencyException)
-                {
-                    if (!StockExists(stock.Id))
-                    {
-                        return NotFound();
-                    }
-                    else
-                    {
-                        throw;
-                    }
-                }
+                await _manager.ManageMaterial(stock, EntityOperation.Update);
+
+                await _userLogService.CreateAsync(ControllerConst.Stock, ActionConst.Edit, stock.Id.ToString());
+                
                 return RedirectToAction(nameof(Index));
             }
             //ViewData["ProductBrandId"] = new SelectList(_context.Set<ProductBrand>(), "Id", "Id", stock.ProductBrandId);
@@ -170,33 +155,26 @@ namespace WebApp_GozenBv.Controllers
                 return NotFound();
             }
 
-            var stock = await _context.Stock
-                .FirstOrDefaultAsync(m => m.Id == id);
+            var material = await _manager.MapMaterial(id);
 
-            if (stock == null)
+            if (material == null)
             {
                 return NotFound();
             }
 
-            return View(stock);
+            return View(material);
         }
 
         [HttpPost, ActionName("Delete")]
         [ValidateAntiForgeryToken]
         public async Task<IActionResult> DeleteConfirmed(int id)
         {
-            var stock = await _context.Stock.FindAsync(id);
-            _context.Stock.Remove(stock);
-            await _context.SaveChangesAsync();
+            var material = await _manager.MapMaterial(id);
+            await _manager.ManageMaterial(material, EntityOperation.Delete);
 
-            await _userLogService.CreateAsync(ControllerConst.Stock, ActionConst.Delete, stock.Id.ToString());
+            await _userLogService.CreateAsync(ControllerConst.Stock, ActionConst.Delete, material.Id.ToString());
 
             return RedirectToAction(nameof(Index));
-        }
-
-        private bool StockExists(int id)
-        {
-            return _context.Stock.Any(e => e.Id == id);
         }
     }
 }
