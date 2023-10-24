@@ -46,8 +46,8 @@ namespace WebApp_GozenBv
             services.AddTransient<IEmployeeManager, EmployeeManager>();
             services.AddTransient<IEmployeeDataHandler, EmployeeDataHandler>();
 
-            services.AddTransient<IStockManager, StockManager>();
-            services.AddTransient<IStockDataHandler, StockDataHandler>();
+            services.AddTransient<IMaterialManager, MaterialManager>();
+            services.AddTransient<IMaterialDataHandler, MaterialDataHandler>();
         }
 
         public void Configure(IApplicationBuilder app, IWebHostEnvironment env)

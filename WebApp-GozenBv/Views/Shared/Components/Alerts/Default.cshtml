@@ -14,9 +14,9 @@
                         </h4>
 
                     </button>
-                    @if (Model.CarAlerts.Count > 0 || Model.StockAlerts.Count > 0)
+                    @if (Model.CarAlerts.Count > 0 || Model.MaterialAlerts.Count > 0)
                     {
-                        <div class="rounded-circle btn-danger d-flex justify-content-center align-items-center" style="width: 25px; height: 25px"><small style=>@(Model.CarAlerts.Count + Model.StockAlerts.Count)</small></div>
+                        <div class="rounded-circle btn-danger d-flex justify-content-center align-items-center" style="width: 25px; height: 25px"><small style=>@(Model.CarAlerts.Count + Model.MaterialAlerts.Count)</small></div>
                     }
                 </div>
             </div>
@@ -25,7 +25,7 @@
                 <div class="card-body">
                     <div class="container d-flex flex-column justify-content-center">
 
-                        @if ((Model.CarAlerts.Count + Model.StockAlerts.Count) > 0)
+                        @if ((Model.CarAlerts.Count + Model.MaterialAlerts.Count) > 0)
                         {
                             @if (Model.CarAlerts.Count > 0)
                             {
@@ -64,26 +64,26 @@
                                 </div>
                             }
 
-                            @if (Model.StockAlerts.Count > 0)
+                            @if (Model.MaterialAlerts.Count > 0)
                             {
-                                <h5>Stock Alerts</h5>
+                                <h5>Material Alerts</h5>
                                 <div>
-                                    @foreach (var stockAlert in Model.StockAlerts)
+                                    @foreach (var materialAlert in Model.MaterialAlerts)
                                     {
-                                        <a class="btn btn-light w-100 mb-1" asp-action="Details" asp-controller="Stock" asp-route-id="@stockAlert.Stock.Id">
+                                        <a class="btn btn-light w-100 mb-1" asp-action="Details" asp-controller="Material" asp-route-id="@materialAlert.Material.Id">
                                             <div class="d-flex">
-                                                <p class="col-1 mb-0">@stockAlert.Stock.Id.</p>
-                                                <p class="col-2 mb-0">@stockAlert.Stock.ProductName</p>
-                                                <p class="col-2 mb-0">@stockAlert.Stock.ProductCode</p>
+                                                <p class="col-1 mb-0">@materialAlert.Material.Id.</p>
+                                                <p class="col-2 mb-0">@materialAlert.Material.ProductName</p>
+                                                <p class="col-2 mb-0">@materialAlert.Material.ProductCode</p>
                                                 <div class="col-7">
                                                     <p class="mb-0">
-                                                        @if (stockAlert.Status == StockAlertsConst.LessThanMinimum)
+                                                        @if (materialAlert.Status == MaterialAlertsConst.LessThanMinimum)
                                                         {
-                                                            <b>Amount less than minimum (current Qty: @stockAlert.Stock.QuantityNew)</b>
+                                                            <b>Amount less than minimum (current Qty: @materialAlert.Material.QuantityNew)</b>
                                                         }
-                                                        else if (stockAlert.Status == StockAlertsConst.Empty)
+                                                        else if (materialAlert.Status == MaterialAlertsConst.Empty)
                                                         {
-                                                            <b>Item is out of stock!</b>
+                                                            <b>Item is out of material!</b>
                                                         }
                                                     </p>
                                                 </div>

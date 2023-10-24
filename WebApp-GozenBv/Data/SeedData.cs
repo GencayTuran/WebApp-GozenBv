@@ -21,9 +21,9 @@ namespace WebApp_GozenBv.Data
                 .ApplicationServices.CreateScope()
                 .ServiceProvider.GetRequiredService<DataDbContext>();
 
-            if (!_context.Stock.Any())
+            if (!_context.Material.Any())
             {
-                _context.Stock.AddRange(GetStock());
+                _context.Material.AddRange(GetMaterial());
                 _context.SaveChanges();
                 _context.Employees.AddRange(GetEmployees());
                 _context.SaveChanges();
@@ -32,9 +32,9 @@ namespace WebApp_GozenBv.Data
                 _context.CarMaintenances.AddRange(GetCarMaintenances());
                 _context.SaveChanges();
 
-                _context.StockLogs.AddRange(GetStockLogs());
+                _context.MaterialLogs.AddRange(GetMaterialLogs());
                 _context.SaveChanges();
-                _context.StockLogItems.AddRange(GetStockLogItems());
+                _context.MaterialLogItems.AddRange(GetMaterialLogItems());
                 _context.SaveChanges();
 
                 _context.Users.AddRange(GetUsers());
@@ -43,58 +43,58 @@ namespace WebApp_GozenBv.Data
 
         }
 
-        private static StockLog[] GetStockLogs()
+        private static MaterialLog[] GetMaterialLogs()
         {
-            var stockLogs = new List<StockLog>
+            var materialLogs = new List<MaterialLog>
             {
-                new StockLog
+                new MaterialLog
                 {
-                    StockLogDate = new DateTime(2022, 1, 1),
+                    MaterialLogDate = new DateTime(2022, 1, 1),
                     EmployeeId = 1,
                     ReturnDate = new DateTime(2022, 2, 1),
                     Damaged = false,
                     Status = 1,
                     LogCode = Guid.NewGuid().ToString(),
                 },
-                new StockLog
+                new MaterialLog
                 {
-                    StockLogDate = new DateTime(2022, 2, 1),
+                    MaterialLogDate = new DateTime(2022, 2, 1),
                     EmployeeId = 2,
                     ReturnDate = new DateTime(2022, 3, 1),
                     Damaged = false,
                     Status = 2,
                     LogCode = Guid.NewGuid().ToString(),
                 },
-                new StockLog
+                new MaterialLog
                 {
-                    StockLogDate = new DateTime(2022, 3, 1),
+                    MaterialLogDate = new DateTime(2022, 3, 1),
                     EmployeeId = 3,
                     ReturnDate = new DateTime(2022, 4, 1),
                     Damaged = true,
                     Status = 3,
                     LogCode = Guid.NewGuid().ToString(),
                 },
-                new StockLog
+                new MaterialLog
                 {
-                    StockLogDate = new DateTime(2022, 4, 1),
+                    MaterialLogDate = new DateTime(2022, 4, 1),
                     EmployeeId = 1,
                     ReturnDate = new DateTime(2022, 5, 1),
                     Damaged = false,
                     Status = 1,
                     LogCode = Guid.NewGuid().ToString(),
                 },
-                new StockLog
+                new MaterialLog
                 {
-                    StockLogDate = new DateTime(2022, 5, 1),
+                    MaterialLogDate = new DateTime(2022, 5, 1),
                     EmployeeId = 2,
                     ReturnDate = new DateTime(2022, 6, 1),
                     Damaged = true,
                     Status = 2,
                     LogCode = Guid.NewGuid().ToString(),
                 },
-                new StockLog
+                new MaterialLog
                 {
-                    StockLogDate = new DateTime(2022, 6, 1),
+                    MaterialLogDate = new DateTime(2022, 6, 1),
                     EmployeeId = 3,
                     ReturnDate = new DateTime(2022, 7, 1),
                     Damaged = true,
@@ -102,14 +102,14 @@ namespace WebApp_GozenBv.Data
                     LogCode = Guid.NewGuid().ToString(),
         }
             };
-            return stockLogs.ToArray();
+            return materialLogs.ToArray();
         }
 
 
-        private static StockLogItem[] GetStockLogItems()
+        private static MaterialLogItem[] GetMaterialLogItems()
         {
-            var stockLogItems = new List<StockLogItem>();
-            var stockLogs = _context.StockLogs.Select(s => s).ToList();
+            var materialLogItems = new List<MaterialLogItem>();
+            var materialLogs = _context.MaterialLogs.Select(s => s).ToList();
 
             bool[] arrDamaged = new bool[4];
             arrDamaged[0] = true;
@@ -118,31 +118,31 @@ namespace WebApp_GozenBv.Data
             arrDamaged[3] = false;
 
             var rnd = new Random();
-            for (int i = 0; i < stockLogs.Count; i++)
+            for (int i = 0; i < materialLogs.Count; i++)
             {
                 int counter = 1;
                 do
                 {
-                    var rndStockId = rnd.Next(1, 6);
-                    var stock = _context.Stock.Where(s => s.Id == rndStockId).FirstOrDefault();
-                    string productNameCode = (stock.ProductName + " " + stock.ProductCode).ToUpper();
-                    int rndStockAmount = rnd.Next(1, 4);
+                    var rndMaterialId = rnd.Next(1, 6);
+                    var material = _context.Material.Where(s => s.Id == rndMaterialId).FirstOrDefault();
+                    string productNameCode = (material.ProductName + " " + material.ProductCode).ToUpper();
+                    int rndMaterialAmount = rnd.Next(1, 4);
                     bool rndDamaged = arrDamaged[rnd.Next(0, 4)];
-                    bool damaged = stockLogs[i].Damaged ? rndDamaged : false;
-                    int rndDamagedAmount = stockLogs[i].Damaged == false ? 0 : rndDamaged ? rnd.Next(1, rndStockAmount + 1) : 0;
+                    bool damaged = materialLogs[i].Damaged ? rndDamaged : false;
+                    int rndDamagedAmount = materialLogs[i].Damaged == false ? 0 : rndDamaged ? rnd.Next(1, rndMaterialAmount + 1) : 0;
                     int rndRepairedAmount = rndDamagedAmount != 0 ? rnd.Next(0, rndDamagedAmount + 1) : 0;
                     int rndDeletedAmount = rndDamagedAmount - rndRepairedAmount;
                     var rndUsed = rnd.Next(0, 2);
                     bool used = rndUsed == 1 ? true : false;
 
-                    stockLogItems.Add(new StockLogItem
+                    materialLogItems.Add(new MaterialLogItem
                     {
-                        LogCode = stockLogs[i].LogCode,
-                        StockId = stock.Id,
+                        LogCode = materialLogs[i].LogCode,
+                        MaterialId = material.Id,
                         ProductNameCode = productNameCode,
-                        StockAmount = rndStockAmount,
+                        MaterialAmount = rndMaterialAmount,
                         IsDamaged = damaged,
-                        Cost = stock.Cost,
+                        Cost = material.Cost,
                         DamagedAmount = rndDamagedAmount,
                         RepairedAmount = rndRepairedAmount,
                         DeletedAmount = rndDeletedAmount,
@@ -153,7 +153,7 @@ namespace WebApp_GozenBv.Data
                 } while (counter <= 10);
             }
 
-            return stockLogItems.ToArray();
+            return materialLogItems.ToArray();
         }
 
         private static User[] GetUsers()
@@ -169,10 +169,10 @@ namespace WebApp_GozenBv.Data
             return users;
         }
 
-        private static Stock[] GetStock()
+        private static Material[] GetMaterial()
         {
-            var stock = new Stock[5];
-            stock[0] = new Stock
+            var material = new Material[5];
+            material[0] = new Material
             {
                 ProductName = "Kniptang",
                 QuantityNew = 75,
@@ -182,7 +182,7 @@ namespace WebApp_GozenBv.Data
                 Cost = 20
             };
 
-            stock[1] = new Stock
+            material[1] = new Material
             {
                 ProductName = "Boormachine",
                 QuantityNew = 80,
@@ -191,7 +191,7 @@ namespace WebApp_GozenBv.Data
                 ProductCode = "Makita",
                 Cost = 50
             };
-            stock[2] = new Stock
+            material[2] = new Material
             {
                 ProductName = "Slijper",
                 QuantityNew = 50,
@@ -200,7 +200,7 @@ namespace WebApp_GozenBv.Data
                 ProductCode = "Bosch",
                 Cost = 80
             };
-            stock[3] = new Stock
+            material[3] = new Material
             {
                 ProductName = "Hamer",
                 QuantityNew = 50,
@@ -208,7 +208,7 @@ namespace WebApp_GozenBv.Data
                 QuantityUsed = 20,
                 ProductCode = "Hitachi",
             };
-            stock[4] = new Stock
+            material[4] = new Material
             {
                 ProductName = "Kniptang",
                 QuantityNew = 50,
@@ -218,7 +218,7 @@ namespace WebApp_GozenBv.Data
                 Cost = 20
             };
 
-            return stock;
+            return material;
         }
 
         private static CarPark[] GetCarPark()

@@ -1,0 +1,234 @@
+﻿@using WebApp_GozenBv.Constants;
+@model WebApp_GozenBv.ViewModels.MaterialLogDetailVM
+
+@{
+    ViewData["Title"] = "Details";
+}
+
+<h1>Details</h1>
+
+<h4>MaterialLog</h4>
+<hr />
+
+<div class="d-flex flex-column">
+    <a asp-action="Index">Back to List</a>
+
+    @switch (Model.Status)
+    {
+        case MaterialLogStatusConst.Created:
+            <a asp-action="Edit" asp-route-id="@Model.MaterialLogId">Edit</a>
+            <a asp-action="Delete" asp-route-id="@Model.LogCode">Delete</a>
+            <a asp-action="ReturnItems" asp-route-id="@Model.LogCode">Return Items</a>
+            break;
+
+        case MaterialLogStatusConst.DamagedAwaitingAction:
+            <a asp-action="Undo" asp-route-id="@Model.LogCode">Undo</a>
+            <a asp-action="CompleteDamaged" asp-route-id="@Model.LogCode">Complete Damaged</a>
+            break;
+
+        case MaterialLogStatusConst.Returned:
+            <a asp-action="Undo" asp-route-id="@Model.LogCode">Undo</a>
+            break;
+    }
+</div>
+
+@*<table class="table">
+    <thead>
+        <tr>
+            <th scope="col">@Html.DisplayNameFor(model => model.MaterialLogDate)</th>
+            <th scope="col">@Html.DisplayNameFor(model => model.MaterialLog.Employee)</th>
+            <th scope="col">@Html.DisplayNameFor(model => model.Status)</th>
+            @if (Model.Status == MaterialLogStatusConst.Returned || Model.Status == MaterialLogStatusConst.DamagedAwaitingAction)
+            {
+                <th scope="col">@Html.DisplayNameFor(model => model.ReturnDate)</th>
+            }
+        </tr>
+    </thead>
+    <tbody>
+        <tr>
+            <td>@Html.DisplayFor(model => model.MaterialLogDate)</td>
+            <td>@Html.DisplayFor(model => model.EmployeeFullName)</td>
+            <td>
+                <vc:status-icon status="@Model.Status" is-damaged="@Model.IsDamaged"></vc:status-icon>
+            </td>
+            @if (Model.Status == MaterialLogStatusConst.Returned || Model.Status == MaterialLogStatusConst.DamagedAwaitingAction)
+            {
+                <td>@Html.DisplayFor(model => model.ReturnDate)</td>
+            }
+        </tr>
+    </tbody>
+    <thead>
+        <tr>
+            <th scope="col">@Html.DisplayNameFor(model => model.MaterialLogItems)</th>
+        </tr>
+        <tr>
+            <th>@Html.DisplayNameFor(model => model.MaterialLogItem.MaterialId)</th>
+            <th>@Html.DisplayNameFor(model => model.MaterialLogItem)</th>
+            @if (Model.IsDamaged)
+            {
+                <th>@Html.DisplayNameFor(model => model.MaterialLogItem.Cost)</th>
+
+            }
+            <th>@Html.DisplayNameFor(model => model.MaterialLogItem.MaterialAmount)</th>
+            @if (Model.IsDamaged && Model.Status == MaterialLogStatusConst.Returned)
+            {
+                <th>@Html.DisplayNameFor(model => model.MaterialLogItem.DamagedAmount)</th>
+                <th>@Html.DisplayNameFor(model => model.MaterialLogItem.RepairedAmount)</th>
+                <th>@Html.DisplayNameFor(model => model.MaterialLogItem.DeletedAmount)</th>
+            }
+            @if (Model.Status == MaterialLogStatusConst.DamagedAwaitingAction)
+            {
+                <th>@Html.DisplayNameFor(model => model.MaterialLogItem.DamagedAmount)</th>
+            }
+        </tr>
+    </thead>
+    <tbody>
+        @foreach (var item in Model.MaterialLogItems)
+        {
+            <tr>
+                <td>@item.MaterialId</td>
+                <td>@item.ProductNameCode</td>
+                @if (Model.IsDamaged)
+                {
+                    @if (item.IsDamaged)
+                    {
+                        <td>@item.Cost</td>
+                    }
+                    else
+                    {
+                        <td></td>
+                    }
+                }
+                <td>@item.MaterialAmount</td>
+                @if (Model.IsDamaged && Model.Status == MaterialLogStatusConst.Returned && item.IsDamaged)
+                {
+                    <td>@item.DamagedAmount</td>
+                    <td>@item.RepairedAmount</td>
+                    <td>@item.DeletedAmount</td>
+                }
+
+                @if (Model.Status == MaterialLogStatusConst.DamagedAwaitingAction)
+                {
+                    if (item.DamagedAmount != 0)
+                    {
+                        <td>@item.DamagedAmount</td>
+                    }
+                    else
+                    {
+                        <td></td>
+                    }
+                }
+            </tr>
+        }
+    </tbody>
+</table>*@
+
+<table class="table">
+    <thead>
+        <tr>
+            <th scope="col">@Html.DisplayNameFor(model => model.MaterialLogDate)</th>
+            <th scope="col">@Html.DisplayNameFor(model => model.MaterialLog.Employee)</th>
+            <th scope="col">@Html.DisplayNameFor(model => model.Status)</th>
+            @if (Model.Status == MaterialLogStatusConst.Returned || Model.Status == MaterialLogStatusConst.DamagedAwaitingAction)
+            {
+                <th scope="col">@Html.DisplayNameFor(model => model.ReturnDate)</th>
+            }
+        </tr>
+    </thead>
+    <tbody>
+        <tr>
+            <td>@Html.DisplayFor(model => model.MaterialLogDate)</td>
+            <td>@Html.DisplayFor(model => model.EmployeeFullName)</td>
+            <td>
+                <vc:status-icon status="@Model.Status" is-damaged="@Model.IsDamaged"></vc:status-icon>
+            </td>
+            @if (Model.Status == MaterialLogStatusConst.Returned || Model.Status == MaterialLogStatusConst.DamagedAwaitingAction)
+            {
+                <td>@Html.DisplayFor(model => model.ReturnDate)</td>
+            }
+        </tr>
+    </tbody>
+</table>
+
+<div>
+    <h5>Items</h5>
+</div>
+<table class="table" id="notDamagedItems">
+    <thead>
+        <tr>
+            <th>@Html.DisplayNameFor(model => model.MaterialLogItem.MaterialId)</th>
+            <th>@Html.DisplayNameFor(model => model.MaterialLogItem)</th>
+            <th>@Html.DisplayNameFor(model => model.MaterialLogItem.MaterialAmount)</th>
+            <th>@Html.DisplayNameFor(model => model.MaterialLogItem.Used)</th>
+        </tr>
+    </thead>
+    <tbody>
+        @foreach (var item in Model.MaterialLogItems)
+        {
+            <tr>
+                <td>@item.MaterialId</td>
+                <td>@item.ProductNameCode</td>
+                <td>@item.MaterialAmount</td>
+                <td>@item.Used</td>
+            </tr>
+        }
+    </tbody>
+</table>
+
+@if (Model.IsDamaged)
+{
+    <div>
+        <h5>Damaged Items</h5>
+    </div>
+    <table class="table" id="damagedItems">
+        <thead>
+            <tr>
+                <th>@Html.DisplayNameFor(model => model.MaterialLogItem.MaterialId)</th>
+                <th>@Html.DisplayNameFor(model => model.MaterialLogItem)</th>
+                <th>@Html.DisplayNameFor(model => model.MaterialLogItem.MaterialAmount)</th>
+                <th>@Html.DisplayNameFor(model => model.MaterialLogItem.Cost)</th>
+                <th>@Html.DisplayNameFor(model => model.MaterialLogItem.Used)</th>
+                @if (Model.Status == MaterialLogStatusConst.DamagedAwaitingAction)
+                {
+                    <th>@Html.DisplayNameFor(model => model.MaterialLogItem.DamagedAmount)</th>
+                }
+                @if (Model.Status == MaterialLogStatusConst.Returned)
+                {
+                    <th>@Html.DisplayNameFor(model => model.MaterialLogItem.DamagedAmount)</th>
+                    <th>@Html.DisplayNameFor(model => model.MaterialLogItem.RepairedAmount)</th>
+                    <th>@Html.DisplayNameFor(model => model.MaterialLogItem.DeletedAmount)</th>
+                }
+            </tr>
+        </thead>
+        <tbody>
+            @foreach (var item in Model.MaterialLogItemsDamaged)
+            {
+                <tr>
+                    <td>@item.MaterialId</td>
+                    <td>@item.ProductNameCode</td>
+                    <td>@item.MaterialAmount</td>
+                    <td>@item.Cost</td>
+                    <td>@item.Used</td>
+                    @if (Model.Status == MaterialLogStatusConst.DamagedAwaitingAction)
+                    {
+                        <td>@item.DamagedAmount</td>
+                    }
+                    @if (Model.Status == MaterialLogStatusConst.Returned)
+                    {
+                        <td>@item.DamagedAmount</td>
+                        <td>@item.RepairedAmount</td>
+                        <td>@item.DeletedAmount</td>
+                    }
+                </tr>
+            }
+        </tbody>
+    </table>
+}
+
+<div>
+    <vc:user-log view="@ViewTypeConst.Entity" controller="@ControllerConst.MaterialLog" entity-id="@Model.LogCode"></vc:user-log>
+</div>
+
+
+<input id="statusId" type="hidden" value="@Model.Status" />
+<script src="~/js/MaterialLog_Details.js"></script>

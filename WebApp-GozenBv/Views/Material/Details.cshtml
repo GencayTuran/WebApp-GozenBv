@@ -1,0 +1,72 @@
+﻿@using WebApp_GozenBv.Constants;
+@model WebApp_GozenBv.ViewModels.MaterialViewModel
+
+@{
+    ViewData["Title"] = "Details";
+}
+
+<h1>Details</h1>
+
+<div>
+    <h4>Material</h4>
+    <hr />
+    <dl class="row">
+        <dt class="col-sm-2">
+            @Html.DisplayNameFor(model => model.ProductName)
+        </dt>
+        <dd class="col-sm-10">
+            @Html.DisplayFor(model => model.ProductName)
+        </dd>
+        <dt class="col-sm-2">
+            @Html.DisplayNameFor(model => model.ProductCode)
+        </dt>
+        <dd class="col-sm-10">
+            @Html.DisplayFor(model => model.ProductCode)
+        </dd>
+        <dt class="col-sm-2">
+            @Html.DisplayNameFor(model => model.QuantityNew)
+        </dt>
+        <dd class="col-sm-10">
+            @Html.DisplayFor(model => model.QuantityNew)
+        </dd>
+        <dt class="col-sm-2">
+            @Html.DisplayNameFor(model => model.QuantityUsed)
+        </dt>
+        <dd class="col-sm-10">
+            @Html.DisplayFor(model => model.QuantityUsed)
+        </dd>
+        <dt class="col-sm-2">
+            @Html.DisplayNameFor(model => model.TotalQty)
+        </dt>
+        <dd class="col-sm-10">
+            @Html.DisplayFor(model => model.TotalQty)
+        </dd>
+        <dt class="col-sm-2">
+            @Html.DisplayNameFor(model => model.MinQuantity)
+        </dt>
+        <dd class="col-sm-10">
+            @Html.DisplayFor(model => model.MinQuantity)
+        </dd>
+        <dt class="col-sm-2">
+            @Html.DisplayNameFor(model => model.NoReturn)
+        </dt>
+        <dd class="col-sm-10">
+            @Html.DisplayFor(model => model.NoReturn)
+        </dd>
+        <dt class="col-sm-2">
+            @Html.DisplayNameFor(model => model.Cost)
+        </dt>
+        <dd class="col-sm-10">
+            @Html.DisplayFor(model => model.Cost)
+        </dd>
+    </dl>
+</div>
+
+<div>
+    <vc:user-log view="@ViewTypeConst.Entity" controller="@ControllerConst.Material" entity-id="@Model.Id"></vc:user-log>
+</div>
+
+<div>
+    <a asp-action="Edit" asp-route-id="@Model.Id">Edit</a> |
+    <a asp-action="Index">Back to List</a>
+</div>

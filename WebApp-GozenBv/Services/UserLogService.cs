@@ -162,11 +162,11 @@ namespace WebApp_GozenBv.Services
             string controller = "";
             switch (dataController)
             {
-                case ControllerConst.Stock:
-                    controller = "Stock";
+                case ControllerConst.Material:
+                    controller = "Material";
                     break;
-                case ControllerConst.StockLog:
-                    controller = "Stocklog";
+                case ControllerConst.MaterialLog:
+                    controller = "Materiallog";
                     break;
                 case ControllerConst.Employee:
                     controller = "Employee";

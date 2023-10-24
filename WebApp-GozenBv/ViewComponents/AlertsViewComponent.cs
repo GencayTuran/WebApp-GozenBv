@@ -15,12 +15,12 @@ namespace WebApp_GozenBv.ViewComponents
     public class AlertsViewComponent : ViewComponent
     {
         private readonly ICarParkManager _carParkManager;
-        private readonly IStockManager _stockManager;
+        private readonly IMaterialManager _materialManager;
 
-        public AlertsViewComponent(ICarParkManager carParkManager, IStockManager stockManager)
+        public AlertsViewComponent(ICarParkManager carParkManager, IMaterialManager materialManager)
         {
             _carParkManager = carParkManager;
-            _stockManager = stockManager;
+            _materialManager = materialManager;
         }
 
         public async Task<IViewComponentResult> InvokeAsync()
@@ -28,7 +28,7 @@ namespace WebApp_GozenBv.ViewComponents
             return View(new AlertsViewModel()
             {
                 CarAlerts = await _carParkManager.MapCarAlerts(),
-                StockAlerts = await _stockManager.MapMaterialAlerts(),
+                MaterialAlerts = await _materialManager.MapMaterialAlerts(),
             });
         }
     }

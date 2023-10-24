@@ -1,0 +1,64 @@
+﻿@model WebApp_GozenBv.ViewModels.MaterialLogDetailVM
+
+@{
+    ViewData["Title"] = "Return items?";
+}
+
+<h1>Return</h1>
+
+@*<h3>Which products are damaged?</h3>*@
+<h4>Return items?</h4>
+<hr />
+<table class="table">
+    <thead>
+        <tr>
+            <th scope="col">@Html.DisplayNameFor(model => model.MaterialLogDate)</th>
+            <th scope="col">@Html.DisplayNameFor(model => model.MaterialLog.Employee)</th>
+            <th scope="col">@Html.DisplayNameFor(model => model.LogCode)</th>
+        </tr>
+    </thead>
+    <tbody>
+        <tr>
+            <td>@Html.DisplayFor(model => model.MaterialLogDate)</td>
+            <td>@Html.DisplayFor(model => model.EmployeeFullName)</td>
+            <td>@Html.DisplayFor(model => model.LogCode)</td>
+        </tr>
+    </tbody>
+    <thead>
+        <tr>
+            <th scope="col">@Html.DisplayNameFor(model => model.MaterialLogItems)</th>
+        </tr>
+        <tr>
+            <th>@Html.DisplayNameFor(model => model.MaterialLogItem.MaterialId)</th>
+            <th>@Html.DisplayNameFor(model => model.MaterialLogItem)</th>
+            <th>@Html.DisplayNameFor(model => model.MaterialLogItem.MaterialAmount)</th>
+            <th>Damaged?</th>
+            <th id="damagedTitle" style="opacity: 0.6">@Html.DisplayNameFor(model => model.MaterialLogItem.DamagedAmount)</th>
+        </tr>
+    </thead>
+    <tbody>
+        @foreach (var item in Model.MaterialLogItems)
+        {
+            <tr class="materialLogItemRow">
+                <td><p class="labelMaterialId">@item.MaterialId</p></td>
+                <td><p>@item.ProductNameCode</p></td>
+                <td><p>@item.MaterialAmount</p></td>
+                <td><input class="chkDamaged" type="checkbox" onclick="ChangeDamaged(this)" /></td>
+                <td>
+                    <input class="inputDamagedAmount w-25" disabled type="number" max="@item.MaterialAmount" min="1"/>
+                </td>
+                <input class="inputMaterialAmount" value="@item.MaterialAmount" type="hidden" />
+            </tr>
+        }
+    </tbody>
+</table>
+
+<form asp-action="ReturnItems">
+    <input type="hidden" asp-for="LogCode" />
+    <input id="isDamaged" hidden type="checkbox" asp-for="IsDamaged" />
+    <input id="damagedMaterialResult" type="hidden" asp-for="DamagedMaterial" />
+    <input id="btnSubmit" onclick="PassDamagedItems()" type="submit" value="Complete" class="btn btn-primary" /> |
+    <a asp-action="Index">Back to List</a>
+</form>
+
+<script src="~/js/MaterialLog_ReturnItems.js"></script>
