@@ -8,11 +8,16 @@ using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.Rendering;
 using Microsoft.AspNetCore.Routing;
+using Microsoft.Data.SqlClient;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Graph;
+using Microsoft.Graph.SecurityNamespace;
+using Microsoft.IdentityModel.Tokens;
 using WebApp_GozenBv.Constants;
 using WebApp_GozenBv.Data;
 using WebApp_GozenBv.Helpers;
+using WebApp_GozenBv.Helpers.Interfaces;
+using WebApp_GozenBv.Managers.Interfaces;
 using WebApp_GozenBv.Models;
 using WebApp_GozenBv.Services;
 using WebApp_GozenBv.ViewModels;
@@ -22,154 +27,85 @@ namespace WebApp_GozenBv.Controllers
     //[Authorize]
     public class MaterialLogController : Controller
     {
-        private readonly DataDbContext _context;
+        private readonly IMaterialLogManager _manager;
+        private readonly ILogSearchHelper _searchHelper;
         private readonly IUserLogService _userLogService;
-        public MaterialLogController(DataDbContext context, IUserLogService userLogService)
+        public MaterialLogController(
+            IMaterialLogManager manager,
+            IUserLogService userLogService,
+            ILogSearchHelper searchHelper)
         {
-            _context = context;
+            _manager = manager;
             _userLogService = userLogService;
+            _searchHelper = searchHelper;
         }
 
         // GET: MaterialLog
         [HttpGet]
         public async Task<IActionResult> Index(string searchString, int sortStatus, int sortOrder)
         {
+            var logs = await _manager.MapMaterialLogs();
 
-            var materialLogsAll = _context.MaterialLogs
-                .Include(s => s.Employee);
+            var lstStatusSort = _searchHelper.GetStatusSortList();
+            var lstOrderSort = _searchHelper.GetSortOrderList();
 
-            List<MaterialLog> materialLogs = new();
-            List<SortViewModel> lstStatus = new()
-            {
-                new SortViewModel
-                {
-                    Id = MaterialLogStatusConst.Created,
-                    Name = MaterialLogStatusConst.CreatedName
-                },
+            ViewBag.StatusSortList = new SelectList(lstStatusSort, "Id", "Name");
+            ViewBag.SortOrderList = new SelectList(lstOrderSort, "Id", "Name");
 
-                new SortViewModel
-                {
-                    Id = MaterialLogStatusConst.Returned,
-                    Name = MaterialLogStatusConst.ReturnedName
-                },
+            //TODO: after finishing restructure, check what a not filtered ints return so the check is right.
+            logs = CheckFilters(logs, lstStatusSort, lstOrderSort, searchString, sortStatus, sortOrder);
 
-                new SortViewModel
-                {
-                    Id = MaterialLogStatusConst.DamagedAwaitingAction,
-                    Name = MaterialLogStatusConst.DamagedAwaitingActionName
-                }
-
-            };
-            List<SortViewModel> lstSortOrder = new()
-            {
-                new SortViewModel
-                {
-                    Id = SortOrderConst.DateDescendingId,
-                    Name = SortOrderConst.DateDescendingName
-                },
-
-                new SortViewModel
-                {
-                    Id = SortOrderConst.DateAscendingId,
-                    Name = SortOrderConst.DateAscendingName
-                },
-
-                new SortViewModel
-                {
-                    Id = SortOrderConst.EmpAzId,
-                    Name = SortOrderConst.EmpAzName
-                },
-
-                new SortViewModel
-                {
-                    Id = SortOrderConst.EmpZaId,
-                    Name = SortOrderConst.EmpZaName
-                }
-            };
-
-            ViewBag.StatusSortList = new SelectList(lstStatus, "Id", "Name");
-            ViewBag.SortOrderList = new SelectList(lstSortOrder, "Id", "Name");
-
-            foreach (var item in lstSortOrder)
-            {
-                if (item.Id == sortOrder)
-                {
-                    ViewBag.SortOrderIdParam = item.Id;
-                    ViewBag.SortOrderNameParam = item.Name;
-                }
-            }
-
-            foreach (var item in lstStatus)
-            {
-                if (item.Id == sortStatus)
-                {
-                    ViewBag.SortStatusIdParam = item.Id;
-                    ViewBag.SortStatusNameParam = item.Name;
-                }
-            }
-
-            switch (sortOrder)
-            {
-                case SortOrderConst.DateDescendingId:
-                    materialLogs = materialLogsAll.OrderByDescending(s => s.MaterialLogDate).ToList();
-                    break;
-                case SortOrderConst.DateAscendingId:
-                    materialLogs = materialLogsAll.OrderBy(s => s.MaterialLogDate).ToList();
-                    break;
-                case SortOrderConst.EmpAzId:
-                    materialLogs = materialLogsAll.OrderBy(s => s.Employee.Name).ToList();
-                    break;
-                case SortOrderConst.EmpZaId:
-                    materialLogs = materialLogsAll.OrderByDescending(s => s.Employee.Name).ToList();
-                    break;
-                default:
-                    materialLogs = materialLogsAll.OrderByDescending(s => s.MaterialLogDate).ToList();
-                    break;
-            }
-
-            if (sortStatus != 0)
-            {
-                switch (sortStatus)
-                {
-                    case MaterialLogStatusConst.Created:
-                        materialLogs = materialLogs.Where(s => s.Status == MaterialLogStatusConst.Created).ToList();
-                        break;
-                    case MaterialLogStatusConst.Returned:
-                        materialLogs = materialLogs.Where(s => s.Status == MaterialLogStatusConst.Returned).ToList();
-                        break;
-                    case MaterialLogStatusConst.DamagedAwaitingAction:
-                        materialLogs = materialLogs.Where(s => s.Status == MaterialLogStatusConst.DamagedAwaitingAction).ToList();
-                        break;
-                }
-            }
-
-            materialLogs = CheckSearchString(materialLogs, searchString);
-
-            return View(materialLogs);
+            return View(logs);
         }
 
-        private List<MaterialLog> CheckSearchString(List<MaterialLog> materialLogs, string searchString)
+
+        private List<MaterialLog> CheckFilters(List<MaterialLog> logs, List<SortViewModel> lstStatus,
+            List<SortViewModel> lstOrder, string searchString, int sortStatus, int sortOrder)
         {
-            if (!String.IsNullOrEmpty(searchString))
+
+            if (IsOrderFiltered(sortOrder))
             {
-                searchString = searchString.Trim();
-                var capitalizedString = (char.ToUpper(searchString[0]) + searchString.Substring(1).ToLower());
-                var lowerString = searchString.ToLower();
+                foreach (var item in lstOrder)
+                {
+                    if (item.Id == sortOrder)
+                    {
+                        ViewBag.SortOrderIdParam = item.Id;
+                        ViewBag.SortOrderNameParam = item.Name;
+                    }
+                }
 
-                materialLogs = materialLogs
-                        .Where(s => s.Employee.Name.Contains(searchString)
-                            || s.Employee.Surname.Contains(searchString)
-                            || s.Employee.Name.Contains(capitalizedString)
-                            || s.Employee.Surname.Contains(capitalizedString)
-                            || s.Employee.Name.Contains(lowerString)
-                            || s.Employee.Surname.Contains(lowerString))
-                        .ToList();
-
-                ViewBag.SearchString = searchString;
+                logs = _searchHelper.SortListByOrder(logs, sortOrder);
             }
 
-            return materialLogs;
+            if (IsStatusFiltered(sortStatus))
+            {
+                foreach (var item in lstStatus)
+                {
+                    if (item.Id == sortStatus)
+                    {
+                        ViewBag.SortStatusIdParam = item.Id;
+                        ViewBag.SortStatusNameParam = item.Name;
+                    }
+                }
+
+                logs = _searchHelper.SortListByStatus(logs, sortStatus); 
+            }
+
+            if (IsStringFiltered(searchString))
+            {
+                var trimmedString = searchString.Trim();
+                ViewBag.SearchString = trimmedString;
+
+                logs = _searchHelper.FilterList(logs, trimmedString);
+            }
+
+            return logs;
         }
+        private bool IsStringFiltered(string searchString) => !searchString.IsNullOrEmpty();
+        private bool IsStatusFiltered(int sortStatus) => sortStatus != 0;
+        private bool IsOrderFiltered(int sortOrder) => sortOrder != 0;
+
+
 
         // GET: MaterialLog/Details/5
         [HttpGet]

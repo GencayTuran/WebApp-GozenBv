@@ -10,6 +10,8 @@ using Microsoft.Extensions.Hosting;
 using WebApp_GozenBv.Data;
 using WebApp_GozenBv.DataHandlers;
 using WebApp_GozenBv.DataHandlers.Interfaces;
+using WebApp_GozenBv.Helpers;
+using WebApp_GozenBv.Helpers.Interfaces;
 using WebApp_GozenBv.Managers;
 using WebApp_GozenBv.Managers.Interfaces;
 using WebApp_GozenBv.Services;
@@ -39,6 +41,8 @@ namespace WebApp_GozenBv
             services.AddTransient<IUserLogService, UserLogService>();
             services.AddTransient<IUserService, UserService>();
 
+            services.AddTransient<ILogSearchHelper, LogSearchHelper>();
+
             services.AddTransient<ICarParkManager, CarParkManager>();
             services.AddTransient<ICarParkDataHandler, CarParkDataHandler>();
             services.AddTransient<ICarMaintenanceDataHandler, CarMaintenanceDataHandler>();
@@ -48,6 +52,11 @@ namespace WebApp_GozenBv
 
             services.AddTransient<IMaterialManager, MaterialManager>();
             services.AddTransient<IMaterialDataHandler, MaterialDataHandler>();
+
+            services.AddTransient<IMaterialLogManager, MaterialLogManager>();
+            services.AddTransient<IMaterialLogDataHandler, MaterialLogDataHandler>();
+            services.AddTransient<IMaterialLogItemDataHandler, MaterialLogItemDataHandler>();
+
         }
 
         public void Configure(IApplicationBuilder app, IWebHostEnvironment env)
