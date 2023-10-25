@@ -49,6 +49,21 @@ namespace WebApp_GozenBv.DataHandlers
         {
             return await _context.MaterialLogItems.FindAsync(id);
         }
+
+        public async Task<List<MaterialLogItem>> GetDamagedItemsByLogCode(string logCode)
+        {
+            return await _context.MaterialLogItems
+                    .Where(s => s.LogCode == logCode)
+                    .Where(s => s.IsDamaged == true)
+                    .ToListAsync();
+        }
+
+        public async Task<List<MaterialLogItem>> GetUnDamagedItemsByLogCode(string logCode)
+        {
+            return await _context.MaterialLogItems
+                            .Where(s => s.LogCode == logCode)
+                            .Where(s => !s.IsDamaged || s.NoReturn).ToListAsync();
+        }
     }
 }
 

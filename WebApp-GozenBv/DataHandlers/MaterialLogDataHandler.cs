@@ -22,9 +22,9 @@ namespace WebApp_GozenBv.DataHandlers
             return await _context.MaterialLogs.Include(log => log.Employee).ToListAsync();
         }
 
-        public async Task<MaterialLog> GetMaterialLogById(int? id)
+        public async Task<MaterialLog> GetMaterialLogByLogCode(string logCode)
         {
-            return await _context.MaterialLogs.FindAsync(id);
+            return await _context.MaterialLogs.Where(log => log.LogCode.Equals(logCode)).Include(log => log.Employee).FirstOrDefaultAsync();
         }
 
         public async Task<List<MaterialLog>> GetMaterialLogs(Expression<Func<MaterialLog, bool>> filter)

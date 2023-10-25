@@ -10,6 +10,8 @@ namespace WebApp_GozenBv.DataHandlers
 	{
         Task<List<MaterialLogItem>> GetItemsByLogCode(string logCode);
         Task<List<MaterialLogItem>> GetItemsByLogCode(string logCode, Expression<Func<MaterialLogItem, bool>> filter);
+        Task<List<MaterialLogItem>> GetDamagedItemsByLogCode(string logCode);
+        Task<List<MaterialLogItem>> GetUnDamagedItemsByLogCode(string logCode);
         Task<MaterialLogItem> GetMaterialLogById(int? id);
         Task CreateItems(List<MaterialLogItem> items);
         Task UpdateItems(List<MaterialLogItem> items);

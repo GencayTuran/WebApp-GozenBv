@@ -74,6 +74,22 @@ namespace WebApp_GozenBv.Managers
 
             return materialAlerts;
         }
+
+        public async Task ManageMaterials(List<Material> materials, EntityOperation operation)
+        {
+            switch (operation)
+            {
+                case EntityOperation.Create:
+                    await _materialData.CreateMaterials(materials);
+                    break;
+                case EntityOperation.Update:
+                    await _materialData.UpdateMaterials(materials);
+                    break;
+                case EntityOperation.Delete:
+                    await _materialData.DeleteMaterials(materials);
+                    break;
+            }
+        }
     }
 }
 

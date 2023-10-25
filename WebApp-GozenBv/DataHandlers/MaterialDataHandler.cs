@@ -33,6 +33,12 @@ namespace WebApp_GozenBv.DataHandlers
             await _context.SaveChangesAsync();
         }
 
+        public async Task UpdateMaterials(List<Material> materials)
+        {
+            _context.UpdateRange(materials);
+            await _context.SaveChangesAsync();
+        }
+
         public async Task<List<Material>> GetAllMaterials()
         {
             return await _context.Material.ToListAsync();
@@ -43,7 +49,15 @@ namespace WebApp_GozenBv.DataHandlers
             return await _context.Material.FindAsync(id);
         }
 
-        
+        public Task CreateMaterials(List<Material> materials)
+        {
+            throw new NotImplementedException();
+        }
+
+        public Task DeleteMaterials(List<Material> materials)
+        {
+            throw new NotImplementedException();
+        }
     }
 }
 

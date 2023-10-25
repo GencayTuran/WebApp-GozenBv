@@ -27,24 +27,28 @@ namespace WebApp_GozenBv.Controllers
     //[Authorize]
     public class MaterialLogController : Controller
     {
-        private readonly IMaterialLogManager _manager;
+        private readonly IMaterialLogManager _logManager;
+        private readonly IEmployeeManager _employeeManager;
         private readonly ILogSearchHelper _searchHelper;
         private readonly IUserLogService _userLogService;
         public MaterialLogController(
-            IMaterialLogManager manager,
+            IMaterialLogManager logManager,
             IUserLogService userLogService,
-            ILogSearchHelper searchHelper)
+            ILogSearchHelper searchHelper,
+            IEmployeeManager employeeManager,
+            IMaterialManager materialManager)
         {
-            _manager = manager;
+            _logManager = logManager;
             _userLogService = userLogService;
             _searchHelper = searchHelper;
+            _employeeManager = employeeManager;
         }
 
         // GET: MaterialLog
         [HttpGet]
         public async Task<IActionResult> Index(string searchString, int sortStatus, int sortOrder)
         {
-            var logs = await _manager.MapMaterialLogs();
+            var logs = await _logManager.MapMaterialLogs();
 
             var lstStatusSort = _searchHelper.GetStatusSortList();
             var lstOrderSort = _searchHelper.GetSortOrderList();
@@ -57,7 +61,6 @@ namespace WebApp_GozenBv.Controllers
 
             return View(logs);
         }
-
 
         private List<MaterialLog> CheckFilters(List<MaterialLog> logs, List<SortViewModel> lstStatus,
             List<SortViewModel> lstOrder, string searchString, int sortStatus, int sortOrder)
@@ -106,61 +109,53 @@ namespace WebApp_GozenBv.Controllers
         private bool IsOrderFiltered(int sortOrder) => sortOrder != 0;
 
 
-
         // GET: MaterialLog/Details/5
         [HttpGet]
         public async Task<IActionResult> Details(string id)
         {
             string logCode = id;
 
-            var materialLog = await _context.MaterialLogs
-                .Where(s => s.LogCode == logCode)
-                .FirstOrDefaultAsync();
-
-            if (materialLog == null)
+            if (logCode.IsNullOrEmpty())
             {
                 return PartialView("_EntityNotFound");
             }
 
-            return View(await GetMaterialLogDetails(logCode));
+            return View(await _logManager.MapMaterialLogDetails(logCode));
         }
 
-        private readonly List<EmployeeVM> lstEmp = new List<EmployeeVM>();
-        private readonly List<MaterialQuantityVM> lstMaterial = new();
         [HttpGet]
-        public IActionResult Create()
+        public async Task<IActionResult> Create()
         {
-            GetCreateViewData();
+            var createViewModel = await MapLogCreateViewData();
 
             ViewData["dateToday"] = DateTime.Today.ToString("yyyy-MM-dd");
-            //ViewData["employees"] = lstEmp;
-            ViewData["employees"] = new SelectList(lstEmp, "EmployeeId", "EmployeeFullName"); ;
-            //ViewData["material"] = lstMaterial;
-            ViewData["material"] = new SelectList(lstMaterial, "MaterialId", "ProductNameCode");
+
+            //TODO: change the viewbags to returning viewModel as you did with carpark?
+            ViewData["employees"] = new SelectList(createViewModel.EmployeesList, "EmployeeId", "EmployeeFullName"); ;
+            ViewData["material"] = new SelectList(createViewModel.MaterialsList, "MaterialId", "ProductNameCode");
 
             return View();
         }
 
-        private void GetCreateViewData()
+        private async Task<MaterialLogCreateViewModel> MapLogCreateViewData()
         {
-            var employees = _context.Employees.Select(x => x);
+            var employees = await _employeeManager.MapEmployees();
+            MaterialLogCreateViewModel viewModel = new();
 
-            foreach (var emp in employees)
+            foreach (var employee in employees)
             {
-                var empFullName = String.Format("{0,0} {1,0}", emp.Name, emp.Surname);
-
-                lstEmp.Add(new EmployeeVM
+                viewModel.EmployeesList.Add(new LogCreateEmployeeViewModel
                 {
-                    EmployeeId = emp.Id,
-                    EmployeeFullName = empFullName,
+                    EmployeeId = employee.Id,
+                    EmployeeFullName = employee.Name + " " + employee.Surname,
                 });
             }
 
-            var materialVM = _context.Material.Select(s => new { s.Id, s.ProductName, s.ProductCode, s.QuantityNew, s.QuantityUsed });
+            var materials = await _materialManager.MapMaterials();
 
-            foreach (var material in materialVM)
+            foreach (var material in materials)
             {
-                lstMaterial.Add(new MaterialQuantityVM
+                viewModel.MaterialsList.Add(new LogCreateMaterialViewModel
                 {
                     MaterialId = material.Id,
                     QuantityNew = material.QuantityNew,
@@ -169,63 +164,17 @@ namespace WebApp_GozenBv.Controllers
                 });
             }
 
+            return viewModel;
         }
 
         [HttpPost]
         [ValidateAntiForgeryToken]
-        public async Task<IActionResult> Create(MaterialLogCreateVM materialLogCreateVM)
+        public async Task<IActionResult> Create(MaterialLogCreateViewModel viewModel)
         {
             //TODO: check modelstate validation proper way
-            if (ModelState.IsValid && materialLogCreateVM.SelectedProducts != null)
+            if (ModelState.IsValid && viewModel.SelectedProducts != null)
             {
-                var selectedItems = JsonSerializer.Deserialize<List<MaterialLogSelectedItemViewModel>>(materialLogCreateVM.SelectedProducts,
-                    new JsonSerializerOptions
-                    {
-                        PropertyNameCaseInsensitive = true
-                    });
-
-                Guid guid = Guid.NewGuid();
-                string logCode = guid.ToString();
-
-                //new materiallog
-                MaterialLog materialLog = new()
-                {
-                    LogCode = logCode,
-                    Status = MaterialLogStatusConst.Created,
-                    MaterialLogDate = materialLogCreateVM.MaterialLogDate,
-                    EmployeeId = materialLogCreateVM.EmployeeId
-                };
-                _context.Add(materialLog);
-
-
-                foreach (var item in selectedItems)
-                {
-                    //new MaterialLogItem
-                    MaterialLogItem materialLogItem = new();
-                    var material = await GetMaterialAsync(item.MaterialId);
-
-                    if (material.NoReturn)
-                    {
-                        materialLogItem.DamagedAmount = null;
-                        materialLogItem.RepairedAmount = null;
-                        materialLogItem.DeletedAmount = null;
-                    }
-
-                    materialLogItem.MaterialId = item.MaterialId;
-                    materialLogItem.MaterialAmount = item.Amount;
-                    materialLogItem.Used = item.Used;
-
-                    materialLogItem.Cost = material.Cost;
-                    materialLogItem.LogCode = logCode;
-                    materialLogItem.ProductNameCode = (material.ProductName + " " + material.ProductCode).ToUpper();
-
-                    _context.Add(materialLogItem);
-
-                    //update material amount
-                    _context.Update(MaterialHelper.TakeMaterial(material, item.Amount, item.Used));
-                }
-
-                await _context.SaveChangesAsync();
+                var logCode = await _logManager.MapIncomingLog(viewModel);
                 await _userLogService.CreateAsync(ControllerConst.MaterialLog, ActionConst.Create, logCode);
 
                 return RedirectToAction(nameof(Index));
@@ -233,7 +182,6 @@ namespace WebApp_GozenBv.Controllers
             else
             {
                 //GetCreateViewData();
-
                 //ViewData["dateToday"] = DateTime.Today.ToString("yyyy-MM-dd");
                 //ViewData["employees"] = new SelectList(lstEmp, "EmployeeId", "EmployeeFullName");
                 //ViewData["material"] = new SelectList(lstMaterial, "MaterialId", "ProductNameCode");
@@ -251,6 +199,7 @@ namespace WebApp_GozenBv.Controllers
                 return NotFound();
             }
 
+            //TODO: get details of damaged and undamaged items here (existing method) for edit.
             var materialLog = await _context.MaterialLogs.FindAsync(id);
             if (materialLog == null)
             {
@@ -320,7 +269,7 @@ namespace WebApp_GozenBv.Controllers
         }
 
         [HttpPost]
-        public async Task<IActionResult> ReturnItems(MaterialLogDetailVM materialLogDetailVM)
+        public async Task<IActionResult> ReturnItems(MaterialLogDetailViewModel materialLogDetailVM)
         {
             string logCode = materialLogDetailVM.LogCode;
 
@@ -404,16 +353,16 @@ namespace WebApp_GozenBv.Controllers
         {
             string logCode = id;
 
-            if (logCode == null)
+            if (logCode.IsNullOrEmpty())
             {
                 return NotFound();
             }
 
-            return View(await GetMaterialLogDetails(logCode));
+            return View(await _manager.MapMaterialLogDetails(logCode));
         }
 
         [HttpPost]
-        public async Task<IActionResult> CompleteDamaged(MaterialLogDetailVM materialLogDetail)
+        public async Task<IActionResult> CompleteDamaged(MaterialLogDetailViewModel materialLogDetail)
         {
             string logCode = materialLogDetail.LogCode;
 
@@ -526,38 +475,7 @@ namespace WebApp_GozenBv.Controllers
             return _context.MaterialLogs.Any(e => e.Id == id);
         }
 
-        private async Task<MaterialLogDetailVM> GetMaterialLogDetails(string logCode)
-        {
-            var materialLog = await _context.MaterialLogs
-                .Include(s => s.Employee)
-                .FirstOrDefaultAsync(s => s.LogCode == logCode);
-
-            var materialLogItems = await _context.MaterialLogItems
-                .Where(s => s.LogCode == logCode)
-                .Where(s => s.IsDamaged == false || s.NoReturn == true).ToListAsync();
-
-            List<MaterialLogItem> materialLogItemsDamaged = new();
-            if (materialLog.Damaged)
-            {
-                materialLogItemsDamaged = await _context.MaterialLogItems
-                    .Where(s => s.LogCode == logCode)
-                    .Where(s => s.IsDamaged == true)
-                    .ToListAsync();
-            }
-
-            return new MaterialLogDetailVM
-            {
-                MaterialLogId = materialLog.Id,
-                MaterialLogDate = materialLog.MaterialLogDate,
-                EmployeeFullName = (materialLog.Employee.Name + " " + materialLog.Employee.Surname).ToUpper(),
-                LogCode = materialLog.LogCode,
-                MaterialLogItems = materialLogItems,
-                MaterialLogItemsDamaged = materialLogItemsDamaged,
-                ReturnDate = materialLog.ReturnDate,
-                Status = materialLog.Status,
-                IsDamaged = materialLog.Damaged,
-            };
-        }
+        
 
         // GET: MaterialLog/Delete/5
         [HttpGet]

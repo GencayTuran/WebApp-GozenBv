@@ -11,13 +11,15 @@ namespace WebApp_GozenBv.Managers.Interfaces
 	public interface IMaterialLogManager
 	{
 		Task<List<MaterialLog>> MapMaterialLogs();
-		Task<MaterialLogDetailVM> MapMaterialLogDetails();
+		Task<MaterialLogDetailViewModel> MapMaterialLogDetails(string logCode);
 
         Task<List<MaterialLogItem>> MapItemsByLogId(int? logId);
         //Task<List<MaterialLogItem>> MapDamagedItemsByLogId(int? logId);
         Task<MaterialLogItem> MapMaterialLogItem(string logCode);
 
-		Task ManageMaterialLog(MaterialLog material, EntityOperation operation);
+		Task<string> MapIncomingLog(MaterialLogCreateViewModel incomingViewModel);
+
+		Task ManageMaterialLog(MaterialLog log, EntityOperation operation);
         Task ManageMaterialLogItems(List<MaterialLogItem> items, EntityOperation operation);
 	}
 }

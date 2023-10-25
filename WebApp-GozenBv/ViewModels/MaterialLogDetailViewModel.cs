@@ -7,7 +7,7 @@ using WebApp_GozenBv.Models;
 
 namespace WebApp_GozenBv.ViewModels
 {
-    public class MaterialLogDetailVM
+    public class MaterialLogDetailViewModel
     {
         public int MaterialLogId { get; set; }
         [DataType(DataType.Date)]

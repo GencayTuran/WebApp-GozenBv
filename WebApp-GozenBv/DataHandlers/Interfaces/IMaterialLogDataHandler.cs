@@ -11,7 +11,7 @@ namespace WebApp_GozenBv.DataHandlers
 	{
 		Task<List<MaterialLog>> GetMaterialLogs();
 		Task<List<MaterialLog>> GetMaterialLogs(Expression<Func<MaterialLog, bool>> filter);
-		Task<MaterialLog> GetMaterialLogById(int? id);
+		Task<MaterialLog> GetMaterialLogByLogCode(string logCode);
         Task CreateMaterialLog(MaterialLog log);
         Task UpdateMaterialLog(MaterialLog log);
 		Task DeleteMaterialLog(MaterialLog log);

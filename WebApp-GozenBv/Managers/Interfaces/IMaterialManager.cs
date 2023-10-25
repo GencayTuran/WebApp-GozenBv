@@ -12,6 +12,7 @@ namespace WebApp_GozenBv.Managers.Interfaces
         Task<List<Material>> MapMaterials();
         Task<Material> MapMaterial(int? id);
         Task ManageMaterial(Material material, EntityOperation operation);
+        Task ManageMaterials(List<Material> materials, EntityOperation operation);
         Task<List<MaterialAlertViewModel>> MapMaterialAlerts();
     }
 }
