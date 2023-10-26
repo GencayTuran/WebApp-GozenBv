@@ -133,15 +133,19 @@ namespace WebApp_GozenBv.Managers
 
             return new MaterialLogDetailViewModel
             {
-                MaterialLogId = log.Id,
-                MaterialLogDate = log.MaterialLogDate,
-                EmployeeFullName = (log.Employee.Name + " " + log.Employee.Surname).ToUpper(),
-                LogCode = log.LogCode,
+                MaterialLog = new MaterialLog
+                {
+                    Id = log.Id,
+                    LogCode = log.LogCode,
+                    MaterialLogDate = log.MaterialLogDate,
+                    EmployeeId = log.EmployeeId,
+                    ReturnDate = log.ReturnDate,
+                    Status = log.Status,
+                    Damaged = log.Damaged,
+                },
                 MaterialLogItems = items,
                 MaterialLogItemsDamaged = damagedItems,
-                ReturnDate = log.ReturnDate,
-                Status = log.Status,
-                IsDamaged = log.Damaged,
+                EmployeeFullName = (log.Employee.Name + " " + log.Employee.Surname).ToUpper(),
             };
         }
 

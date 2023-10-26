@@ -29,6 +29,7 @@ namespace WebApp_GozenBv.Controllers
     {
         private readonly IMaterialLogManager _logManager;
         private readonly IEmployeeManager _employeeManager;
+        private readonly IMaterialLogHelper _logHelper;
         private readonly ILogSearchHelper _searchHelper;
         private readonly IUserLogService _userLogService;
         public MaterialLogController(
@@ -36,12 +37,13 @@ namespace WebApp_GozenBv.Controllers
             IUserLogService userLogService,
             ILogSearchHelper searchHelper,
             IEmployeeManager employeeManager,
-            IMaterialManager materialManager)
+            IMaterialLogHelper logHelper)
         {
             _logManager = logManager;
             _userLogService = userLogService;
             _searchHelper = searchHelper;
             _employeeManager = employeeManager;
+            _logHelper = logHelper;
         }
 
         // GET: MaterialLog
@@ -192,58 +194,39 @@ namespace WebApp_GozenBv.Controllers
         }
 
         [HttpGet]
-        public async Task<IActionResult> Edit(int? id)
+        public async Task<IActionResult> Edit(string id)
         {
-            if (id == null)
+            if (id.IsNullOrEmpty())
+            {
+                return NotFound();
+            }
+            var logCode = id;
+            
+            var logDetails = await _logManager.MapMaterialLogDetails(logCode);
+
+            if (logDetails == null)
             {
                 return NotFound();
             }
 
-            //TODO: get details of damaged and undamaged items here (existing method) for edit.
-            var materialLog = await _context.MaterialLogs.FindAsync(id);
-            if (materialLog == null)
-            {
-                return NotFound();
-            }
-            ViewData["EmployeeId"] = new SelectList(_context.Employees, "Id", "Id", materialLog.EmployeeId);
-            return View(materialLog);
+            ViewData["Employees"] = new SelectList(await _employeeManager.MapEmployees(), "Id", "Id", logDetails.MaterialLog.EmployeeId);
+            return View(logDetails);
         }
 
         [HttpPost]
         [ValidateAntiForgeryToken]
-        public async Task<IActionResult> Edit(int id, [Bind("Id,MaterialLogDate,Action,EmployeeId,LogCode")] MaterialLog materialLog)
-        {
-            if (id != materialLog.Id)
-            {
-                return NotFound();
-            }
-
+        public async Task<IActionResult> Edit(MaterialLogDetailViewModel incomingEdit)
+        { 
             if (ModelState.IsValid)
             {
-                try
-                {
-                    var materialLogItems = await GetMaterialLogItems(materialLog);
+                await _logHelper.HandleEdit(incomingEdit);
 
-                    _context.Update(materialLog);
-                    await _context.SaveChangesAsync();
-                    await _userLogService.CreateAsync(ControllerConst.MaterialLog, ActionConst.Edit, materialLog.LogCode);
+                await _userLogService.CreateAsync(ControllerConst.MaterialLog, ActionConst.Edit, incomingEdit.MaterialLog.LogCode);
 
-                }
-                catch (DbUpdateConcurrencyException)
-                {
-                    if (!MaterialLogExists(materialLog.Id))
-                    {
-                        return NotFound();
-                    }
-                    else
-                    {
-                        throw;
-                    }
-                }
                 return RedirectToAction(nameof(Index));
             }
-            ViewData["EmployeeId"] = new SelectList(_context.Employees, "Id", "Id", materialLog.EmployeeId);
-            return View(materialLog);
+            ViewData["Employees"] = new SelectList(await _employeeManager.MapEmployees(), "Id", "Id", incomingEdit.MaterialLog.EmployeeId);
+            return View(incomingEdit);
         }
 
         // GET: MaterialLog/Delete/5

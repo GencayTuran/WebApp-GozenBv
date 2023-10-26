@@ -16,7 +16,7 @@
     @switch (Model.Status)
     {
         case MaterialLogStatusConst.Created:
-            <a asp-action="Edit" asp-route-id="@Model.MaterialLogId">Edit</a>
+            <a asp-action="Edit" asp-route-id="@Model.LogCode">Edit</a>
             <a asp-action="Delete" asp-route-id="@Model.LogCode">Delete</a>
             <a asp-action="ReturnItems" asp-route-id="@Model.LogCode">Return Items</a>
             break;
