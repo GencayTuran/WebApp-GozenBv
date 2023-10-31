@@ -9,10 +9,12 @@ namespace WebApp_GozenBv.Managers.Interfaces
 {
     public interface IMaterialManager
     {
-        Task<List<Material>> MapMaterials();
-        Task<Material> MapMaterial(int? id);
+        Task<List<Material>> MapMaterialsAsync();
+        Task<Material> MapMaterialAsync(int? id);
+        Material MapMaterial(int? id);
         Task ManageMaterial(Material material, EntityOperation operation);
-        Task ManageMaterials(List<Material> materials, EntityOperation operation);
+        Task ManageMaterialsAsync(List<Material> materials, EntityOperation operation);
+        void ManageMaterials(List<Material> materials, EntityOperation operation);
         Task<List<MaterialAlertViewModel>> MapMaterialAlerts();
     }
 }

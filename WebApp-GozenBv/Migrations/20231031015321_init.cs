@@ -85,7 +85,7 @@ namespace WebApp_GozenBv.Migrations
                 {
                     Id = table.Column<int>(type: "int", nullable: false)
                         .Annotation("SqlServer:Identity", "1, 1"),
-                    LogCode = table.Column<string>(type: "nvarchar(max)", nullable: true),
+                    LogId = table.Column<string>(type: "nvarchar(max)", nullable: true),
                     MaterialId = table.Column<int>(type: "int", nullable: false),
                     MaterialAmount = table.Column<int>(type: "int", nullable: false),
                     ProductNameCode = table.Column<string>(type: "nvarchar(max)", nullable: true),
@@ -122,9 +122,9 @@ namespace WebApp_GozenBv.Migrations
                 {
                     Id = table.Column<int>(type: "int", nullable: false)
                         .Annotation("SqlServer:Identity", "1, 1"),
-                    MaterialLogDate = table.Column<DateTime>(type: "datetime2", nullable: false),
+                    LogDate = table.Column<DateTime>(type: "datetime2", nullable: false),
                     EmployeeId = table.Column<int>(type: "int", nullable: false),
-                    LogCode = table.Column<string>(type: "nvarchar(max)", nullable: true),
+                    LogId = table.Column<string>(type: "nvarchar(max)", nullable: true),
                     ReturnDate = table.Column<DateTime>(type: "datetime2", nullable: true),
                     Damaged = table.Column<bool>(type: "bit", nullable: false),
                     Status = table.Column<int>(type: "int", nullable: false)

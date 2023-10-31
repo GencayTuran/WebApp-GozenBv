@@ -12,7 +12,7 @@ using WebApp_GozenBv.Data;
 namespace WebApp_GozenBv.Migrations
 {
     [DbContext(typeof(DataDbContext))]
-    [Migration("20231024152420_init")]
+    [Migration("20231031015321_init")]
     partial class init
     {
         protected override void BuildTargetModel(ModelBuilder modelBuilder)
@@ -162,11 +162,11 @@ namespace WebApp_GozenBv.Migrations
                     b.Property<int>("EmployeeId")
                         .HasColumnType("int");
 
-                    b.Property<string>("LogCode")
-                        .HasColumnType("nvarchar(max)");
-
-                    b.Property<DateTime>("MaterialLogDate")
+                    b.Property<DateTime>("LogDate")
                         .HasColumnType("datetime2");
+
+                    b.Property<string>("LogId")
+                        .HasColumnType("nvarchar(max)");
 
                     b.Property<DateTime?>("ReturnDate")
                         .HasColumnType("datetime2");
@@ -201,7 +201,7 @@ namespace WebApp_GozenBv.Migrations
                     b.Property<bool>("IsDamaged")
                         .HasColumnType("bit");
 
-                    b.Property<string>("LogCode")
+                    b.Property<string>("LogId")
                         .HasColumnType("nvarchar(max)");
 
                     b.Property<int>("MaterialAmount")

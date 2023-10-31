@@ -49,57 +49,57 @@ namespace WebApp_GozenBv.Data
             {
                 new MaterialLog
                 {
-                    MaterialLogDate = new DateTime(2022, 1, 1),
+                    LogDate = new DateTime(2022, 1, 1),
                     EmployeeId = 1,
                     ReturnDate = new DateTime(2022, 2, 1),
                     Damaged = false,
                     Status = 1,
-                    LogCode = Guid.NewGuid().ToString(),
+                    LogId = Guid.NewGuid().ToString(),
                 },
                 new MaterialLog
                 {
-                    MaterialLogDate = new DateTime(2022, 2, 1),
+                    LogDate = new DateTime(2022, 2, 1),
                     EmployeeId = 2,
                     ReturnDate = new DateTime(2022, 3, 1),
                     Damaged = false,
                     Status = 2,
-                    LogCode = Guid.NewGuid().ToString(),
+                    LogId = Guid.NewGuid().ToString(),
                 },
                 new MaterialLog
                 {
-                    MaterialLogDate = new DateTime(2022, 3, 1),
+                    LogDate = new DateTime(2022, 3, 1),
                     EmployeeId = 3,
                     ReturnDate = new DateTime(2022, 4, 1),
                     Damaged = true,
                     Status = 3,
-                    LogCode = Guid.NewGuid().ToString(),
+                    LogId = Guid.NewGuid().ToString(),
                 },
                 new MaterialLog
                 {
-                    MaterialLogDate = new DateTime(2022, 4, 1),
+                    LogDate = new DateTime(2022, 4, 1),
                     EmployeeId = 1,
                     ReturnDate = new DateTime(2022, 5, 1),
                     Damaged = false,
                     Status = 1,
-                    LogCode = Guid.NewGuid().ToString(),
+                    LogId = Guid.NewGuid().ToString(),
                 },
                 new MaterialLog
                 {
-                    MaterialLogDate = new DateTime(2022, 5, 1),
+                    LogDate = new DateTime(2022, 5, 1),
                     EmployeeId = 2,
                     ReturnDate = new DateTime(2022, 6, 1),
                     Damaged = true,
                     Status = 2,
-                    LogCode = Guid.NewGuid().ToString(),
+                    LogId = Guid.NewGuid().ToString(),
                 },
                 new MaterialLog
                 {
-                    MaterialLogDate = new DateTime(2022, 6, 1),
+                    LogDate = new DateTime(2022, 6, 1),
                     EmployeeId = 3,
                     ReturnDate = new DateTime(2022, 7, 1),
                     Damaged = true,
                     Status = 3,
-                    LogCode = Guid.NewGuid().ToString(),
+                    LogId = Guid.NewGuid().ToString(),
         }
             };
             return materialLogs.ToArray();
@@ -137,7 +137,7 @@ namespace WebApp_GozenBv.Data
 
                     materialLogItems.Add(new MaterialLogItem
                     {
-                        LogCode = materialLogs[i].LogCode,
+                        LogId = materialLogs[i].LogId,
                         MaterialId = material.Id,
                         ProductNameCode = productNameCode,
                         MaterialAmount = rndMaterialAmount,

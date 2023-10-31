@@ -15,6 +15,7 @@ using WebApp_GozenBv.Helpers.Interfaces;
 using WebApp_GozenBv.Managers;
 using WebApp_GozenBv.Managers.Interfaces;
 using WebApp_GozenBv.Services;
+using WebApp_GozenBv.Services.Interfaces;
 
 namespace WebApp_GozenBv
 {
@@ -40,8 +41,11 @@ namespace WebApp_GozenBv
 
             services.AddTransient<IUserLogService, UserLogService>();
             services.AddTransient<IUserService, UserService>();
+            services.AddTransient<IMaterialLogService, MaterialLogService>();
 
             services.AddTransient<ILogSearchHelper, LogSearchHelper>();
+            services.AddTransient<IMaterialHelper, MaterialHelper>();
+            services.AddTransient<IEqualityHelper, EqualityHelper>();
 
             services.AddTransient<ICarParkManager, CarParkManager>();
             services.AddTransient<ICarParkDataHandler, CarParkDataHandler>();

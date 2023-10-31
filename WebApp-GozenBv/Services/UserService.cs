@@ -4,6 +4,7 @@ using WebApp_GozenBv.Data;
 using Microsoft.Graph;
 using System.Threading.Tasks;
 using System.Runtime.InteropServices;
+using WebApp_GozenBv.Services.Interfaces;
 
 namespace WebApp_GozenBv.Services
 {

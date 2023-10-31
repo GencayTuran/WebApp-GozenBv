@@ -22,32 +22,60 @@ namespace WebApp_GozenBv.DataHandlers
             return await _context.MaterialLogs.Include(log => log.Employee).ToListAsync();
         }
 
-        public async Task<MaterialLog> GetMaterialLogByLogCode(string logCode)
+        public async Task<MaterialLog> GetMaterialLogByLogIdAsync(string logCode)
         {
-            return await _context.MaterialLogs.Where(log => log.LogCode.Equals(logCode)).Include(log => log.Employee).FirstOrDefaultAsync();
+            return await _context.MaterialLogs.Where(log => log.LogId.Equals(logCode)).Include(log => log.Employee).FirstOrDefaultAsync();
         }
 
-        public async Task<List<MaterialLog>> GetMaterialLogs(Expression<Func<MaterialLog, bool>> filter)
+        public async Task<List<MaterialLog>> GetMaterialLogsAsync(Expression<Func<MaterialLog, bool>> filter)
         {
             return await _context.MaterialLogs.Where(filter).ToListAsync();
         }
 
-        public async Task UpdateMaterialLog(MaterialLog log)
+        public async Task UpdateMaterialLogAsync(MaterialLog log)
         {
             _context.Update(log);
             await _context.SaveChangesAsync();
         }
 
-        public async Task DeleteMaterialLog(MaterialLog log)
+        public async Task DeleteMaterialLogAsync(MaterialLog log)
         {
             _context.Remove(log);
             await _context.SaveChangesAsync();
         }
 
-        public async Task CreateMaterialLog(MaterialLog log)
+        public async Task CreateMaterialLogAsync(MaterialLog log)
         {
             _context.Add(log);
             await _context.SaveChangesAsync();
+        }
+
+        public void CreateMaterialLog(MaterialLog log)
+        {
+            _context.Add(log);
+            _context.SaveChanges();
+        }
+
+        public void UpdateMaterialLog(MaterialLog log)
+        {
+            _context.Update(log);
+            _context.SaveChanges();
+        }
+
+        public void DeleteMaterialLog(MaterialLog log)
+        {
+            _context.Remove(log);
+            _context.SaveChanges();
+        }
+
+        public List<MaterialLog> GetMaterialLogs(Expression<Func<MaterialLog, bool>> filter)
+        {
+            return _context.MaterialLogs.Include(log => log.Employee).ToList();
+        }
+
+        public MaterialLog GetMaterialLogByLogId(string logId)
+        {
+            return _context.MaterialLogs.Where(log => log.LogId.Equals(logId)).Include(log => log.Employee).FirstOrDefault();
         }
     }
 }

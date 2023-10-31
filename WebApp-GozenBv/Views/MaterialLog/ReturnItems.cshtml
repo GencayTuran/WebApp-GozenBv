@@ -2,6 +2,8 @@
 
 @{
     ViewData["Title"] = "Return items?";
+    var status = Model.MaterialLog.Status;
+    var logId = Model.MaterialLog.LogId;
 }
 
 <h1>Return</h1>
@@ -12,21 +14,21 @@
 <table class="table">
     <thead>
         <tr>
-            <th scope="col">@Html.DisplayNameFor(model => model.MaterialLogDate)</th>
+            <th scope="col">@Html.DisplayNameFor(model => model.MaterialLog.LogDate)</th>
             <th scope="col">@Html.DisplayNameFor(model => model.MaterialLog.Employee)</th>
-            <th scope="col">@Html.DisplayNameFor(model => model.LogCode)</th>
+            <th scope="col">@Html.DisplayNameFor(model => model.MaterialLog.LogId)</th>
         </tr>
     </thead>
     <tbody>
         <tr>
-            <td>@Html.DisplayFor(model => model.MaterialLogDate)</td>
+            <td>@Html.DisplayFor(model => model.MaterialLog.LogDate)</td>
             <td>@Html.DisplayFor(model => model.EmployeeFullName)</td>
-            <td>@Html.DisplayFor(model => model.LogCode)</td>
+            <td>@Html.DisplayFor(model => logId)</td>
         </tr>
     </tbody>
     <thead>
         <tr>
-            <th scope="col">@Html.DisplayNameFor(model => model.MaterialLogItems)</th>
+            <th>MaterialLogItems</th>
         </tr>
         <tr>
             <th>@Html.DisplayNameFor(model => model.MaterialLogItem.MaterialId)</th>
@@ -37,7 +39,7 @@
         </tr>
     </thead>
     <tbody>
-        @foreach (var item in Model.MaterialLogItems)
+        @foreach (var item in Model.ItemsUndamaged)
         {
             <tr class="materialLogItemRow">
                 <td><p class="labelMaterialId">@item.MaterialId</p></td>
@@ -54,8 +56,9 @@
 </table>
 
 <form asp-action="ReturnItems">
-    <input type="hidden" asp-for="LogCode" />
-    <input id="isDamaged" hidden type="checkbox" asp-for="IsDamaged" />
+    <input type="hidden" asp-for="MaterialLog.EmployeeId" />
+    <input type="hidden" asp-for="MaterialLog.LogId" />
+    <input id="isDamaged" hidden type="checkbox" asp-for="MaterialLog.Damaged" />
     <input id="damagedMaterialResult" type="hidden" asp-for="DamagedMaterial" />
     <input id="btnSubmit" onclick="PassDamagedItems()" type="submit" value="Complete" class="btn btn-primary" /> |
     <a asp-action="Index">Back to List</a>

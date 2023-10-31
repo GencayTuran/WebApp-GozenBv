@@ -1,6 +1,6 @@
-﻿namespace WebApp_GozenBv.ViewModels
+﻿namespace WebApp_GozenBv.ViewData
 {
-    public class LogCreateMaterialViewModel
+    public class MaterialViewData
     {
         public int MaterialId { get; set; }
         public int QuantityNew { get; set; }

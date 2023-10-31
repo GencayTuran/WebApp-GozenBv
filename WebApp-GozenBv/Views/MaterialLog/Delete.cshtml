@@ -13,21 +13,21 @@
     <table class="table">
         <thead>
             <tr>
-                <th scope="col">@Html.DisplayNameFor(model => model.MaterialLogDate)</th>
+                <th scope="col">@Html.DisplayNameFor(model => model.MaterialLog.LogDate)</th>
                 <th scope="col">@Html.DisplayNameFor(model => model.MaterialLog.Employee)</th>
-                <th scope="col">@Html.DisplayNameFor(model => model.LogCode)</th>
+                <th scope="col">@Html.DisplayNameFor(model => model.MaterialLog.LogId)</th>
             </tr>
         </thead>
         <tbody>
             <tr>
-                <td>@Html.DisplayFor(model => model.MaterialLogDate)</td>
+                <td>@Html.DisplayFor(model => model.MaterialLog.LogDate)</td>
                 <td>@Html.DisplayFor(model => model.EmployeeFullName)</td>
-                <td>@Html.DisplayFor(model => model.LogCode)</td>
+                <td>@Html.DisplayFor(model => model.MaterialLog.LogId)</td>
             </tr>
         </tbody>
         <thead>
             <tr>
-                <th scope="col">@Html.DisplayNameFor(model => model.MaterialLogItems)</th>
+                <th>@Html.DisplayNameFor(model => model.ItemsUndamaged)</th>
             </tr>
             <tr>
                 <th>@Html.DisplayNameFor(model => model.MaterialLogItem.MaterialId)</th>
@@ -36,7 +36,27 @@
             </tr>
         </thead>
         <tbody>
-            @foreach (var item in Model.MaterialLogItems)
+            @foreach (var item in Model.ItemsUndamaged)
+            {
+                <tr>
+                    <td>@item.MaterialId</td>
+                    <td>@item.ProductNameCode</td>
+                    <td>@item.MaterialAmount</td>
+                </tr>
+            }
+        </tbody>
+        <thead>
+            <tr>
+                <th>@Html.DisplayNameFor(model => model.ItemsDamaged)</th>
+            </tr>
+            <tr>
+                <th>@Html.DisplayNameFor(model => model.MaterialLogItem.MaterialId)</th>
+                <th>@Html.DisplayNameFor(model => model.MaterialLogItem)</th>
+                <th>@Html.DisplayNameFor(model => model.MaterialLogItem.MaterialAmount)</th>
+            </tr>
+        </thead>
+        <tbody>
+            @foreach (var item in Model.ItemsDamaged)
             {
                 <tr>
                     <td>@item.MaterialId</td>
@@ -48,8 +68,8 @@
     </table>
 
     <form asp-action="Delete">
-        @*<input type="hidden" asp-for="LogCode" />*@
-        <input type="submit" asp-route-id="@Model.LogCode" value="Delete" class="btn btn-danger" /> |
+        @*<input type="hidden" asp-for="LogId" />*@
+        <input type="submit" asp-route-id="@Model.MaterialLog.LogId" value="Delete" class="btn btn-danger" /> |
         <a asp-action="Index">Back to List</a>
     </form>
 </div>

@@ -13,8 +13,5 @@ namespace WebApp_GozenBv.ViewModels
         public int EmployeeId { get; set; }
         [DataType(DataType.Date)]
         public DateTime MaterialLogDate { get; set; }
-
-        public List<LogCreateEmployeeViewModel> EmployeesList { get; set; }
-        public List<LogCreateMaterialViewModel> MaterialsList { get; set; }
     }
 }

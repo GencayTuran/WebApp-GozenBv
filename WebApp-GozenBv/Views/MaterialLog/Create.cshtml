@@ -16,19 +16,19 @@
                 <div asp-validation-summary="ModelOnly" class="text-danger"></div>
                 <div class="form-group">
                     <label class="control-label">Datum</label>
-                    <input value="@ViewBag.dateToday" asp-for="MaterialLogDate" class="form-control" />
+                    <input value="@ViewBag.DateToday" asp-for="MaterialLogDate" class="form-control" />
                     <span asp-validation-for="MaterialLogDate" class="text-danger"></span>
                 </div>
                 <div class="form-group">
                     <label class="control-label">Werknemer</label>
 
-                    <select id="selectEmployee" class="form-control" asp-for="EmployeeId" asp-items="ViewBag.employees" allowClear>
+                    <select id="selectEmployee" class="form-control" asp-for="EmployeeId" asp-items="ViewBag.Employees" allowClear>
                         <option value="">Select Employee</option>
                     </select>
-                    @*<select class="form-control" asp-for="EmployeeId" asp-items="ViewBag.employees"></select>*@
+                    @*<select class="form-control" asp-for="EmployeeId" asp-items="ViewBag.Employees"></select>*@
                     @*<input id="inputSelectedEmployee" type="search" placeholder="Select Employee" class="form-control" list="lstEmployees"></input>
                     <datalist id="lstEmployees">
-                        @foreach (var emp in ViewBag.employees)
+                        @foreach (var emp in ViewBag.Employees)
                         {
                             <option data-value="@emp.EmployeeId" value="@emp.EmployeeFullName"></option>
                         }
@@ -57,17 +57,17 @@
                 <div class="productRow">
                     <div class="form-group d-flex flex-row justify-content-between">
                         <div class="col-6">
-                            @*<select class="inputProduct form-control" asp-items="ViewBag.material">
+                            @*<select class="inputProduct form-control" asp-items="ViewBag.Materials">
                             <option value="">Selecteer materiaal</option>
                             </select>*@
 @*                            <input class="inputSelectedProduct form-control" placeholder="Select Material" type="search" list="lstMaterial" />
                             <datalist id="lstMaterial">
-                                @foreach (var material in ViewBag.material)
+                                @foreach (var material in ViewBag.Materials)
                                 {
                                     <option data-value="@material.MaterialId" value="@material.ProductNameCode"></option>
                                 }
                             </datalist>*@
-                            <select class="form-control selectMaterial" asp-items="ViewBag.material" allowClear>
+                            <select class="form-control selectMaterial" asp-items="ViewBag.Materials" allowClear>
                                 <option value="">Select Materiaal</option>
                             </select>
                         </div>
@@ -96,8 +96,8 @@
 
 
 <script>
-    var materialQtyAndNames = @Html.Raw(Json.Serialize(ViewBag.material));
-    var employeeData = @Html.Raw(Json.Serialize(ViewBag.employees));
+    var materialQtyAndNames = @Html.Raw(Json.Serialize(ViewBag.Materials));
+    var employeeData = @Html.Raw(Json.Serialize(ViewBag.Employees));
 
     $('#selectEmployee').select2({width: '100%'});
     $('.selectMaterial').select2({ width: '100%' });

@@ -11,10 +11,10 @@ namespace WebApp_GozenBv.Models
     {
         public int Id { get; set; }
         [DataType(DataType.Date)]
-        public DateTime MaterialLogDate { get; set; }
+        public DateTime LogDate { get; set; }
         public int EmployeeId { get; set; }
         public Employee Employee { get; set; }
-        public string LogCode { get; set; }
+        public string LogId { get; set; }
 
         [DataType(DataType.Date)]
         public DateTime? ReturnDate { get; set; }

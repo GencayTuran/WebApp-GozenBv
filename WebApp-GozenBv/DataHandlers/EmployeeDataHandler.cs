@@ -34,15 +34,20 @@ namespace WebApp_GozenBv.DataHandlers
             await _context.SaveChangesAsync();
         }
 
-        public async Task<Employee> GetEmployeeById(int? id)
+        public async Task<Employee> GetEmployeeByIdAsync(int? id)
         {
             return await _context.Employees.FindAsync(id);
         }
+        public Employee GetEmployeeById(int? id)
+        {
+            return _context.Employees.Find(id);
+        }
 
-        public async Task<List<Employee>> GetEmployees()
+        public async Task<List<Employee>> GetEmployeesAsync()
         {
             return await _context.Employees.ToListAsync();
         }
+
     }
 }
 

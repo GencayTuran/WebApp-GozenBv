@@ -10,8 +10,9 @@ namespace WebApp_GozenBv.Managers.Interfaces
 	public interface IEmployeeManager
 	{
 		Task ManageEmployee(Employee employee, EntityOperation operation);
-		Task<Employee> MapEmployee(int? id);
-		Task<List<Employee>> MapEmployees();
+		Task<Employee> MapEmployeeAsync(int? id);
+		Employee MapEmployee(int? id);
+		Task<List<Employee>> MapEmployeesAsync();
 	}
 }
 

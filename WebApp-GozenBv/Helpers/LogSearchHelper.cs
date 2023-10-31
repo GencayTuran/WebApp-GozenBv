@@ -80,10 +80,10 @@ namespace WebApp_GozenBv.Helpers
             switch (sortOrder)
             {
                 case SortOrderConst.DateDescendingId:
-                    filteredLogs = logs.OrderByDescending(s => s.MaterialLogDate).ToList();
+                    filteredLogs = logs.OrderByDescending(s => s.LogDate).ToList();
                     break;
                 case SortOrderConst.DateAscendingId:
-                    filteredLogs = logs.OrderBy(s => s.MaterialLogDate).ToList();
+                    filteredLogs = logs.OrderBy(s => s.LogDate).ToList();
                     break;
                 case SortOrderConst.EmpAzId:
                     filteredLogs = logs.OrderBy(s => s.Employee.Name).ToList();
@@ -92,7 +92,7 @@ namespace WebApp_GozenBv.Helpers
                     filteredLogs = logs.OrderByDescending(s => s.Employee.Name).ToList();
                     break;
                 default:
-                    filteredLogs = logs.OrderByDescending(s => s.MaterialLogDate).ToList();
+                    filteredLogs = logs.OrderByDescending(s => s.LogDate).ToList();
                     break;
             }
 
@@ -105,13 +105,13 @@ namespace WebApp_GozenBv.Helpers
             switch (sortStatus)
             {
                 case MaterialLogStatusConst.Created:
-                    filteredLogs = filteredLogs.Where(s => s.Status == MaterialLogStatusConst.Created).ToList();
+                    filteredLogs = logs.Where(s => s.Status == MaterialLogStatusConst.Created).ToList();
                     break;
                 case MaterialLogStatusConst.Returned:
-                    filteredLogs = filteredLogs.Where(s => s.Status == MaterialLogStatusConst.Returned).ToList();
+                    filteredLogs = logs.Where(s => s.Status == MaterialLogStatusConst.Returned).ToList();
                     break;
                 case MaterialLogStatusConst.DamagedAwaitingAction:
-                    filteredLogs = filteredLogs.Where(s => s.Status == MaterialLogStatusConst.DamagedAwaitingAction).ToList();
+                    filteredLogs = logs.Where(s => s.Status == MaterialLogStatusConst.DamagedAwaitingAction).ToList();
                     break;
             }
 
@@ -138,6 +138,11 @@ namespace WebApp_GozenBv.Helpers
             }
 
             return materialLogs;
+        }
+
+        public List<MaterialLog> SortListByDefault(List<MaterialLog> logs)
+        {
+            return logs.OrderByDescending(x => x.LogDate).ToList();
         }
     }
 

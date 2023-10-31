@@ -11,21 +11,21 @@
 <table class="table">
     <thead>
         <tr>
-            <th scope="col">@Html.DisplayNameFor(model => model.MaterialLogDate)</th>
+            <th scope="col">@Html.DisplayNameFor(model => model.MaterialLog.LogDate)</th>
             <th scope="col">@Html.DisplayNameFor(model => model.MaterialLog.Employee)</th>
-            <th scope="col">@Html.DisplayNameFor(model => model.LogCode)</th>
+            <th scope="col">@Html.DisplayNameFor(model => model.MaterialLog.LogId)</th>
         </tr>
     </thead>
     <tbody>
         <tr>
-            <td>@Html.DisplayFor(model => model.MaterialLogDate)</td>
+            <td>@Html.DisplayFor(model => model.MaterialLog.LogDate)</td>
             <td>@Html.DisplayFor(model => model.EmployeeFullName)</td>
-            <td>@Html.DisplayFor(model => model.LogCode)</td>
+            <td>@Html.DisplayFor(model => model.MaterialLog.LogId)</td>
         </tr>
     </tbody>
     <thead>
         <tr>
-            <th scope="col">@Html.DisplayNameFor(model => model.MaterialLogItems)</th>
+            <th>MaterialLogItems</th>
         </tr>
         <tr>
             <th>@Html.DisplayNameFor(model => model.MaterialLogItem.MaterialId)</th>
@@ -37,7 +37,7 @@
         </tr>
     </thead>
     <tbody>
-        @foreach (var item in Model.MaterialLogItemsDamaged)
+        @foreach (var item in Model.ItemsDamaged)
         {
             <tr>
                 <td>
@@ -58,7 +58,7 @@
     </tbody>
 </table>
 <form asp-action="CompleteDamaged" onsubmit="FillData(event)">
-    <input type="hidden" asp-for="LogCode" />
+    <input type="hidden" asp-for="MaterialLog.LogId" />
     <input id="completeDamagedResult" type="hidden" asp-for="DamagedMaterial" />
     <input id="btnSubmit" type="submit" value="Complete" class="btn btn-primary" /> |
     <a asp-action="Index">Back to List</a>

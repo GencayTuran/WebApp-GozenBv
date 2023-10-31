@@ -12,7 +12,7 @@ using WebApp_GozenBv.Data;
 using WebApp_GozenBv.DataHandlers;
 using WebApp_GozenBv.Managers.Interfaces;
 using WebApp_GozenBv.Models;
-using WebApp_GozenBv.Services;
+using WebApp_GozenBv.Services.Interfaces;
 using WebApp_GozenBv.ViewModels;
 
 namespace WebApp_GozenBv.Controllers

@@ -8,6 +8,7 @@ using System.Threading.Tasks;
 using WebApp_GozenBv.Constants;
 using WebApp_GozenBv.Data;
 using WebApp_GozenBv.Models;
+using WebApp_GozenBv.Services.Interfaces;
 using WebApp_GozenBv.ViewModels;
 
 
@@ -47,10 +48,10 @@ namespace WebApp_GozenBv.Services
 
         public async Task<List<UserLogViewModel>> GetLogs()
         {
-            var userLogs = _context.UserLogs
+            var userLogs = await _context.UserLogs
                 .Include(u => u.User)
                 .OrderByDescending(x => x.LogDate)
-                .ToList();
+                .ToListAsync();
 
             List<UserLogViewModel> userlogsViewModel = new();
 
@@ -61,11 +62,11 @@ namespace WebApp_GozenBv.Services
 
         public async Task<List<UserLogViewModel>> GetLogsByController(int controller)
         {
-            var userLogs = _context.UserLogs
+            var userLogs = await _context.UserLogs
                 .Include(u => u.User)
                 .Where(x => x.Controller == controller)
                 .OrderByDescending(x => x.LogDate)
-                .ToList();
+                .ToListAsync();
 
             var userLogsViewModel = SetViewModel(userLogs);
 
@@ -74,12 +75,12 @@ namespace WebApp_GozenBv.Services
 
         public async Task<List<UserLogViewModel>> GetLogsByEntity(string entityId, int controller)
         {
-            var userLogs = _context.UserLogs
+            var userLogs =  await _context.UserLogs
                 .Include(u => u.User)
                 .Where(x => x.EntityId == entityId)
                 .Where(x => x.Controller == controller)
                 .OrderByDescending(x => x.LogDate)
-                .ToList();
+                .ToListAsync();
 
             var userLogsViewModel = SetViewModel(userLogs);
 
@@ -88,11 +89,11 @@ namespace WebApp_GozenBv.Services
 
         public async Task<List<UserLogViewModel>> GetLogsByUser(int userId)
         {
-            var userLogs = _context.UserLogs
+            var userLogs = await _context.UserLogs
                 .Include(u => u.User)
                 .Where(x => x.UserId == userId)
                 .OrderByDescending(x => x.LogDate)
-                .ToList();
+                .ToListAsync();
 
             var userLogsViewModel = SetViewModel(userLogs);
 

@@ -11,7 +11,7 @@ using WebApp_GozenBv.Data;
 using WebApp_GozenBv.DataHandlers;
 using WebApp_GozenBv.Managers.Interfaces;
 using WebApp_GozenBv.Models;
-using WebApp_GozenBv.Services;
+using WebApp_GozenBv.Services.Interfaces;
 using WebApp_GozenBv.ViewModels;
 
 namespace WebApp_GozenBv.Controllers
@@ -30,7 +30,7 @@ namespace WebApp_GozenBv.Controllers
         [HttpGet]
         public async Task<IActionResult> Index()
         {
-            var materials = await _manager.MapMaterials();
+            var materials = await _manager.MapMaterialsAsync();
             List<MaterialViewModel> lstMaterialViewModel = new();
 
             foreach (var material in materials)
@@ -60,7 +60,7 @@ namespace WebApp_GozenBv.Controllers
                 return NotFound();
             }
 
-            var material = await _manager.MapMaterial(id);
+            var material = await _manager.MapMaterialAsync(id);
 
             MaterialViewModel materialViewModel = new()
             {
@@ -119,7 +119,7 @@ namespace WebApp_GozenBv.Controllers
                 return NotFound();
             }
 
-            var material = await _manager.MapMaterial(id);
+            var material = await _manager.MapMaterialAsync(id);
             if (material == null)
             {
                 return NotFound();
@@ -155,7 +155,7 @@ namespace WebApp_GozenBv.Controllers
                 return NotFound();
             }
 
-            var material = await _manager.MapMaterial(id);
+            var material = await _manager.MapMaterialAsync(id);
 
             if (material == null)
             {
@@ -169,7 +169,7 @@ namespace WebApp_GozenBv.Controllers
         [ValidateAntiForgeryToken]
         public async Task<IActionResult> DeleteConfirmed(int id)
         {
-            var material = await _manager.MapMaterial(id);
+            var material = await _manager.MapMaterialAsync(id);
             await _manager.ManageMaterial(material, EntityOperation.Delete);
 
             await _userLogService.CreateAsync(ControllerConst.Material, ActionConst.Delete, material.Id.ToString());

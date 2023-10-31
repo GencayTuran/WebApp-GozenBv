@@ -4,7 +4,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
 using WebApp_GozenBv.Constants;
-using WebApp_GozenBv.Services;
+using WebApp_GozenBv.Services.Interfaces;
 using WebApp_GozenBv.ViewModels;
 
 namespace WebApp_GozenBv.ViewComponents

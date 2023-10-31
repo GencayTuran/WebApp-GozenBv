@@ -19,8 +19,9 @@ using WebApp_GozenBv.Helpers;
 using WebApp_GozenBv.Helpers.Interfaces;
 using WebApp_GozenBv.Managers.Interfaces;
 using WebApp_GozenBv.Models;
-using WebApp_GozenBv.Services;
+using WebApp_GozenBv.Services.Interfaces;
 using WebApp_GozenBv.ViewModels;
+using WebApp_GozenBv.ViewData;
 
 namespace WebApp_GozenBv.Controllers
 {
@@ -29,24 +30,28 @@ namespace WebApp_GozenBv.Controllers
     {
         private readonly IMaterialLogManager _logManager;
         private readonly IEmployeeManager _employeeManager;
-        private readonly IMaterialLogHelper _logHelper;
+        private readonly IMaterialManager _materialManager;
+
         private readonly ILogSearchHelper _searchHelper;
+
+        private readonly IMaterialLogService _logService;
         private readonly IUserLogService _userLogService;
         public MaterialLogController(
             IMaterialLogManager logManager,
-            IUserLogService userLogService,
-            ILogSearchHelper searchHelper,
             IEmployeeManager employeeManager,
-            IMaterialLogHelper logHelper)
+            IMaterialManager materialManager,
+            ILogSearchHelper searchHelper,
+            IUserLogService userLogService,
+            IMaterialLogService logService)
         {
             _logManager = logManager;
-            _userLogService = userLogService;
-            _searchHelper = searchHelper;
             _employeeManager = employeeManager;
-            _logHelper = logHelper;
+            _materialManager = materialManager;
+            _searchHelper = searchHelper;
+            _userLogService = userLogService;
+            _logService = logService;
         }
 
-        // GET: MaterialLog
         [HttpGet]
         public async Task<IActionResult> Index(string searchString, int sortStatus, int sortOrder)
         {
@@ -67,6 +72,10 @@ namespace WebApp_GozenBv.Controllers
         private List<MaterialLog> CheckFilters(List<MaterialLog> logs, List<SortViewModel> lstStatus,
             List<SortViewModel> lstOrder, string searchString, int sortStatus, int sortOrder)
         {
+            if (IsNotFiltered(searchString, sortStatus, sortOrder))
+            {
+                return _searchHelper.SortListByDefault(logs);
+            }
 
             if (IsOrderFiltered(sortOrder))
             {
@@ -101,7 +110,7 @@ namespace WebApp_GozenBv.Controllers
                 var trimmedString = searchString.Trim();
                 ViewBag.SearchString = trimmedString;
 
-                logs = _searchHelper.FilterList(logs, trimmedString);
+                logs = _searchHelper.FilterListByString(logs, trimmedString);
             }
 
             return logs;
@@ -109,9 +118,9 @@ namespace WebApp_GozenBv.Controllers
         private bool IsStringFiltered(string searchString) => !searchString.IsNullOrEmpty();
         private bool IsStatusFiltered(int sortStatus) => sortStatus != 0;
         private bool IsOrderFiltered(int sortOrder) => sortOrder != 0;
+        private bool IsNotFiltered(string searchString, int sortStatus, int sortOrder) 
+            => !IsOrderFiltered(sortOrder) && !IsStatusFiltered(sortStatus) && !IsStringFiltered(searchString);
 
-
-        // GET: MaterialLog/Details/5
         [HttpGet]
         public async Task<IActionResult> Details(string id)
         {
@@ -128,36 +137,38 @@ namespace WebApp_GozenBv.Controllers
         [HttpGet]
         public async Task<IActionResult> Create()
         {
-            var createViewModel = await MapLogCreateViewData();
-
-            ViewData["dateToday"] = DateTime.Today.ToString("yyyy-MM-dd");
-
-            //TODO: change the viewbags to returning viewModel as you did with carpark?
-            ViewData["employees"] = new SelectList(createViewModel.EmployeesList, "EmployeeId", "EmployeeFullName"); ;
-            ViewData["material"] = new SelectList(createViewModel.MaterialsList, "MaterialId", "ProductNameCode");
+            ViewData["DateToday"] = DateTime.Today.ToString("yyyy-MM-dd");
+            ViewData["Employees"] = new SelectList(await MapEmployeesViewData(), "EmployeeId", "EmployeeFullName");
+            ViewData["Materials"] = new SelectList(await MapMaterialsViewData(), "MaterialId", "ProductNameCode");
 
             return View();
         }
 
-        private async Task<MaterialLogCreateViewModel> MapLogCreateViewData()
+        private async Task<List<EmployeeViewData>> MapEmployeesViewData()
         {
-            var employees = await _employeeManager.MapEmployees();
-            MaterialLogCreateViewModel viewModel = new();
+            var employees = await _employeeManager.MapEmployeesAsync();
+            var viewData = new List<EmployeeViewData>();
 
             foreach (var employee in employees)
             {
-                viewModel.EmployeesList.Add(new LogCreateEmployeeViewModel
+                viewData.Add(new EmployeeViewData
                 {
                     EmployeeId = employee.Id,
                     EmployeeFullName = employee.Name + " " + employee.Surname,
                 });
             }
 
-            var materials = await _materialManager.MapMaterials();
+            return viewData;
+        }
+
+        private async Task<List<MaterialViewData>> MapMaterialsViewData()
+        {
+            var materials = await _materialManager.MapMaterialsAsync();
+            var viewData = new List<MaterialViewData>();
 
             foreach (var material in materials)
             {
-                viewModel.MaterialsList.Add(new LogCreateMaterialViewModel
+                viewData.Add(new MaterialViewData
                 {
                     MaterialId = material.Id,
                     QuantityNew = material.QuantityNew,
@@ -166,7 +177,7 @@ namespace WebApp_GozenBv.Controllers
                 });
             }
 
-            return viewModel;
+            return viewData;
         }
 
         [HttpPost]
@@ -176,8 +187,8 @@ namespace WebApp_GozenBv.Controllers
             //TODO: check modelstate validation proper way
             if (ModelState.IsValid && viewModel.SelectedProducts != null)
             {
-                var logCode = await _logManager.MapIncomingLog(viewModel);
-                await _userLogService.CreateAsync(ControllerConst.MaterialLog, ActionConst.Create, logCode);
+                var logId = await _logService.HandleCreate(viewModel);
+                await _userLogService.CreateAsync(ControllerConst.MaterialLog, ActionConst.Create, logId);
 
                 return RedirectToAction(nameof(Index));
             }
@@ -200,17 +211,21 @@ namespace WebApp_GozenBv.Controllers
             {
                 return NotFound();
             }
-            var logCode = id;
-            
-            var logDetails = await _logManager.MapMaterialLogDetails(logCode);
+            var logId = id;
+            var log = await _logManager.MapMaterialLogAsync(logId);
 
-            if (logDetails == null)
+            if (log == null)
             {
                 return NotFound();
             }
 
-            ViewData["Employees"] = new SelectList(await _employeeManager.MapEmployees(), "Id", "Id", logDetails.MaterialLog.EmployeeId);
-            return View(logDetails);
+            ViewData["Employees"] = new SelectList(await MapEmployeesViewData(), "EmployeeId", "EmployeeFullName");
+            ViewData["Materials"] = new SelectList(await MapMaterialsViewData(), "MaterialId", "ProductNameCode");
+            return View(new MaterialLogEditViewModel()
+            {
+                LogId = logId,
+                Status = log.Status
+            });
         }
 
         [HttpPost]
@@ -219,17 +234,22 @@ namespace WebApp_GozenBv.Controllers
         { 
             if (ModelState.IsValid)
             {
-                await _logHelper.HandleEdit(incomingEdit);
-
-                await _userLogService.CreateAsync(ControllerConst.MaterialLog, ActionConst.Edit, incomingEdit.MaterialLog.LogCode);
-
-                return RedirectToAction(nameof(Index));
+                try
+                {
+                    await _logService.HandleEdit(incomingEdit);
+                    await _userLogService.CreateAsync(ControllerConst.MaterialLog, ActionConst.Edit, incomingEdit.MaterialLog.LogId);
+                    return RedirectToAction(nameof(Index));
+                }
+                catch (Exception e)
+                {
+                    //TODO: handle exception
+                    
+                }
             }
-            ViewData["Employees"] = new SelectList(await _employeeManager.MapEmployees(), "Id", "Id", incomingEdit.MaterialLog.EmployeeId);
+            ViewData["Employees"] = new SelectList(await _employeeManager.MapEmployeesAsync(), "Id", "Id", incomingEdit.MaterialLog.EmployeeId);
             return View(incomingEdit);
         }
 
-        // GET: MaterialLog/Delete/5
         [HttpGet]
         public async Task<IActionResult> ReturnItems(string id)
         {
@@ -240,279 +260,86 @@ namespace WebApp_GozenBv.Controllers
                 return NotFound();
             }
 
-            var materialLog = await _context.MaterialLogs
-                .FirstOrDefaultAsync(m => m.LogCode == logCode);
+            var logDetails = await _logManager.MapMaterialLogDetails(logCode);
 
-            if (materialLog == null)
+            if (logDetails == null)
             {
                 return NotFound();
             }
 
-            return View(await GetMaterialLogDetails(logCode));
+            return View(logDetails);
         }
 
         [HttpPost]
-        public async Task<IActionResult> ReturnItems(MaterialLogDetailViewModel materialLogDetailVM)
+        public IActionResult ReturnItems(MaterialLogDetailViewModel incomingReturn)
         {
-            string logCode = materialLogDetailVM.LogCode;
-
-            MaterialLog materialLog = _context.MaterialLogs
-                .FirstOrDefault(s => s.LogCode == logCode);
-
-            if (materialLog == null)
+            var logId = incomingReturn.MaterialLog.LogId;
+            try
             {
-                return NotFound();
+                //TODO: try to return the full model with entities from view back to here. (employee gives null)
+                _logService.HandleReturn(incomingReturn);
+            }
+            catch (NullReferenceException e)
+            {
+                return NotFound(e.Message);
             }
 
-            var materialLogItems = await GetMaterialLogItems(materialLog);
-            materialLog.ReturnDate = DateTime.Now;
+            _userLogService.CreateAsync(ControllerConst.MaterialLog, ActionConst.ReturnItems, logId);
 
-            if (materialLogDetailVM.IsDamaged)
-            {
-                var damagedMaterials = JsonSerializer.Deserialize<List<ReturnItemsDamagedViewModel>>(materialLogDetailVM.DamagedMaterial,
-                    new JsonSerializerOptions
-                    {
-                        PropertyNameCaseInsensitive = true
-                    });
-
-                //update MaterialLog
-                materialLog.Status = MaterialLogStatusConst.DamagedAwaitingAction;
-                materialLog.Damaged = true;
-                _context.Update(materialLog);
-
-                //update MaterialLogItems
-                foreach (var materiallogItem in materialLogItems)
-                {
-                    foreach (var damagedItem in damagedMaterials)
-                    {
-                        if (materiallogItem.MaterialId == damagedItem.MaterialId)
-                        {
-                            var material = await GetMaterialAsync(damagedItem.MaterialId);
-                            materiallogItem.DamagedAmount = damagedItem.DamagedAmount;
-                            materiallogItem.IsDamaged = true;
-                            _context.Update(materiallogItem);
-
-                            var notDamagedAmount = materiallogItem.MaterialAmount - damagedItem.DamagedAmount;
-                            if (notDamagedAmount != 0)
-                            {
-                                _context.Update(MaterialHelper.AddToUsed(material, notDamagedAmount));
-                            }
-                        }
-                        else
-                        {
-                            var material = await GetMaterialAsync(materiallogItem.MaterialId);
-                            _context.Update(MaterialHelper.AddToUsed(material, materiallogItem.MaterialAmount));
-                        }
-                    }
-                }
-                await _context.SaveChangesAsync();
-                await _userLogService.CreateAsync(ControllerConst.MaterialLog, ActionConst.ReturnItems, logCode);
-
-                //TODO: routeValue could be more readable
-                return RedirectToAction("Details", new RouteValueDictionary(
-                    new { ControllerContext = "MaterialLog", Action = "Details", Id = logCode }));
-            }
-
-            materialLog.Status = MaterialLogStatusConst.Returned;
-            _context.Update(materialLog);
-
-            //update material amount for each materiallogitems
-            foreach (var item in materialLogItems)
-            {
-                var material = await GetMaterialAsync(item.MaterialId);
-                _context.Update(MaterialHelper.AddToUsed(material, item.MaterialAmount));
-            }
-
-            _context.SaveChanges();
-
-            await _userLogService.CreateAsync(ControllerConst.MaterialLog, ActionConst.ReturnItems, logCode);
-
+            //TODO: more readable routevalue?
             return RedirectToAction("Details", new RouteValueDictionary(
-                    new { ControllerContext = "MaterialLog", Action = "Details", Id = logCode }));
+                    new { ControllerContext = "MaterialLog", Action = "Details", Id = logId }));
         }
 
         [HttpGet]
         public async Task<IActionResult> CompleteDamaged(string id)
         {
-            string logCode = id;
+            string logId = id;
 
-            if (logCode.IsNullOrEmpty())
+            if (logId.IsNullOrEmpty())
             {
                 return NotFound();
             }
 
-            return View(await _manager.MapMaterialLogDetails(logCode));
+            return View(await _logManager.MapMaterialLogDetails(logId));
         }
 
         [HttpPost]
-        public async Task<IActionResult> CompleteDamaged(MaterialLogDetailViewModel materialLogDetail)
+        public async Task<IActionResult> CompleteDamaged(MaterialLogDetailViewModel incomingCompleteDamaged)
         {
-            string logCode = materialLogDetail.LogCode;
+            string logId = incomingCompleteDamaged.MaterialLog.LogId;
 
-            var materialLog = await GetMaterialLog(logCode);
-            var materialLogItems = await GetMaterialLogItems(materialLog);
-
-            if (materialLog == null)
-            {
-                return NotFound();
-            }
-            materialLog.Status = MaterialLogStatusConst.Returned;
-            _context.Update(materialLog);
-
-            var completeDamagedMaterial = JsonSerializer.Deserialize<List<CompleteDamagedMaterialViewModel>>(materialLogDetail.DamagedMaterial,
-                    new JsonSerializerOptions
-                    {
-                        PropertyNameCaseInsensitive = true
-                    });
-
-            //update MaterialLogItems
-            foreach (var damagedItem in completeDamagedMaterial)
-            {
-                foreach (var materialLogItem in materialLogItems)
-                {
-                    if (materialLogItem.MaterialId == damagedItem.MaterialId)
-                    {
-                        var material = await GetMaterialAsync(damagedItem.MaterialId);
-                        materialLogItem.RepairedAmount = damagedItem.RepairedAmount;
-                        materialLogItem.DeletedAmount = damagedItem.DeletedAmount;
-                        _context.Update(MaterialHelper.AddToUsed(material, damagedItem.RepairedAmount));
-                    }
-                }
-            }
-            await _context.SaveChangesAsync();
-            await _userLogService.CreateAsync(ControllerConst.MaterialLog, ActionConst.CompleteDamaged, logCode);
+            await _logService.HandleDamaged(incomingCompleteDamaged);
+            
+            await _userLogService.CreateAsync(ControllerConst.MaterialLog, ActionConst.CompleteDamaged, logId);
 
             //TODO: routeValue could be more readable
             return RedirectToAction("Details", new RouteValueDictionary(
-                new { ControllerContext = "MaterialLog", Action = "Details", Id = logCode }));
+                new { ControllerContext = "MaterialLog", Action = "Details", Id = logId }));
         }
 
-        public async Task<IActionResult> Undo(string id)
-        {
-            var logCode = id;
-
-            var materialLog = await GetMaterialLog(logCode);
-            var materialLogItems = await GetMaterialLogItems(materialLog);
-
-            switch (materialLog.Status)
-            {
-                case MaterialLogStatusConst.DamagedAwaitingAction:
-
-                    foreach (var item in materialLogItems)
-                    {
-                        item.DamagedAmount = item.DamagedAmount == null ? 0 : item.DamagedAmount;
-                        var notDamagedItems = item.MaterialAmount - item.DamagedAmount;
-                        item.DamagedAmount = 0;
-                        _context.Update(item);
-
-                        var material = await GetMaterialAsync(item.MaterialId);
-                        _context.Update(MaterialHelper.UndoAddToUsed(material, (int)notDamagedItems));
-                    }
-                    materialLog.Status = MaterialLogStatusConst.Created;
-                    materialLog.Damaged = false;
-                    break;
-
-                case MaterialLogStatusConst.Returned:
-
-                    if (materialLog.Damaged)
-                    {
-                        foreach (var item in materialLogItems)
-                        {
-                            var material = await GetMaterialAsync(item.MaterialId);
-                            if (item.RepairedAmount > 0)
-                            {
-                                _context.Update(MaterialHelper.UndoAddToUsed(material, (int)item.RepairedAmount));
-                                item.RepairedAmount = 0;
-                            }
-                            item.DeletedAmount = 0;
-                            _context.Update(item);
-
-                            var notDamagedItems = item.MaterialAmount - item.DamagedAmount;
-                            _context.Update(MaterialHelper.UndoAddToUsed(material, (int)notDamagedItems));
-                        }
-                        materialLog.Status = MaterialLogStatusConst.DamagedAwaitingAction;
-                    }
-                    else
-                    {
-                        foreach (var item in materialLogItems)
-                        {
-                            var material = await GetMaterialAsync(item.MaterialId);
-                            _context.Update(MaterialHelper.UndoAddToUsed(material, item.MaterialAmount));
-                        }
-                        materialLog.Status = MaterialLogStatusConst.Created;
-                    }
-                    break;
-
-                default:
-                    break;
-            }
-            _context.Update(materialLog);
-            _context.SaveChanges();
-
-            return RedirectToAction("Details", new RouteValueDictionary(
-             new { ControllerContext = "MaterialLog", Action = "Details", Id = logCode }));
-        }
-
-        private bool MaterialLogExists(int id)
-        {
-            return _context.MaterialLogs.Any(e => e.Id == id);
-        }
-
-        
-
-        // GET: MaterialLog/Delete/5
         [HttpGet]
         public async Task<IActionResult> Delete(string id)
         {
-            if (id == null)
+            var logId = id;
+            if (logId == null)
             {
                 return NotFound();
             }
 
-            return View(await GetMaterialLogDetails(id));
+            return View(await _logManager.MapMaterialLogDetails(logId));
         }
-
-        // POST: MaterialLog/Delete/5
+        
         [HttpPost, ActionName("Delete")]
         public async Task<IActionResult> DeleteConfirmed(string id)
         {
-            var logCode = id;
+            var logId = id;
 
-            var materialLog = await _context.MaterialLogs
-                .Where(s => s.LogCode == logCode)
-                .FirstOrDefaultAsync();
+            await _logService.HandleDelete(logId);
 
-            var materialLogItems = await GetMaterialLogItems(materialLog);
-
-            //update material & remove its materiallogitems
-            foreach (var item in materialLogItems)
-            {
-                var material = await GetMaterialAsync(item.MaterialId);
-                _context.Update(MaterialHelper.UpdateMaterialQty(material, item.MaterialAmount, item.Used));
-                _context.MaterialLogItems.Remove(item);
-            }
-
-            _context.MaterialLogs.Remove(materialLog);
-            _context.SaveChanges();
-
-            await _userLogService.CreateAsync(ControllerConst.MaterialLog, ActionConst.Delete, materialLog.LogCode);
+            await _userLogService.CreateAsync(ControllerConst.MaterialLog, ActionConst.Delete, logId);
 
             return RedirectToAction(nameof(Index));
-        }
-
-        private async Task<MaterialLog> GetMaterialLog(string logCode)
-        {
-            return await _context.MaterialLogs.Where(s => s.LogCode == logCode).FirstOrDefaultAsync();
-        }
-
-        private async Task<List<MaterialLogItem>> GetMaterialLogItems(MaterialLog materialLog)
-        {
-            return await _context.MaterialLogItems.Where(s => s.LogCode == materialLog.LogCode).ToListAsync();
-        }
-
-        private async Task<Material> GetMaterialAsync(int materialId)
-        {
-            return await _context.Material.Where(s => s.Id == materialId).FirstOrDefaultAsync();
         }
     }
 }

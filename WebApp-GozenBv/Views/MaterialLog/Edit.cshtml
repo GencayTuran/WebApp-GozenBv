@@ -1,4 +1,5 @@
-﻿@model WebApp_GozenBv.Models.MaterialLog
+﻿@using WebApp_GozenBv.Constants;
+@model WebApp_GozenBv.ViewModels.MaterialLogEditViewModel
 
 @{
     ViewData["Title"] = "Edit";
@@ -8,37 +9,23 @@
 
 <h4>MaterialLog</h4>
 <hr />
-<div class="row">
-    <div class="col-md-4">
-        <form asp-action="Edit">
-            <div asp-validation-summary="ModelOnly" class="text-danger"></div>
-            <input type="hidden" asp-for="Id" />
-            <div class="form-group">
-                <label asp-for="MaterialLogDate" class="control-label"></label>
-                <input asp-for="MaterialLogDate" class="form-control" />
-                <span asp-validation-for="MaterialLogDate" class="text-danger"></span>
-            </div>
-            <div class="form-group">
-                <label asp-for="EmployeeId" class="control-label"></label>
-                <select asp-for="EmployeeId" class="form-control" asp-items="ViewBag.EmployeeId"></select>
-                <span asp-validation-for="EmployeeId" class="text-danger"></span>
-            </div>
-            <div class="form-group">
-                <label asp-for="LogCode" class="control-label"></label>
-                <input asp-for="LogCode" class="form-control" />
-                <span asp-validation-for="LogCode" class="text-danger"></span>
-            </div>
-            <div class="form-group">
-                <input type="submit" value="Save" class="btn btn-primary" />
-            </div>
-        </form>
-    </div>
-</div>
+
+@switch (Model.Status)
+{
+    case MaterialLogStatusConst.Created:
+        <vc:log-created-edit log-id="@Model.LogId"></vc:log-created-edit>
+        break;
+    case MaterialLogStatusConst.DamagedAwaitingAction:
+        @*viewComponent of log-damaged-edit here*@
+        break;
+}
 
 <div>
     <a asp-action="Index">Back to List</a>
 </div>
 
 @section Scripts {
-    @{await Html.RenderPartialAsync("_ValidationScriptsPartial");}
+    @{
+        await Html.RenderPartialAsync("_ValidationScriptsPartial");
+    }
 }

@@ -17,52 +17,71 @@ namespace WebApp_GozenBv.DataHandlers
             _context = context;
         }
 
-        public async Task CreateItems(List<MaterialLogItem> items)
+        public async Task CreateItemsAsync(List<MaterialLogItem> items)
         {
             await _context.AddRangeAsync(items);
             await _context.SaveChangesAsync();
         }
 
-        public async Task UpdateItems(List<MaterialLogItem> items)
+        public async Task UpdateItemsAsync(List<MaterialLogItem> items)
         {
             _context.UpdateRange(items);
             await _context.SaveChangesAsync();
         }
 
-        public async Task DeleteItems(List<MaterialLogItem> items)
+        public async Task DeleteItemsAsync(List<MaterialLogItem> items)
         {
             _context.RemoveRange(items);
             await _context.SaveChangesAsync();
         }
 
-        public async Task<List<MaterialLogItem>> GetItemsByLogCode(string logCode)
+        public void CreateItems(List<MaterialLogItem> items)
         {
-            return await _context.MaterialLogItems.Where(i => i.LogCode.Equals(logCode)).ToListAsync();
+            _context.AddRange(items);
+            _context.SaveChanges();
         }
 
-        public async Task<List<MaterialLogItem>> GetItemsByLogCode(string logCode, Expression<Func<MaterialLogItem, bool>> filter)
+        public void UpdateItems(List<MaterialLogItem> items)
         {
-            return await _context.MaterialLogItems.Where(i => i.LogCode.Equals(logCode)).Where(filter).ToListAsync();
+            _context.UpdateRange(items);
+            _context.SaveChanges();
         }
 
-        public async Task<MaterialLogItem> GetMaterialLogById(int? id)
+        public void DeleteItems(List<MaterialLogItem> items)
         {
-            return await _context.MaterialLogItems.FindAsync(id);
+            _context.RemoveRange(items);
+            _context.SaveChanges();
         }
 
-        public async Task<List<MaterialLogItem>> GetDamagedItemsByLogCode(string logCode)
+
+        public async Task<List<MaterialLogItem>> GetItemsByLogIdAsync(string logCode)
+        {
+            return await _context.MaterialLogItems.Where(i => i.LogId.Equals(logCode)).ToListAsync();
+        }
+
+        public async Task<List<MaterialLogItem>> GetItemsByLogId(string logCode, Expression<Func<MaterialLogItem, bool>> filter)
+        {
+            return await _context.MaterialLogItems.Where(i => i.LogId.Equals(logCode)).Where(filter).ToListAsync();
+        }
+
+        public async Task<List<MaterialLogItem>> GetDamagedItemsByLogId(string logCode)
         {
             return await _context.MaterialLogItems
-                    .Where(s => s.LogCode == logCode)
+                    .Where(s => s.LogId == logCode)
                     .Where(s => s.IsDamaged == true)
                     .ToListAsync();
         }
 
-        public async Task<List<MaterialLogItem>> GetUnDamagedItemsByLogCode(string logCode)
+        public async Task<List<MaterialLogItem>> GetUnDamagedItemsByLogId(string logCode)
         {
             return await _context.MaterialLogItems
-                            .Where(s => s.LogCode == logCode)
+                            .Where(s => s.LogId == logCode)
                             .Where(s => !s.IsDamaged || s.NoReturn).ToListAsync();
+        }
+
+        public List<MaterialLogItem> GetItemsByLogId(string logId)
+        {
+            return _context.MaterialLogItems.Where(i => i.LogId.Equals(logId)).ToList();
         }
     }
 }

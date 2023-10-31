@@ -50,7 +50,7 @@
                 @Html.DisplayNameFor(model => model.Employee)
             </th>
             <th>
-                @Html.DisplayNameFor(model => model.MaterialLogDate)
+                @Html.DisplayNameFor(model => model.LogDate)
             </th>
             <th></th>
         </tr>
@@ -67,9 +67,9 @@
                     @Html.DisplayFor(modelItem => item.Employee.Surname)
                 </td>
                 <td>
-                    @Html.DisplayFor(modelItem => item.MaterialLogDate)
+                    @Html.DisplayFor(modelItem => item.LogDate)
                 </td>
-                <a hidden id="anchor_@item.Id" asp-action="Details" asp-route-id="@item.LogCode"></a>
+                <a hidden id="anchor_@item.Id" asp-action="Details" asp-route-id="@item.LogId"></a>
             </tr>
         }
     </tbody>

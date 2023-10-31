@@ -8,7 +8,7 @@ namespace WebApp_GozenBv.Models
     public class MaterialLogItem
     {
         public int Id { get; set; }
-        public string LogCode { get; set; }
+        public string LogId { get; set; }
         public int MaterialId { get; set; }
         public int MaterialAmount { get; set; }
         public string ProductNameCode { get; set; }

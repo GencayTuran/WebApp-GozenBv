@@ -22,32 +22,37 @@ namespace WebApp_GozenBv.Managers
             switch (operation)
             {
                 case EntityOperation.Create:
-                    await _materialData.CreateMaterial(material);
+                    await _materialData.CreateMaterialAsync(material);
                     break;
                 case EntityOperation.Update:
-                    await _materialData.UpdateMaterial(material);
+                    await _materialData.UpdateMaterialAsync(material);
                     break;
                 case EntityOperation.Delete:
-                    await _materialData.DeleteMaterial(material);
+                    await _materialData.DeleteMaterialAsync(material);
                     break;
             }
         }
 
-        public Task<Material> MapMaterial(int? id)
+        public async Task<Material> MapMaterialAsync(int? id)
+        {
+            return await _materialData.GetMaterialByIdAsync(id);
+        }
+
+        public Material MapMaterial(int? id)
         {
             return _materialData.GetMaterialById(id);
         }
 
-        public Task<List<Material>> MapMaterials()
+        public Task<List<Material>> MapMaterialsAsync()
         {
-            return _materialData.GetAllMaterials();
+            return _materialData.GetAllMaterialsAsync();
         }
 
         public async Task<List<MaterialAlertViewModel>> MapMaterialAlerts()
         {
             List<MaterialAlertViewModel> materialAlerts = new();
 
-            var material = await _materialData.GetAllMaterials();
+            var material = await _materialData.GetAllMaterialsAsync();
 
             foreach (var item in material)
             {
@@ -75,18 +80,34 @@ namespace WebApp_GozenBv.Managers
             return materialAlerts;
         }
 
-        public async Task ManageMaterials(List<Material> materials, EntityOperation operation)
+        public async Task ManageMaterialsAsync(List<Material> materials, EntityOperation operation)
         {
             switch (operation)
             {
                 case EntityOperation.Create:
-                    await _materialData.CreateMaterials(materials);
+                    await _materialData.CreateMaterialsAsync(materials);
                     break;
                 case EntityOperation.Update:
-                    await _materialData.UpdateMaterials(materials);
+                    await _materialData.UpdateMaterialsAsync(materials);
                     break;
                 case EntityOperation.Delete:
-                    await _materialData.DeleteMaterials(materials);
+                    await _materialData.DeleteMaterialsAsync(materials);
+                    break;
+            }
+        }
+
+        public void ManageMaterials(List<Material> materials, EntityOperation operation)
+        {
+            switch (operation)
+            {
+                case EntityOperation.Create:
+                    _materialData.CreateMaterials(materials);
+                    break;
+                case EntityOperation.Update:
+                    _materialData.UpdateMaterials(materials);
+                    break;
+                case EntityOperation.Delete:
+                    _materialData.DeleteMaterials(materials);
                     break;
             }
         }

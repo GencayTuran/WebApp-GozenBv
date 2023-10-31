@@ -10,8 +10,9 @@ namespace WebApp_GozenBv.DataHandlers
 		Task CreateEmployee(Employee employee);
 		Task UpdateEmployee(Employee employee);
 		Task DeleteEmployee(Employee employee);
-		Task<Employee> GetEmployeeById(int? id);
-        Task<List<Employee>> GetEmployees();
+		Task<Employee> GetEmployeeByIdAsync(int? id);
+        Employee GetEmployeeById(int? id);
+        Task<List<Employee>> GetEmployeesAsync();
     }
 }
 

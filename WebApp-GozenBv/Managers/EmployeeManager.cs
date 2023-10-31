@@ -33,11 +33,23 @@ namespace WebApp_GozenBv.Managers
 			}
 		}
 
-        public async Task<Employee> MapEmployee(int? id)
+        public Employee MapEmployee(int? id)
+        {
+            try
+            {
+                return _employeeData.GetEmployeeById(id);
+            }
+            catch (NullReferenceException e)
+            {
+                throw new NullReferenceException($"No Employee with id {id}.\n\n {e.Message}");
+            }
+        }
+
+        public async Task<Employee> MapEmployeeAsync(int? id)
         {
 			try
 			{
-				return await _employeeData.GetEmployeeById(id);
+				return await _employeeData.GetEmployeeByIdAsync(id);
 			}
 			catch (NullReferenceException e)
 			{
@@ -45,9 +57,9 @@ namespace WebApp_GozenBv.Managers
 			}
         }
 
-        public async Task<List<Employee>> MapEmployees()
+        public async Task<List<Employee>> MapEmployeesAsync()
         {
-			return await _employeeData.GetEmployees();
+			return await _employeeData.GetEmployeesAsync();
         }
     }
 }
