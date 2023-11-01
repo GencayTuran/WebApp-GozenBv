@@ -19,27 +19,27 @@ namespace WebApp_GozenBv.ViewComponents
             _userService= userService;
         }
 
-        public async Task<IViewComponentResult> InvokeAsync(int view, string entityId, int controller)
+        public async Task<IViewComponentResult> InvokeAsync(int view, string entityId, int controllerId)
         {
             List<UserLogViewModel> userLogs = new();
 
             switch (view)
             {
                 case ViewTypeConst.Controller:
-                    userLogs = await _userLogService.GetLogsByController(controller);
+                    userLogs = await _userLogService.GetLogsByControllerAsync(controllerId);
                     break;
                 case ViewTypeConst.Entity:
-                    userLogs = await _userLogService.GetLogsByEntity(entityId, controller);
+                    userLogs = await _userLogService.ArrangeLogsByEntityAsync(entityId, controllerId);
                     break;
                 case ViewTypeConst.User:
-                    var user = _userService.GetCurrentUser();
-                    userLogs = await _userLogService.GetLogsByUser(user.Id);
+                    var user = _userService.ArrangeCurrentUserAsync();
+                    userLogs = await _userLogService.ArrangeLogsByUserAsync(user.Id);
                     break;
                 case ViewTypeConst.All:
-                    userLogs = await _userLogService.GetLogs();
+                    userLogs = await _userLogService.ArrangeUserLogsAsync();
                     break;
                 case ViewTypeConst.Limit:
-                    var logs = await _userLogService.GetLogs();
+                    var logs = await _userLogService.ArrangeUserLogsAsync();
                     userLogs.AddRange(logs.Take(20));
                     break;
                 default:

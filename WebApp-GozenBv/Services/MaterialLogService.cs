@@ -299,6 +299,7 @@ namespace WebApp_GozenBv.Services
 
             //remove from database
         }
+
         private bool LogModified(MaterialLog original, MaterialLog incoming) => !_equalityHelper.AreEqual(original, incoming);
         private bool LogItemsModified(List<MaterialLogItem> original, List<MaterialLogItem> incoming) => !original.SequenceEqual(incoming); //TODO: check if this works right
         private bool MaterialAmountModified(MaterialLogItem original, MaterialLogItem incoming)
@@ -307,7 +308,6 @@ namespace WebApp_GozenBv.Services
             original.DamagedAmount != incoming.DamagedAmount ||
             original.RepairedAmount != incoming.RepairedAmount ||
             original.DeletedAmount != incoming.DeletedAmount;
-
         private bool IsReadOnlyState(int status) => status == MaterialLogStatusConst.Returned;
     }
 }

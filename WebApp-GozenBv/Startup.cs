@@ -40,8 +40,12 @@ namespace WebApp_GozenBv
             });
 
             services.AddTransient<IUserLogService, UserLogService>();
+            services.AddTransient<IUserLogManager, UserLogManager>();
+            services.AddTransient<IUserLogDataHandler, UserLogDataHandler>();
+
             services.AddTransient<IUserService, UserService>();
-            services.AddTransient<IMaterialLogService, MaterialLogService>();
+            services.AddTransient<IUserManager, UserManager>();
+            services.AddTransient<IUserDataHandler, UserDataHandler>();
 
             services.AddTransient<ILogSearchHelper, LogSearchHelper>();
             services.AddTransient<IMaterialHelper, MaterialHelper>();
@@ -57,6 +61,7 @@ namespace WebApp_GozenBv
             services.AddTransient<IMaterialManager, MaterialManager>();
             services.AddTransient<IMaterialDataHandler, MaterialDataHandler>();
 
+            services.AddTransient<IMaterialLogService, MaterialLogService>();
             services.AddTransient<IMaterialLogManager, MaterialLogManager>();
             services.AddTransient<IMaterialLogDataHandler, MaterialLogDataHandler>();
             services.AddTransient<IMaterialLogItemDataHandler, MaterialLogItemDataHandler>();

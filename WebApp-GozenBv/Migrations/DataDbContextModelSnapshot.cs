@@ -255,7 +255,7 @@ namespace WebApp_GozenBv.Migrations
                     b.Property<int>("Action")
                         .HasColumnType("int");
 
-                    b.Property<int>("Controller")
+                    b.Property<int>("ControllerId")
                         .HasColumnType("int");
 
                     b.Property<string>("EntityId")

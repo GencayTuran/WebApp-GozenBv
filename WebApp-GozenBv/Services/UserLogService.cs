@@ -7,6 +7,7 @@ using System.Linq;
 using System.Threading.Tasks;
 using WebApp_GozenBv.Constants;
 using WebApp_GozenBv.Data;
+using WebApp_GozenBv.Managers.Interfaces;
 using WebApp_GozenBv.Models;
 using WebApp_GozenBv.Services.Interfaces;
 using WebApp_GozenBv.ViewModels;
@@ -16,88 +17,54 @@ namespace WebApp_GozenBv.Services
 {
     public class UserLogService : IUserLogService
     {
-        private readonly DataDbContext _context;
-        private readonly IUserService _userService;
+        private readonly IUserManager _userManager;
+        private readonly IUserLogManager _userLogManager;
 
-        public UserLogService(DataDbContext context, IUserService userService)
+        public UserLogService(
+            IUserManager userManager,
+            IUserLogManager userLogManager)
         {
-            _context = context;
-            _userService = userService;
+            _userLogManager = userLogManager;
+            _userManager = userManager;
         }
 
-
-        public async Task CreateAsync(int controller, int action, string entityId)
+        public async Task StoreLogAsync(int controller, int action, string entityId)
         {
-            //var user = await _userService.GetCurrentUser();
-            //var userId = _userService.GetCurrentUserId(user);
+            //var user = await _userManager.GetCurrentUser();
+            //var userId = _userManager.GetCurrentUserId(user);
 
-            var user = await _userService.GetCurrentUser();
+            var user = await _userManager.MapCurrentUserAsync();
 
             var userLog = new UserLog
             {
                 UserId = user.Id,
-                Controller = controller,
+                ControllerId = controller,
                 Action = action,
                 EntityId = entityId,
                 LogDate = DateTime.Now
             };
 
-            _context.Add(userLog);
-            _context.SaveChanges();
+            await _userLogManager.ManageUserLog(userLog);
         }
 
-        public async Task<List<UserLogViewModel>> GetLogs()
+        public async Task<List<UserLogViewModel>> GetLogsByControllerAsync(int controllerId)
         {
-            var userLogs = await _context.UserLogs
-                .Include(u => u.User)
-                .OrderByDescending(x => x.LogDate)
-                .ToListAsync();
-
-            List<UserLogViewModel> userlogsViewModel = new();
-
-            var userLogsViewModel = SetViewModel(userLogs);
-
-            return userLogsViewModel;
+            return SetViewModel(await _userLogManager.MapLogsByControllerAsync(controllerId));
         }
 
-        public async Task<List<UserLogViewModel>> GetLogsByController(int controller)
+        public async Task<List<UserLogViewModel>> ArrangeLogsByEntityAsync(string entityId, int controllerId)
         {
-            var userLogs = await _context.UserLogs
-                .Include(u => u.User)
-                .Where(x => x.Controller == controller)
-                .OrderByDescending(x => x.LogDate)
-                .ToListAsync();
-
-            var userLogsViewModel = SetViewModel(userLogs);
-
-            return userLogsViewModel;
+            return SetViewModel(await _userLogManager.MapUserLogsByEntityAsync(entityId, controllerId));
         }
 
-        public async Task<List<UserLogViewModel>> GetLogsByEntity(string entityId, int controller)
+        public async Task<List<UserLogViewModel>> ArrangeLogsByUserAsync(int id)
         {
-            var userLogs =  await _context.UserLogs
-                .Include(u => u.User)
-                .Where(x => x.EntityId == entityId)
-                .Where(x => x.Controller == controller)
-                .OrderByDescending(x => x.LogDate)
-                .ToListAsync();
-
-            var userLogsViewModel = SetViewModel(userLogs);
-
-            return userLogsViewModel;
+            return SetViewModel(await _userLogManager.MapUserLogsByUserAsync(id));
         }
 
-        public async Task<List<UserLogViewModel>> GetLogsByUser(int userId)
+        public async Task<List<UserLogViewModel>> ArrangeUserLogsAsync()
         {
-            var userLogs = await _context.UserLogs
-                .Include(u => u.User)
-                .Where(x => x.UserId == userId)
-                .OrderByDescending(x => x.LogDate)
-                .ToListAsync();
-
-            var userLogsViewModel = SetViewModel(userLogs);
-
-            return userLogsViewModel;
+            return SetViewModel(await _userLogManager.MapUserLogsAsync());
         }
 
         private List<UserLogViewModel> SetViewModel(List<UserLog> userLogs)
@@ -112,7 +79,7 @@ namespace WebApp_GozenBv.Services
                     {
                         UserName = log.User.Name,
                         Action = SetAction(log.Action),
-                        Controller = SetController(log.Controller),
+                        ControllerName = SetControllerName(log.ControllerId),
                         EntityId = log.EntityId,
                         LogDate = log.LogDate
                     });
@@ -153,40 +120,39 @@ namespace WebApp_GozenBv.Services
                     action = "did undo";
                     break;
                 default:
-                    break;
+                    throw new ArgumentOutOfRangeException($"Action with Id: {dataAction} does not exist for user logging.");
             }
             return action;
         }
 
-        private string SetController(int dataController)
+        private string SetControllerName(int controllerId)
         {
-            string controller = "";
-            switch (dataController)
+            string result = "";
+            switch (controllerId)
             {
-                case ControllerConst.Material:
-                    controller = "Material";
+                case ControllerNames.Material:
+                    result = "Material";
                     break;
-                case ControllerConst.MaterialLog:
-                    controller = "Materiallog";
+                case ControllerNames.MaterialLog:
+                    result = "Materiallog";
                     break;
-                case ControllerConst.Employee:
-                    controller = "Employee";
+                case ControllerNames.Employee:
+                    result = "Employee";
                     break;
-                case ControllerConst.Firma:
-                    controller = "Firma";
+                case ControllerNames.Firma:
+                    result = "Firma";
                     break;
-                case ControllerConst.CarPark:
-                    controller = "Carpark";
+                case ControllerNames.CarPark:
+                    result = "Carpark";
                     break;
-                case ControllerConst.CarMaintenance:
-                    controller = "Carmaintenance";
+                case ControllerNames.CarMaintenance:
+                    result = "Carmaintenance";
                     break;
                 default:
-                    break;
+                    throw new ArgumentOutOfRangeException($"Controller with Id: {controllerId} does not exist for user logging.");
             }
 
-            return controller;
+            return result;
         }
     }
-
 }

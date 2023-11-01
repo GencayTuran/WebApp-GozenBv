@@ -148,7 +148,7 @@ namespace WebApp_GozenBv.Migrations
                         .Annotation("SqlServer:Identity", "1, 1"),
                     UserId = table.Column<int>(type: "int", nullable: false),
                     Action = table.Column<int>(type: "int", nullable: false),
-                    Controller = table.Column<int>(type: "int", nullable: false),
+                    ControllerId = table.Column<int>(type: "int", nullable: false),
                     EntityId = table.Column<string>(type: "nvarchar(max)", nullable: true),
                     LogDate = table.Column<DateTime>(type: "datetime2", nullable: false)
                 },

@@ -21,11 +21,11 @@
                             @foreach (var log in Model)
                             {
                                 <li class="list-group-item">
-                                    <a asp-controller="@log.ControllerName" asp-action="Details" asp-route-id="@log.EntityId">
+                                    <a asp-controller="@log.Controller" asp-action="Details" asp-route-id="@log.EntityId">
                                         <div class="flex-row d-flex">
                                             <div class="col-3"><p>@log.UserName</p></div>
                                             <div class="col-4"><p><em>@log.Action</em></p></div>
-                                            <div class="col-2"><p><b>@log.ControllerName</b></p></div>
+                                            <div class="col-2"><p><b>@log.Controller</b></p></div>
                                             <div class="col-4"><p>at @log.LogDate</p></div>
                                         </div>
                                     </a>

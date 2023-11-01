@@ -105,7 +105,7 @@ namespace WebApp_GozenBv.Controllers
 
                 await _manager.ManageMaterial(material, EntityOperation.Create);
 
-                await _userLogService.CreateAsync(ControllerConst.Material, ActionConst.Create, material.Id.ToString());
+                await _userLogService.StoreLogAsync(ControllerNames.Material, ActionConst.Create, material.Id.ToString());
 
                 return RedirectToAction(nameof(Index));
             }
@@ -139,7 +139,7 @@ namespace WebApp_GozenBv.Controllers
             {
                 await _manager.ManageMaterial(material, EntityOperation.Update);
 
-                await _userLogService.CreateAsync(ControllerConst.Material, ActionConst.Edit, material.Id.ToString());
+                await _userLogService.StoreLogAsync(ControllerNames.Material, ActionConst.Edit, material.Id.ToString());
                 
                 return RedirectToAction(nameof(Index));
             }
@@ -172,7 +172,7 @@ namespace WebApp_GozenBv.Controllers
             var material = await _manager.MapMaterialAsync(id);
             await _manager.ManageMaterial(material, EntityOperation.Delete);
 
-            await _userLogService.CreateAsync(ControllerConst.Material, ActionConst.Delete, material.Id.ToString());
+            await _userLogService.StoreLogAsync(ControllerNames.Material, ActionConst.Delete, material.Id.ToString());
 
             return RedirectToAction(nameof(Index));
         }

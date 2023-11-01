@@ -62,7 +62,7 @@ namespace WebApp_GozenBv.Controllers
             if (ModelState.IsValid)
             {
                 await _manager.ManageEmployee(employee, EntityOperation.Create);
-                await _userLogService.CreateAsync(ControllerConst.Employee, ActionConst.Create, employee.Id.ToString());
+                await _userLogService.StoreLogAsync(ControllerNames.Employee, ActionConst.Create, employee.Id.ToString());
                 return RedirectToAction(nameof(Index));
             }
             return View(employee);
@@ -96,7 +96,7 @@ namespace WebApp_GozenBv.Controllers
             if (ModelState.IsValid)
             {
                 await _manager.ManageEmployee(employee, EntityOperation.Update);
-                await _userLogService.CreateAsync(ControllerConst.Employee, ActionConst.Edit, employee.Id.ToString());
+                await _userLogService.StoreLogAsync(ControllerNames.Employee, ActionConst.Edit, employee.Id.ToString());
 
                 return RedirectToAction(nameof(Index));
             }
@@ -128,7 +128,7 @@ namespace WebApp_GozenBv.Controllers
             var employee = await _manager.MapEmployeeAsync(id);
             await _manager.ManageEmployee(employee, EntityOperation.Delete);
 
-            await _userLogService.CreateAsync(ControllerConst.Employee, ActionConst.Delete, employee.Id.ToString());
+            await _userLogService.StoreLogAsync(ControllerNames.Employee, ActionConst.Delete, employee.Id.ToString());
             return RedirectToAction(nameof(Index));
         }
     }

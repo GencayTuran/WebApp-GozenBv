@@ -188,7 +188,7 @@ namespace WebApp_GozenBv.Controllers
             if (ModelState.IsValid && viewModel.SelectedProducts != null)
             {
                 var logId = await _logService.HandleCreate(viewModel);
-                await _userLogService.CreateAsync(ControllerConst.MaterialLog, ActionConst.Create, logId);
+                await _userLogService.StoreLogAsync(ControllerNames.MaterialLog, ActionConst.Create, logId);
 
                 return RedirectToAction(nameof(Index));
             }
@@ -237,7 +237,7 @@ namespace WebApp_GozenBv.Controllers
                 try
                 {
                     await _logService.HandleEdit(incomingEdit);
-                    await _userLogService.CreateAsync(ControllerConst.MaterialLog, ActionConst.Edit, incomingEdit.MaterialLog.LogId);
+                    await _userLogService.StoreLogAsync(ControllerNames.MaterialLog, ActionConst.Edit, incomingEdit.MaterialLog.LogId);
                     return RedirectToAction(nameof(Index));
                 }
                 catch (Exception e)
@@ -284,7 +284,7 @@ namespace WebApp_GozenBv.Controllers
                 return NotFound(e.Message);
             }
 
-            _userLogService.CreateAsync(ControllerConst.MaterialLog, ActionConst.ReturnItems, logId);
+            _userLogService.StoreLogAsync(ControllerNames.MaterialLog, ActionConst.ReturnItems, logId);
 
             //TODO: more readable routevalue?
             return RedirectToAction("Details", new RouteValueDictionary(
@@ -311,7 +311,7 @@ namespace WebApp_GozenBv.Controllers
 
             await _logService.HandleDamaged(incomingCompleteDamaged);
             
-            await _userLogService.CreateAsync(ControllerConst.MaterialLog, ActionConst.CompleteDamaged, logId);
+            await _userLogService.StoreLogAsync(ControllerNames.MaterialLog, ActionConst.CompleteDamaged, logId);
 
             //TODO: routeValue could be more readable
             return RedirectToAction("Details", new RouteValueDictionary(
@@ -337,7 +337,7 @@ namespace WebApp_GozenBv.Controllers
 
             await _logService.HandleDelete(logId);
 
-            await _userLogService.CreateAsync(ControllerConst.MaterialLog, ActionConst.Delete, logId);
+            await _userLogService.StoreLogAsync(ControllerNames.MaterialLog, ActionConst.Delete, logId);
 
             return RedirectToAction(nameof(Index));
         }

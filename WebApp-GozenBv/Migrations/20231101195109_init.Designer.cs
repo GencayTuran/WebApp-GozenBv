@@ -12,7 +12,7 @@ using WebApp_GozenBv.Data;
 namespace WebApp_GozenBv.Migrations
 {
     [DbContext(typeof(DataDbContext))]
-    [Migration("20231031015321_init")]
+    [Migration("20231101195109_init")]
     partial class init
     {
         protected override void BuildTargetModel(ModelBuilder modelBuilder)
@@ -257,7 +257,7 @@ namespace WebApp_GozenBv.Migrations
                     b.Property<int>("Action")
                         .HasColumnType("int");
 
-                    b.Property<int>("Controller")
+                    b.Property<int>("ControllerId")
                         .HasColumnType("int");
 
                     b.Property<string>("EntityId")

@@ -72,7 +72,7 @@ namespace WebApp_GozenBv.Controllers
                     await _manager.ManageCarMaintenance(carCreate.CarMaintenance, EntityOperation.Create);
                 }
 
-                await _userLogService.CreateAsync(ControllerConst.CarPark, ActionConst.Create, carCreate.Car.Id.ToString());
+                await _userLogService.StoreLogAsync(ControllerNames.CarPark, ActionConst.Create, carCreate.Car.Id.ToString());
 
                 return RedirectToAction(nameof(Index));
             }
@@ -116,7 +116,7 @@ namespace WebApp_GozenBv.Controllers
                         await _manager.ManageCarMaintenances(carDetails.CarMaintenances, EntityOperation.Update);
                     }
 
-                    await _userLogService.CreateAsync(ControllerConst.CarPark, ActionConst.Edit, carDetails.Car.Id.ToString());
+                    await _userLogService.StoreLogAsync(ControllerNames.CarPark, ActionConst.Edit, carDetails.Car.Id.ToString());
                 }
                 catch (DbUpdateConcurrencyException)
                 {
@@ -165,7 +165,7 @@ namespace WebApp_GozenBv.Controllers
 
             await _manager.ManageCar(car, EntityOperation.Delete);
 
-            await _userLogService.CreateAsync(ControllerConst.CarPark, ActionConst.Delete, car.Id.ToString());
+            await _userLogService.StoreLogAsync(ControllerNames.CarPark, ActionConst.Delete, car.Id.ToString());
 
             return RedirectToAction(nameof(Index));
         }
