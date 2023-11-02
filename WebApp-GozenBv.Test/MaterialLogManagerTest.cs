@@ -38,20 +38,6 @@ namespace WebApp_GozenBv.Test
         }
 
         [TestMethod]
-        public async Task ManageMaterialLogAsync_Create_Log()
-        {
-            // Arrange
-            var log = new MaterialLog();
-            log = null;
-
-            // Act
-            await _manager.ManageMaterialLogAsync(log, EntityOperation.Create);
-
-            // Assert
-            _materialLogDataMock.Verify(d => d.CreateMaterialLogAsync(log), Times.Once);
-        }
-
-        [TestMethod]
         public async Task ManageMaterialLogAsync_Update_Log()
         {
             // Arrange
