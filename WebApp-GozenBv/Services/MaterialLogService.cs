@@ -96,7 +96,7 @@ namespace WebApp_GozenBv.Services
 
             if (IsReadOnlyState(log.Status))
             {
-                throw new Exception("Is read-only state. No edit possible");
+                throw new Exception("Is read-only state. No edit possible.");
             }
 
             //compare each class with incoming

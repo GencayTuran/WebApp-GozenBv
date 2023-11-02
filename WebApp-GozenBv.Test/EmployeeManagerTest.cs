@@ -10,12 +10,12 @@ namespace WebApp_GozenBv.Test
     [TestClass]
     public class EmployeeManagerTest
     {
-        private Mock<IEmployeeDataHandler> employeeDataHandlerMock;
-        private EmployeeManager employeeManager;
+        private Mock<IEmployeeDataHandler> _employeeDataHandlerMock;
+        private EmployeeManager _employeeManager;
         public EmployeeManagerTest()
         {
-            employeeDataHandlerMock = new Mock<IEmployeeDataHandler>();
-            employeeManager = new EmployeeManager(employeeDataHandlerMock.Object);
+            _employeeDataHandlerMock = new Mock<IEmployeeDataHandler>();
+            _employeeManager = new EmployeeManager(_employeeDataHandlerMock.Object);
         }
 
         [TestMethod]
@@ -25,10 +25,10 @@ namespace WebApp_GozenBv.Test
             var employee = new Employee();
 
             // Act
-            await employeeManager.ManageEmployee(employee, EntityOperation.Create);
+            await _employeeManager.ManageEmployee(employee, EntityOperation.Create);
 
             // Assert
-            employeeDataHandlerMock.Verify(handler => handler.CreateEmployee(It.IsAny<Employee>()), Times.Once);
+            _employeeDataHandlerMock.Verify(handler => handler.CreateEmployee(It.IsAny<Employee>()), Times.Once);
         }
 
         [TestMethod]
@@ -37,10 +37,10 @@ namespace WebApp_GozenBv.Test
             // Arrange
             var expectedEmployee = new Employee { Id = 1, Name = "John", Surname = "Doe" };
             int id = 1;
-            employeeDataHandlerMock.Setup(handler => handler.GetEmployeeById(id)).Returns(expectedEmployee);
+            _employeeDataHandlerMock.Setup(handler => handler.GetEmployeeById(id)).Returns(expectedEmployee);
 
             // Act
-            var result = employeeManager.MapEmployee(id);
+            var result = _employeeManager.MapEmployee(id);
 
             // Assert
             Assert.AreEqual(expectedEmployee, result);
@@ -52,10 +52,10 @@ namespace WebApp_GozenBv.Test
         {
             // Arrange
             int id = 2;
-            employeeDataHandlerMock.Setup(handler => handler.GetEmployeeById(id)).Throws(new NullReferenceException("No Employee with id 2."));
+            _employeeDataHandlerMock.Setup(handler => handler.GetEmployeeById(id)).Throws(new NullReferenceException("No Employee with id 2."));
 
             // Act
-            var result = employeeManager.MapEmployee(id);
+            var result = _employeeManager.MapEmployee(id);
 
             // Exception is expected, so no assertion is needed.
         }
@@ -66,10 +66,10 @@ namespace WebApp_GozenBv.Test
             // Arrange
             var expectedEmployee = new Employee { Id = 1, Name = "John", Surname = "Doe" };
             int id = 1;
-            employeeDataHandlerMock.Setup(handler => handler.GetEmployeeByIdAsync(id)).ReturnsAsync(expectedEmployee);
+            _employeeDataHandlerMock.Setup(handler => handler.GetEmployeeByIdAsync(id)).ReturnsAsync(expectedEmployee);
 
             // Act
-            var result = await employeeManager.MapEmployeeAsync(id);
+            var result = await _employeeManager.MapEmployeeAsync(id);
 
             // Assert
             Assert.AreEqual(expectedEmployee, result);
@@ -81,10 +81,10 @@ namespace WebApp_GozenBv.Test
         {
             // Arrange
             int id = 2;
-            employeeDataHandlerMock.Setup(handler => handler.GetEmployeeByIdAsync(id)).ThrowsAsync(new NullReferenceException("No Employee with id 2."));
+            _employeeDataHandlerMock.Setup(handler => handler.GetEmployeeByIdAsync(id)).ThrowsAsync(new NullReferenceException("No Employee with id 2."));
 
             // Act
-            var result = await employeeManager.MapEmployeeAsync(id);
+            var result = await _employeeManager.MapEmployeeAsync(id);
 
             // Exception is expected, so no assertion is needed.
         }
@@ -98,10 +98,10 @@ namespace WebApp_GozenBv.Test
                 new Employee { Id = 1, Name = "John", Surname = "Doe" },
                 new Employee { Id = 2, Name = "Jane", Surname = "Smith" }
             };
-            employeeDataHandlerMock.Setup(handler => handler.GetEmployeesAsync()).ReturnsAsync(expectedEmployees);
+            _employeeDataHandlerMock.Setup(handler => handler.GetEmployeesAsync()).ReturnsAsync(expectedEmployees);
 
             // Act
-            var result = await employeeManager.MapEmployeesAsync();
+            var result = await _employeeManager.MapEmployeesAsync();
 
             // Assert
             CollectionAssert.AreEqual(expectedEmployees, result);

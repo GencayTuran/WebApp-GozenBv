@@ -69,57 +69,7 @@ namespace WebApp_GozenBv.Controllers
             return View(logs);
         }
 
-        private List<MaterialLog> CheckFilters(List<MaterialLog> logs, List<SortViewModel> lstStatus,
-            List<SortViewModel> lstOrder, string searchString, int sortStatus, int sortOrder)
-        {
-            if (IsNotFiltered(searchString, sortStatus, sortOrder))
-            {
-                return _searchHelper.SortListByDefault(logs);
-            }
-
-            if (IsOrderFiltered(sortOrder))
-            {
-                foreach (var item in lstOrder)
-                {
-                    if (item.Id == sortOrder)
-                    {
-                        ViewBag.SortOrderIdParam = item.Id;
-                        ViewBag.SortOrderNameParam = item.Name;
-                    }
-                }
-
-                logs = _searchHelper.SortListByOrder(logs, sortOrder);
-            }
-
-            if (IsStatusFiltered(sortStatus))
-            {
-                foreach (var item in lstStatus)
-                {
-                    if (item.Id == sortStatus)
-                    {
-                        ViewBag.SortStatusIdParam = item.Id;
-                        ViewBag.SortStatusNameParam = item.Name;
-                    }
-                }
-
-                logs = _searchHelper.SortListByStatus(logs, sortStatus); 
-            }
-
-            if (IsStringFiltered(searchString))
-            {
-                var trimmedString = searchString.Trim();
-                ViewBag.SearchString = trimmedString;
-
-                logs = _searchHelper.FilterListByString(logs, trimmedString);
-            }
-
-            return logs;
-        }
-        private bool IsStringFiltered(string searchString) => !searchString.IsNullOrEmpty();
-        private bool IsStatusFiltered(int sortStatus) => sortStatus != 0;
-        private bool IsOrderFiltered(int sortOrder) => sortOrder != 0;
-        private bool IsNotFiltered(string searchString, int sortStatus, int sortOrder) 
-            => !IsOrderFiltered(sortOrder) && !IsStatusFiltered(sortStatus) && !IsStringFiltered(searchString);
+        
 
         [HttpGet]
         public async Task<IActionResult> Details(string id)
@@ -341,5 +291,57 @@ namespace WebApp_GozenBv.Controllers
 
             return RedirectToAction(nameof(Index));
         }
+
+        private List<MaterialLog> CheckFilters(List<MaterialLog> logs, List<SortViewModel> lstStatus,
+            List<SortViewModel> lstOrder, string searchString, int sortStatus, int sortOrder)
+        {
+            if (IsNotFiltered(searchString, sortStatus, sortOrder))
+            {
+                return _searchHelper.SortListByDefault(logs);
+            }
+
+            if (IsOrderFiltered(sortOrder))
+            {
+                foreach (var item in lstOrder)
+                {
+                    if (item.Id == sortOrder)
+                    {
+                        ViewBag.SortOrderIdParam = item.Id;
+                        ViewBag.SortOrderNameParam = item.Name;
+                    }
+                }
+
+                logs = _searchHelper.SortListByOrder(logs, sortOrder);
+            }
+
+            if (IsStatusFiltered(sortStatus))
+            {
+                foreach (var item in lstStatus)
+                {
+                    if (item.Id == sortStatus)
+                    {
+                        ViewBag.SortStatusIdParam = item.Id;
+                        ViewBag.SortStatusNameParam = item.Name;
+                    }
+                }
+
+                logs = _searchHelper.SortListByStatus(logs, sortStatus);
+            }
+
+            if (IsStringFiltered(searchString))
+            {
+                var trimmedString = searchString.Trim();
+                ViewBag.SearchString = trimmedString;
+
+                logs = _searchHelper.FilterListByString(logs, trimmedString);
+            }
+
+            return logs;
+        }
+        private bool IsStringFiltered(string searchString) => !searchString.IsNullOrEmpty();
+        private bool IsStatusFiltered(int sortStatus) => sortStatus != 0;
+        private bool IsOrderFiltered(int sortOrder) => sortOrder != 0;
+        private bool IsNotFiltered(string searchString, int sortStatus, int sortOrder)
+            => !IsOrderFiltered(sortOrder) && !IsStatusFiltered(sortStatus) && !IsStringFiltered(searchString);
     }
 }
