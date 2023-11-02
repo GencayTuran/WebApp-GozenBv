@@ -5,6 +5,8 @@ VisualStudioVersion = 17.4.33205.214
 MinimumVisualStudioVersion = 10.0.40219.1
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "WebApp-GozenBv", "WebApp-GozenBv\WebApp-GozenBv.csproj", "{C3417A3A-12C2-440D-AC09-6E78FDB8AD5A}"
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "WebApp-GozenBv.Test", "WebApp-GozenBv.Test\WebApp-GozenBv.Test.csproj", "{5C6320F1-9490-4EB5-9308-740E78751325}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -15,6 +17,10 @@ Global
 		{C3417A3A-12C2-440D-AC09-6E78FDB8AD5A}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{C3417A3A-12C2-440D-AC09-6E78FDB8AD5A}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{C3417A3A-12C2-440D-AC09-6E78FDB8AD5A}.Release|Any CPU.Build.0 = Release|Any CPU
+		{5C6320F1-9490-4EB5-9308-740E78751325}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{5C6320F1-9490-4EB5-9308-740E78751325}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{5C6320F1-9490-4EB5-9308-740E78751325}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{5C6320F1-9490-4EB5-9308-740E78751325}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
