@@ -1,0 +1,111 @@
+﻿@model WebApp_GozenBv.ViewModels.MaterialLogCreateViewModel
+
+@{
+    ViewData["Title"] = "Create";
+
+}
+
+<h1>Formulier</h1>
+
+<h4>MaterialLog</h4>
+<hr />
+<div class="row">
+    <div class="col-md-4">
+        <form asp-action="Create" onsubmit="ValidateForm(event)" autocomplete="off">
+            <div>
+                <div asp-validation-summary="ModelOnly" class="text-danger"></div>
+                <div class="form-group">
+                    <label class="control-label">Datum</label>
+                    <input value="@ViewBag.DateToday" asp-for="MaterialLogDate" class="form-control" />
+                    <span asp-validation-for="MaterialLogDate" class="text-danger"></span>
+                </div>
+                <div class="form-group">
+                    <label class="control-label">Werknemer</label>
+
+                    <select id="selectEmployee" class="form-control" asp-for="EmployeeId" asp-items="ViewBag.Employees" allowClear>
+                        <option value="">Select Employee</option>
+                    </select>
+                    @*<select class="form-control" asp-for="EmployeeId" asp-items="ViewBag.Employees"></select>*@
+                    @*<input id="inputSelectedEmployee" type="search" placeholder="Select Employee" class="form-control" list="lstEmployees"></input>
+                    <datalist id="lstEmployees">
+                        @foreach (var emp in ViewBag.Employees)
+                        {
+                            <option data-value="@emp.EmployeeId" value="@emp.EmployeeFullName"></option>
+                        }
+                    </datalist>
+                    <input id="inputEmployeeId" type="hidden" asp-for="EmployeeId" />*@
+                </div>
+                <div class="form-group">
+                    <input type="submit" value="Create" class="btn btn-primary" />
+                </div>
+                <input id="productsResult" type="hidden" asp-for="SelectedProducts" />
+            </div>
+        </form>
+    </div>
+    <div class="col-md-8">
+        <div id="SelectedProducts">
+            <div class="d-flex flex-row justify-content-end bg-secondary">
+                <div class="col-6">Materiaal</div>
+                <div class="col-2">Aantal</div>
+                <div class="col-2">Used?</div>
+                <div class="col-2">
+                    <button onclick="NewRow()" class="btn btn-primary">Add</button>
+                </div>
+            </div>
+
+            <div id="rowCollection">
+                <div class="productRow">
+                    <div class="form-group d-flex flex-row justify-content-between">
+                        <div class="col-6">
+                            @*<select class="inputProduct form-control" asp-items="ViewBag.Materials">
+                            <option value="">Selecteer materiaal</option>
+                            </select>*@
+@*                            <input class="inputSelectedProduct form-control" placeholder="Select Material" type="search" list="lstMaterial" />
+                            <datalist id="lstMaterial">
+                                @foreach (var material in ViewBag.Materials)
+                                {
+                                    <option data-value="@material.MaterialId" value="@material.ProductNameCode"></option>
+                                }
+                            </datalist>*@
+                            <select class="form-control selectMaterial" asp-items="ViewBag.Materials" allowClear>
+                                <option value="">Select Materiaal</option>
+                            </select>
+                        </div>
+                        <div class="col-2 d-flex flex-row">
+                            <input class="form-control inputAmount" type="number" min="1" placeholder="Aantal" />
+                            <p class="labelAlert display-4" style="color: red;"></p>
+                        </div>
+                        <div class="col-2">
+                            <input class="chkUsed" type="checkbox" />
+                        </div>
+                        <div class="col-4">
+                            <button onclick="RemoveRow(this)" value="Remove" class="btn btn-primary">Remove</button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<div>
+    <a asp-action="Index">Back to List</a>
+</div>
+
+
+<script>
+    var materialQtyAndNames = @Html.Raw(Json.Serialize(ViewBag.Materials));
+    var employeeData = @Html.Raw(Json.Serialize(ViewBag.Employees));
+
+    $('#selectEmployee').select2({width: '100%'});
+    $('.selectMaterial').select2({ width: '100%' });
+</script>
+<script src="~/js/MaterialLog_Create.js"></script>
+
+@section Scripts {
+    @{
+        await Html.RenderPartialAsync("_ValidationScriptsPartial");
+    }
+}

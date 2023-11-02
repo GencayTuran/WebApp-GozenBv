@@ -6,30 +6,31 @@ using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.Rendering;
 using Microsoft.EntityFrameworkCore;
+using Microsoft.VisualStudio.Debugger.Contracts.HotReload;
 using WebApp_GozenBv.Constants;
 using WebApp_GozenBv.Data;
+using WebApp_GozenBv.Managers.Interfaces;
 using WebApp_GozenBv.Models;
-using WebApp_GozenBv.Services;
+using WebApp_GozenBv.Services.Interfaces;
 
 namespace WebApp_GozenBv.Controllers
 {
     //[Authorize]
     public class EmployeeController : Controller
     {
-        private readonly DataDbContext _context;
+        private readonly IEmployeeManager _manager;
         private readonly IUserLogService _userLogService;
 
-        public EmployeeController(DataDbContext context, IUserLogService userLogService)
+        public EmployeeController(IEmployeeManager manager, IUserLogService userLogService)
         {
-            _context = context;
+            _manager = manager;
             _userLogService = userLogService;
         }
 
         // GET: Employee
         public async Task<IActionResult> Index()
         {
-            var dataDbContext = _context.Employees.Include(e => e.Firma);
-            return View(await dataDbContext.ToListAsync());
+            return View(await _manager.MapEmployeesAsync());
         }
 
         // GET: Employee/Details/5
@@ -40,9 +41,7 @@ namespace WebApp_GozenBv.Controllers
                 return NotFound();
             }
 
-            var employee = await _context.Employees
-                .Include(e => e.Firma)
-                .FirstOrDefaultAsync(m => m.Id == id);
+            var employee = await _manager.MapEmployeeAsync(id);
             if (employee == null)
             {
                 return PartialView("_EntityNotFound");
@@ -54,24 +53,18 @@ namespace WebApp_GozenBv.Controllers
         [HttpGet]
         public IActionResult Create()
         {
-            ViewData["FirmaId"] = new SelectList(_context.Firmas, "Id", "Id");
             return View();
         }
 
         [HttpPost]
-        [ValidateAntiForgeryToken]
-        public async Task<IActionResult> Create([Bind("Id,Name,Surname,FirmaId")] Employee employee)
+        public async Task<IActionResult> Create(Employee employee)
         {
             if (ModelState.IsValid)
             {
-                _context.Add(employee);
-                await _context.SaveChangesAsync();
-
-                await _userLogService.CreateAsync(ControllerConst.Employee, ActionConst.Create, employee.Id.ToString());
-
+                await _manager.ManageEmployee(employee, EntityOperation.Create);
+                await _userLogService.StoreLogAsync(ControllerNames.Employee, ActionConst.Create, employee.Id.ToString());
                 return RedirectToAction(nameof(Index));
             }
-            ViewData["FirmaId"] = new SelectList(_context.Firmas, "Id", "Id", employee.FirmaId);
             return View(employee);
         }
 
@@ -83,18 +76,17 @@ namespace WebApp_GozenBv.Controllers
                 return NotFound();
             }
 
-            var employee = await _context.Employees.FindAsync(id);
+            var employee = await _manager.MapEmployeeAsync(id);
+
             if (employee == null)
             {
                 return NotFound();
             }
-            ViewData["FirmaId"] = new SelectList(_context.Firmas, "Id", "Id", employee.FirmaId);
             return View(employee);
         }
 
         [HttpPost]
-        [ValidateAntiForgeryToken]
-        public async Task<IActionResult> Edit(int id, [Bind("Id,Name,Surname,FirmaId")] Employee employee)
+        public async Task<IActionResult> Edit(int id, Employee employee)
         {
             if (id != employee.Id)
             {
@@ -103,26 +95,11 @@ namespace WebApp_GozenBv.Controllers
 
             if (ModelState.IsValid)
             {
-                try
-                {
-                    _context.Update(employee);
-                    await _context.SaveChangesAsync();
-                    await _userLogService.CreateAsync(ControllerConst.Employee, ActionConst.Edit, employee.Id.ToString());
-                }
-                catch (DbUpdateConcurrencyException)
-                {
-                    if (!EmployeeExists(employee.Id))
-                    {
-                        return NotFound();
-                    }
-                    else
-                    {
-                        throw;
-                    }
-                }
+                await _manager.ManageEmployee(employee, EntityOperation.Update);
+                await _userLogService.StoreLogAsync(ControllerNames.Employee, ActionConst.Edit, employee.Id.ToString());
+
                 return RedirectToAction(nameof(Index));
             }
-            ViewData["FirmaId"] = new SelectList(_context.Firmas, "Id", "Id", employee.FirmaId);
             return View(employee);
         }
 
@@ -134,9 +111,8 @@ namespace WebApp_GozenBv.Controllers
                 return NotFound();
             }
 
-            var employee = await _context.Employees
-                .Include(e => e.Firma)
-                .FirstOrDefaultAsync(m => m.Id == id);
+            var employee = await _manager.MapEmployeeAsync(id);
+
             if (employee == null)
             {
                 return NotFound();
@@ -147,19 +123,13 @@ namespace WebApp_GozenBv.Controllers
 
         // POST: Employee/Delete/5
         [HttpPost, ActionName("Delete")]
-        [ValidateAntiForgeryToken]
         public async Task<IActionResult> DeleteConfirmed(int id)
         {
-            var employee = await _context.Employees.FindAsync(id);
-            _context.Employees.Remove(employee);
-            await _context.SaveChangesAsync();
-            await _userLogService.CreateAsync(ControllerConst.Employee, ActionConst.Delete, employee.Id.ToString());
-            return RedirectToAction(nameof(Index));
-        }
+            var employee = await _manager.MapEmployeeAsync(id);
+            await _manager.ManageEmployee(employee, EntityOperation.Delete);
 
-        private bool EmployeeExists(int id)
-        {
-            return _context.Employees.Any(e => e.Id == id);
+            await _userLogService.StoreLogAsync(ControllerNames.Employee, ActionConst.Delete, employee.Id.ToString());
+            return RedirectToAction(nameof(Index));
         }
     }
 }

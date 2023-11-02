@@ -1,0 +1,113 @@
+﻿@using WebApp_GozenBv.Constants;
+@model WebApp_GozenBv.ViewModels.CarDetailsViewModel
+
+@{
+    ViewData["Title"] = "Details";
+}
+
+<h1>Details</h1>
+
+<div>
+    <h4>CarPark</h4>
+    <hr />
+    <dl class="row">
+        <dt class="col-sm-2">
+            @Html.DisplayNameFor(model => model.Car.LicencePlate)
+        </dt>
+        <dd class="col-sm-10">
+            @Html.DisplayFor(model => model.Car.LicencePlate)
+        </dd>
+        <dt class="col-sm-2">
+            @Html.DisplayNameFor(model => model.Car.ChassisNumber)
+        </dt>
+        <dd class="col-sm-10">
+            @Html.DisplayFor(model => model.Car.ChassisNumber)
+        </dd>
+        <dt class="col-sm-2">
+            @Html.DisplayNameFor(model => model.Car.Brand)
+        </dt>
+        <dd class="col-sm-10">
+            @Html.DisplayFor(model => model.Car.Brand)
+        </dd>
+        <dt class="col-sm-2">
+            @Html.DisplayNameFor(model => model.Car.Model)
+        </dt>
+        <dd class="col-sm-10">
+            @Html.DisplayFor(model => model.Car.Model)
+        </dd>
+        <dt class="col-sm-2">
+            @Html.DisplayNameFor(model => model.Car.Km)
+        </dt>
+        <dd class="col-sm-10">
+            @Html.DisplayFor(model => model.Car.Km)
+        </dd>
+        <dt class="col-sm-2">
+            @Html.DisplayNameFor(model => model.Car.KeuringDate)
+        </dt>
+        <dd class="col-sm-10">
+            @Html.DisplayFor(model => model.Car.KeuringDate)
+        </dd>
+        <dt class="col-sm-2">
+            @Html.DisplayNameFor(model => model.Car.DeadlineKeuringDate)
+        </dt>
+        <dd class="col-sm-10">
+            @Html.DisplayFor(model => model.Car.DeadlineKeuringDate)
+        </dd>
+        <dt class="col-sm-2">
+            @Html.DisplayNameFor(model => model.Car.DriverName)
+        </dt>
+        <dd class="col-sm-10">
+            @Html.DisplayFor(model => model.Car.DriverName)
+        </dd>
+    </dl>
+
+    <h5>Maintenances</h5>
+    @if (Model.CarMaintenances.Count > 0)
+    {
+        <table>
+            <thead>
+                <tr>
+                    <th>
+                        Maintenance
+                    </th>
+                    <th></th>
+                </tr>
+            </thead>
+            <tbody>
+
+                @foreach (var maintenance in Model.CarMaintenances)
+                {
+                    <tr>
+                        @if (maintenance.MaintenanceDate != null)
+                        {
+                            <td>@maintenance.MaintenanceInfo</td>
+                            <td>@maintenance.MaintenanceDate.Value.ToShortDateString()</td>
+                        }
+                        else
+                        {
+                            <td>@maintenance.MaintenanceKm Km</td>
+                        }
+                        <td>
+                            <a class="btn btn-primary" asp-action="CompleteAlert" asp-controller="CarPark" asp-route-id="@maintenance.Id">
+                                Complete
+                            </a>
+                        </td>
+                    </tr>
+                }
+            </tbody>
+        </table>
+    }
+    else
+    {
+        <p>No future maintenances</p>
+    }
+</div>
+
+<div>
+    <vc:user-log view="@ViewTypeConst.Entity" controller-id="@ControllerNames.CarPark" entity-id="@Model.Car.Id"></vc:user-log>
+</div>
+
+<div>
+    <a asp-action="Edit" asp-route-id="@Model.Car.Id">Edit</a> |
+    <a asp-action="Index">Back to List</a>
+</div>

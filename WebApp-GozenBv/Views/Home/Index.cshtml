@@ -3,18 +3,18 @@
     ViewData["Title"] = "Home Page";
 }
 
-<div class="container align-content-center">
-    <div class="container d-flex justify-content-center"><p class="display-3">Menu</p></div>
+<div class="align-content-center">
+    <div class="d-flex justify-content-center"><p class="display-3">Menu</p></div>
     
     <div class="container d-flex flex-column justify-content-center p-5 w-75">
-        <a class="btn" asp-area="" asp-controller="StockLog" asp-action="Create">Formulier</a>
-        <a class="btn" asp-area="" asp-controller="StockLog" asp-action="Index">StockLog</a>
-        <a class="btn" asp-area="" asp-controller="Stock" asp-action="Index">Stock</a>
-        <a class="btn" asp-area="" asp-controller="WagenPark" asp-action="Index">Wagenpark</a>
+        <a class="btn" asp-area="" asp-controller="MaterialLog" asp-action="Create">Formulier</a>
+        <a class="btn" asp-area="" asp-controller="MaterialLog" asp-action="Index">MaterialLog</a>
+        <a class="btn" asp-area="" asp-controller="Material" asp-action="Index">Material</a>
+        <a class="btn" asp-area="" asp-controller="CarPark" asp-action="Index">Carpark</a>
     </div>
     <vc:alerts></vc:alerts>
 
     @*<div>Api result</div>
     <div>@ViewData["ApiResult"]</div>*@
-    <vc:user-log view="@ViewTypeConst.Limit" controller="@ControllerConst.Home" entity-id=""></vc:user-log>
+    <vc:user-log view="@ViewTypeConst.Limit" controller-id="@ControllerNames.Home" entity-id=""></vc:user-log>
 </div>

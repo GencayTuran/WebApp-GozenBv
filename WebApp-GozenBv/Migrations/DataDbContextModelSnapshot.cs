@@ -22,7 +22,7 @@ namespace WebApp_GozenBv.Migrations
 
             SqlServerModelBuilderExtensions.UseIdentityColumns(modelBuilder, 1L, 1);
 
-            modelBuilder.Entity("WebApp_GozenBv.Models.Employee", b =>
+            modelBuilder.Entity("WebApp_GozenBv.Models.CarMaintenance", b =>
                 {
                     b.Property<int>("Id")
                         .ValueGeneratedOnAdd()
@@ -30,8 +30,74 @@ namespace WebApp_GozenBv.Migrations
 
                     SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"), 1L, 1);
 
-                    b.Property<int>("FirmaId")
+                    b.Property<int>("CarId")
                         .HasColumnType("int");
+
+                    b.Property<bool>("Done")
+                        .HasColumnType("bit");
+
+                    b.Property<DateTime?>("MaintenanceDate")
+                        .HasColumnType("datetime2");
+
+                    b.Property<string>("MaintenanceInfo")
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<int?>("MaintenanceKm")
+                        .HasColumnType("int");
+
+                    b.HasKey("Id");
+
+                    b.ToTable("CarMaintenances");
+                });
+
+            modelBuilder.Entity("WebApp_GozenBv.Models.CarPark", b =>
+                {
+                    b.Property<int>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("int");
+
+                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"), 1L, 1);
+
+                    b.Property<string>("Brand")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<string>("ChassisNumber")
+                        .HasMaxLength(17)
+                        .HasColumnType("nvarchar(17)");
+
+                    b.Property<DateTime>("DeadlineKeuringDate")
+                        .HasColumnType("datetime2");
+
+                    b.Property<string>("DriverName")
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<DateTime>("KeuringDate")
+                        .HasColumnType("datetime2");
+
+                    b.Property<double>("Km")
+                        .HasColumnType("float");
+
+                    b.Property<string>("LicencePlate")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<string>("Model")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(max)");
+
+                    b.HasKey("Id");
+
+                    b.ToTable("CarPark");
+                });
+
+            modelBuilder.Entity("WebApp_GozenBv.Models.Employee", b =>
+                {
+                    b.Property<int>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("int");
+
+                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"), 1L, 1);
 
                     b.Property<string>("Name")
                         .HasColumnType("nvarchar(max)");
@@ -41,12 +107,10 @@ namespace WebApp_GozenBv.Migrations
 
                     b.HasKey("Id");
 
-                    b.HasIndex("FirmaId");
-
                     b.ToTable("Employees");
                 });
 
-            modelBuilder.Entity("WebApp_GozenBv.Models.Firma", b =>
+            modelBuilder.Entity("WebApp_GozenBv.Models.Material", b =>
                 {
                     b.Property<int>("Id")
                         .ValueGeneratedOnAdd()
@@ -54,29 +118,16 @@ namespace WebApp_GozenBv.Migrations
 
                     SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"), 1L, 1);
 
-                    b.Property<string>("FirmaName")
-                        .HasColumnType("nvarchar(max)");
-
-                    b.HasKey("Id");
-
-                    b.ToTable("Firmas");
-                });
-
-            modelBuilder.Entity("WebApp_GozenBv.Models.Stock", b =>
-                {
-                    b.Property<int>("Id")
-                        .ValueGeneratedOnAdd()
-                        .HasColumnType("int");
-
-                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"), 1L, 1);
-
-                    b.Property<double>("Cost")
+                    b.Property<double?>("Cost")
                         .HasColumnType("float");
 
                     b.Property<int>("MinQuantity")
                         .HasColumnType("int");
 
-                    b.Property<string>("ProductBrand")
+                    b.Property<bool>("NoReturn")
+                        .HasColumnType("bit");
+
+                    b.Property<string>("ProductCode")
                         .IsRequired()
                         .HasColumnType("nvarchar(max)");
 
@@ -84,18 +135,18 @@ namespace WebApp_GozenBv.Migrations
                         .IsRequired()
                         .HasColumnType("nvarchar(max)");
 
-                    b.Property<int>("Quantity")
+                    b.Property<int>("QuantityNew")
                         .HasColumnType("int");
 
-                    b.Property<bool>("Used")
-                        .HasColumnType("bit");
+                    b.Property<int>("QuantityUsed")
+                        .HasColumnType("int");
 
                     b.HasKey("Id");
 
-                    b.ToTable("Stock");
+                    b.ToTable("Material");
                 });
 
-            modelBuilder.Entity("WebApp_GozenBv.Models.StockLog", b =>
+            modelBuilder.Entity("WebApp_GozenBv.Models.MaterialLog", b =>
                 {
                     b.Property<int>("Id")
                         .ValueGeneratedOnAdd()
@@ -103,16 +154,16 @@ namespace WebApp_GozenBv.Migrations
 
                     SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"), 1L, 1);
 
-                    b.Property<DateTime?>("CompletionDate")
-                        .HasColumnType("datetime2");
-
                     b.Property<bool>("Damaged")
                         .HasColumnType("bit");
 
                     b.Property<int>("EmployeeId")
                         .HasColumnType("int");
 
-                    b.Property<string>("LogCode")
+                    b.Property<DateTime>("LogDate")
+                        .HasColumnType("datetime2");
+
+                    b.Property<string>("LogId")
                         .HasColumnType("nvarchar(max)");
 
                     b.Property<DateTime?>("ReturnDate")
@@ -121,17 +172,14 @@ namespace WebApp_GozenBv.Migrations
                     b.Property<int>("Status")
                         .HasColumnType("int");
 
-                    b.Property<DateTime>("StockLogDate")
-                        .HasColumnType("datetime2");
-
                     b.HasKey("Id");
 
                     b.HasIndex("EmployeeId");
 
-                    b.ToTable("StockLogs");
+                    b.ToTable("MaterialLogs");
                 });
 
-            modelBuilder.Entity("WebApp_GozenBv.Models.StockLogItem", b =>
+            modelBuilder.Entity("WebApp_GozenBv.Models.MaterialLogItem", b =>
                 {
                     b.Property<int>("Id")
                         .ValueGeneratedOnAdd()
@@ -139,36 +187,42 @@ namespace WebApp_GozenBv.Migrations
 
                     SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"), 1L, 1);
 
-                    b.Property<double>("Cost")
+                    b.Property<double?>("Cost")
                         .HasColumnType("float");
 
-                    b.Property<int>("DamagedAmount")
+                    b.Property<int?>("DamagedAmount")
                         .HasColumnType("int");
 
-                    b.Property<int>("DeletedAmount")
+                    b.Property<int?>("DeletedAmount")
                         .HasColumnType("int");
 
                     b.Property<bool>("IsDamaged")
                         .HasColumnType("bit");
 
-                    b.Property<string>("LogCode")
+                    b.Property<string>("LogId")
                         .HasColumnType("nvarchar(max)");
 
-                    b.Property<string>("ProductNameBrand")
+                    b.Property<int>("MaterialAmount")
+                        .HasColumnType("int");
+
+                    b.Property<int>("MaterialId")
+                        .HasColumnType("int");
+
+                    b.Property<bool>("NoReturn")
+                        .HasColumnType("bit");
+
+                    b.Property<string>("ProductNameCode")
                         .HasColumnType("nvarchar(max)");
 
-                    b.Property<int>("RepairedAmount")
+                    b.Property<int?>("RepairedAmount")
                         .HasColumnType("int");
 
-                    b.Property<int>("StockAmount")
-                        .HasColumnType("int");
-
-                    b.Property<int>("StockId")
-                        .HasColumnType("int");
+                    b.Property<bool>("Used")
+                        .HasColumnType("bit");
 
                     b.HasKey("Id");
 
-                    b.ToTable("StockLogItems");
+                    b.ToTable("MaterialLogItems");
                 });
 
             modelBuilder.Entity("WebApp_GozenBv.Models.User", b =>
@@ -201,7 +255,7 @@ namespace WebApp_GozenBv.Migrations
                     b.Property<int>("Action")
                         .HasColumnType("int");
 
-                    b.Property<int>("Controller")
+                    b.Property<int>("ControllerId")
                         .HasColumnType("int");
 
                     b.Property<string>("EntityId")
@@ -220,84 +274,7 @@ namespace WebApp_GozenBv.Migrations
                     b.ToTable("UserLogs");
                 });
 
-            modelBuilder.Entity("WebApp_GozenBv.Models.WagenMaintenance", b =>
-                {
-                    b.Property<int>("Id")
-                        .ValueGeneratedOnAdd()
-                        .HasColumnType("int");
-
-                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"), 1L, 1);
-
-                    b.Property<DateTime>("MaintenanceDate")
-                        .HasColumnType("datetime2");
-
-                    b.Property<string>("MaintenanceNotes")
-                        .HasColumnType("nvarchar(max)");
-
-                    b.Property<int>("WagenId")
-                        .HasColumnType("int");
-
-                    b.Property<int?>("WagenParkId")
-                        .HasColumnType("int");
-
-                    b.HasKey("Id");
-
-                    b.HasIndex("WagenParkId");
-
-                    b.ToTable("WagenMaintenances");
-                });
-
-            modelBuilder.Entity("WebApp_GozenBv.Models.WagenPark", b =>
-                {
-                    b.Property<int>("Id")
-                        .ValueGeneratedOnAdd()
-                        .HasColumnType("int");
-
-                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"), 1L, 1);
-
-                    b.Property<string>("Brand")
-                        .HasColumnType("nvarchar(max)");
-
-                    b.Property<string>("ChassisNumber")
-                        .HasColumnType("nvarchar(max)");
-
-                    b.Property<DateTime>("DeadlineKeuring")
-                        .HasColumnType("datetime2");
-
-                    b.Property<int>("FirmaId")
-                        .HasColumnType("int");
-
-                    b.Property<DateTime>("KeuringDate")
-                        .HasColumnType("datetime2");
-
-                    b.Property<double>("Km")
-                        .HasColumnType("float");
-
-                    b.Property<string>("LicencePlate")
-                        .HasColumnType("nvarchar(max)");
-
-                    b.Property<string>("Model")
-                        .HasColumnType("nvarchar(max)");
-
-                    b.HasKey("Id");
-
-                    b.HasIndex("FirmaId");
-
-                    b.ToTable("WagenPark");
-                });
-
-            modelBuilder.Entity("WebApp_GozenBv.Models.Employee", b =>
-                {
-                    b.HasOne("WebApp_GozenBv.Models.Firma", "Firma")
-                        .WithMany()
-                        .HasForeignKey("FirmaId")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired();
-
-                    b.Navigation("Firma");
-                });
-
-            modelBuilder.Entity("WebApp_GozenBv.Models.StockLog", b =>
+            modelBuilder.Entity("WebApp_GozenBv.Models.MaterialLog", b =>
                 {
                     b.HasOne("WebApp_GozenBv.Models.Employee", "Employee")
                         .WithMany()
@@ -317,26 +294,6 @@ namespace WebApp_GozenBv.Migrations
                         .IsRequired();
 
                     b.Navigation("User");
-                });
-
-            modelBuilder.Entity("WebApp_GozenBv.Models.WagenMaintenance", b =>
-                {
-                    b.HasOne("WebApp_GozenBv.Models.WagenPark", "WagenPark")
-                        .WithMany()
-                        .HasForeignKey("WagenParkId");
-
-                    b.Navigation("WagenPark");
-                });
-
-            modelBuilder.Entity("WebApp_GozenBv.Models.WagenPark", b =>
-                {
-                    b.HasOne("WebApp_GozenBv.Models.Firma", "Firma")
-                        .WithMany()
-                        .HasForeignKey("FirmaId")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired();
-
-                    b.Navigation("Firma");
                 });
 #pragma warning restore 612, 618
         }

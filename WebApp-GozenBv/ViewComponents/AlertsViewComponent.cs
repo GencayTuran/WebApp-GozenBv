@@ -7,79 +7,29 @@ using WebApp_GozenBv.Data;
 using System.Linq;
 using WebApp_GozenBv.Constants;
 using WebApp_GozenBv.ViewModels;
+using WebApp_GozenBv.Models;
+using WebApp_GozenBv.Managers.Interfaces;
 
 namespace WebApp_GozenBv.ViewComponents
 {
     public class AlertsViewComponent : ViewComponent
     {
-        private readonly DataDbContext _context;
-        public AlertsViewComponent(DataDbContext context)
+        private readonly ICarParkManager _carParkManager;
+        private readonly IMaterialManager _materialManager;
+
+        public AlertsViewComponent(ICarParkManager carParkManager, IMaterialManager materialManager)
         {
-            _context = context;
+            _carParkManager = carParkManager;
+            _materialManager = materialManager;
         }
+
         public async Task<IViewComponentResult> InvokeAsync()
         {
-            List<CarAlertViewModel> carAlerts = new();
-            List<StockAlertViewModel> stockAlerts = new();
-
-            var cars = _context.WagenPark.Include(w => w.Firma);
-            var stock = _context.Stock.Select(x => x);
-
-            foreach (var car in cars)
+            return View(new AlertsViewModel()
             {
-                if (DateTime.Now >= car.DeadlineKeuring.AddMonths(-1))
-                {
-                    if (DateTime.Now >= car.DeadlineKeuring)
-                    {
-                        carAlerts.Add(new CarAlertViewModel()
-                        {
-                            Status = CarAlertsConst.Outdated,
-                            WagenPark = car
-                        });
-                    }
-                    else
-                    {
-                        int daysLeft = (car.DeadlineKeuring - DateTime.Now).Days + 1;
-
-                        carAlerts.Add(new CarAlertViewModel()
-                        {
-                            Status = CarAlertsConst.LessThanOneMonth,
-                            WagenPark = car
-                        });
-                    }
-                }
-            }
-
-            foreach (var item in stock)
-            {
-                if (item.Quantity < item.MinQuantity)
-                {
-                    if (item.Quantity != 0)
-                    {
-                        stockAlerts.Add(new StockAlertViewModel()
-                        {
-                            Status = StockAlertsConst.LessThanMinimum,
-                            Stock = item
-                        });
-                    }
-                    else
-                    {
-                        stockAlerts.Add(new StockAlertViewModel()
-                        {
-                            Status = StockAlertsConst.Empty,
-                            Stock = item
-                        });
-                    }
-                }
-            }
-
-            AlertsViewModel alerts = new AlertsViewModel()
-            {
-                CarAlerts = carAlerts,
-                StockAlerts = stockAlerts
-            };
-
-            return View(alerts);
+                CarAlerts = await _carParkManager.MapCarAlerts(),
+                MaterialAlerts = await _materialManager.MapMaterialAlerts(),
+            });
         }
     }
 }

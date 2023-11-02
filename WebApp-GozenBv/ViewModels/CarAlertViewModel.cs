@@ -6,6 +6,7 @@ namespace WebApp_GozenBv.ViewModels
     public class CarAlertViewModel
     {
         public int Status { get; set; }
-        public WagenPark WagenPark { get; set; }
+        public CarPark CarPark { get; set; }
+        public CarMaintenance CarMaintenance { get; set; }
     }
 }

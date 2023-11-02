@@ -4,22 +4,20 @@ using WebApp_GozenBv.Data;
 using Microsoft.Graph;
 using System.Threading.Tasks;
 using System.Runtime.InteropServices;
+using WebApp_GozenBv.Services.Interfaces;
+using WebApp_GozenBv.Managers.Interfaces;
 
 namespace WebApp_GozenBv.Services
 {
     public class UserService : IUserService
     {
-        private readonly DataDbContext _context;
+        private readonly IUserManager _manager;
         //private readonly GraphServiceClient _graphServiceClient;
-        //public UserService(DataDbContext context, GraphServiceClient graphServiceClient)
-        //{
-        //    _context = context;
-        //    _graphServiceClient = graphServiceClient;
-        //}
 
-        public UserService(DataDbContext context)
+        public UserService(IUserManager manager) //, GraphServiceClient graphServiceClient
         {
-            _context = context;
+            _manager = manager;
+            //_graphServiceClient = graphServiceClient;
         }
 
         //public async Task<Microsoft.Graph.User> GetCurrentUser()
@@ -53,24 +51,16 @@ namespace WebApp_GozenBv.Services
         //        return userId;
         //    }
 
-        public async Task<Models.User> GetCurrentUser()
+        public async Task<Models.User> ArrangeCurrentUserAsync()
         {
-            var user = _context.Users
-            .Where(u => u.Email == "gencay.turan@hotmail.com")
-            .FirstOrDefault();
+            var user = await _manager.MapCurrentUserAsync();
             return user;
         }
 
-        public int GetCurrentUserId(Models.User user)
+        public async Task<int> ArrangeCurrentUserIdAsync(Models.User user)
         {
-            var userId = _context.Users
-                .Where(u => u.Email.Contains(user.Email))
-                .Select(u => u.Id)
-                .FirstOrDefault();
-
-            return userId;
+            return (await _manager.MapCurrentUserAsync()).Id;
         }
-
     }
 }
 

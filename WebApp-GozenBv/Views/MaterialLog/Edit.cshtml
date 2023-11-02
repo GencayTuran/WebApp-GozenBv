@@ -1,0 +1,31 @@
+﻿@using WebApp_GozenBv.Constants;
+@model WebApp_GozenBv.ViewModels.MaterialLogEditViewModel
+
+@{
+    ViewData["Title"] = "Edit";
+}
+
+<h1>Edit</h1>
+
+<h4>MaterialLog</h4>
+<hr />
+
+@switch (Model.Status)
+{
+    case MaterialLogStatusConst.Created:
+        <vc:log-created-edit log-id="@Model.LogId"></vc:log-created-edit>
+        break;
+    case MaterialLogStatusConst.DamagedAwaitingAction:
+        @*viewComponent of log-damaged-edit here*@
+        break;
+}
+
+<div>
+    <a asp-action="Index">Back to List</a>
+</div>
+
+@section Scripts {
+    @{
+        await Html.RenderPartialAsync("_ValidationScriptsPartial");
+    }
+}

@@ -19,16 +19,9 @@ namespace WebApp_GozenBv.Controllers
     //[Authorize]
     public class HomeController : Controller
     {
-        private readonly DataDbContext _context;
-
-        public HomeController(
-            DataDbContext context)
-        {
-            _context = context;
-        }
 
         //[AuthorizeForScopes(ScopeKeySection = "DownstreamApi:Scopes")]
-        public async Task<IActionResult> Index()
+        public IActionResult Index()
         {
 
             //var user = await _graphServiceClient.Me.Request().GetAsync();

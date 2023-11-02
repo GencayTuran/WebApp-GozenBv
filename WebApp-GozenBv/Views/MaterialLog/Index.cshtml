@@ -1,0 +1,82 @@
+﻿@using WebApp_GozenBv.Constants;
+@model IEnumerable<WebApp_GozenBv.Models.MaterialLog>
+
+@{
+    ViewData["Title"] = "Index";
+}
+
+<style>
+    #trMaterialLog:hover {
+        cursor: pointer;
+        background: rgba(100,100,100,0.1);
+    }
+</style>
+
+<h1>All logs</h1>
+
+<p>
+    <a asp-action="Create">Create New Log</a>
+</p>
+
+<form asp-action="Index" method="get">
+    <div class="d-flex justify-content-start flex-row">
+        <input class="mr-2" type="text" placeholder="Find by Name" name="searchString" value="@ViewBag.SearchString" />
+        <select class="mr-2" name="sortStatus" placeholder="Status" asp-items="@ViewBag.StatusSortList">
+            @if (ViewBag.SortStatusIdParam > 0)
+            {
+                <option value="@ViewBag.SortStatusIdParam" selected hidden>@ViewBag.SortStatusNameParam</option>
+            }
+            <option value="0">Status</option>
+        </select>
+        <select class="mr-2" name="sortOrder" asp-items="@ViewBag.SortOrderList">
+            @if (ViewBag.SortOrderIdParam > 0)
+            {
+                <option value="@ViewBag.SortOrderIdParam" selected hidden>@ViewBag.SortOrderNameParam</option>
+            }
+            <option value="0">Sort by</option>
+        </select>
+        <input class="btn btn-primary" type="submit" value="Search" />
+    </div>
+</form>
+
+
+<table class="table">
+    <thead>
+        <tr>
+            <th class="col-1">
+                @Html.DisplayNameFor(model => model.Status)
+            </th>
+            <th>
+                @Html.DisplayNameFor(model => model.Employee)
+            </th>
+            <th>
+                @Html.DisplayNameFor(model => model.LogDate)
+            </th>
+            <th></th>
+        </tr>
+    </thead>
+    <tbody>
+        @foreach (var item in Model)
+        {
+            <tr id="trMaterialLog" onclick="ToDetails(@item.Id)">
+                <td>
+                    <vc:status-icon status="item.Status" is-damaged="item.Damaged"></vc:status-icon>
+                </td>
+                <td>
+                    @Html.DisplayFor(modelItem => item.Employee.Name)
+                    @Html.DisplayFor(modelItem => item.Employee.Surname)
+                </td>
+                <td>
+                    @Html.DisplayFor(modelItem => item.LogDate)
+                </td>
+                <a hidden id="anchor_@item.Id" asp-action="Details" asp-route-id="@item.LogId"></a>
+            </tr>
+        }
+    </tbody>
+</table>
+
+<div>
+    <vc:user-log view="@ViewTypeConst.Controller" controller-id="@ControllerNames.MaterialLog" entity-id=""></vc:user-log>
+</div>
+
+<script src="~/js/MaterialLog_Index.js"></script>
