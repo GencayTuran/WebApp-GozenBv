@@ -76,7 +76,7 @@ namespace WebApp_GozenBv.Services
                 newItem.Used = item.Used;
                 newItem.Cost = material.Cost;
                 newItem.LogId = logId;
-                newItem.ProductNameCode = (material.ProductName + " " + material.ProductCode).ToUpper();
+                newItem.ProductNameCode = (material.Name + " " + material.Brand).ToUpper();
 
                 newItems.Add(newItem);
                 updatedMaterials.Add(_materialHelper.TakeMaterial(material, item.Amount, item.Used));

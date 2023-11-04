@@ -1,7 +1,9 @@
-﻿using System;
+﻿using Microsoft.CodeAnalysis.CSharp.Syntax;
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
+using WebApp_GozenBv.Constants;
 using WebApp_GozenBv.Data;
 using WebApp_GozenBv.Helpers.Interfaces;
 using WebApp_GozenBv.Managers.Interfaces;
@@ -11,79 +13,80 @@ namespace WebApp_GozenBv.Helpers
 {
     public class MaterialHelper : IMaterialHelper
     {
-        public Material UpdateMaterialQty(Material material, int amount, bool isUsed)
+        public Material TakeQuantity(Material material, int qty, bool isUsed)
         {
-            //TODO: check for this problem with check underneath. material != null ??
-            if (material != null || amount == 0)
+            ValidateQuantity(material, qty, isUsed);
+
+            if (!isUsed)
             {
-                if (isUsed)
-                {
-                    if (amount < 0)
-                    {
-                        amount *= -1;
-
-                        if (material.QuantityUsed >= amount)
-                        {
-                            material.QuantityUsed -= amount;
-                            return material;
-                        }
-                        return null;
-                        //TODO: add errorModel or try catch
-                    }
-                    material.QuantityUsed += amount;
-
-                    return material;
-                }
-                else
-                {
-                    if (amount < 0)
-                    {
-                        amount *= -1;
-
-                        if (material.QuantityNew >= amount)
-                        {
-                            material.QuantityNew -= amount;
-                            return material;
-                        }
-                        return null;
-                        //TODO: add errorModel or try catch
-                    }
-                    material.QuantityNew += amount;
-
-                    return material;
-                }
-            }
-            return null;
-        }
-
-        public Material TakeMaterial(Material material, int amount, bool isUsed)
-        {
-            if (isUsed)
-            {
-                material.QuantityUsed -= amount;
-                return material;
+                material.NewQty -= qty;
+                material.UsedQty += qty;
             }
 
-            material.QuantityNew -= amount;
+            material.InUseAmount += qty;
+            material.InDepotAmount -= qty;
+
             return material;
         }
 
-        public Material AddToUsed(Material material, int amount)
-        {
-            if (material == null)
-            {
-                throw new NullReferenceException("Material is null because it has probably been deleted via Materials");
-            }
-            //TODO: catch this on higher level
+        
 
-            material.QuantityUsed += amount;
+        public Material ReturnQuantity(Material material, int qty)
+        {
+            material.InUseAmount -= qty;
+            material.InDepotAmount += qty;
+
             return material;
         }
 
-        public Material UndoAddToUsed(Material material, int amount)
+        public Material ToRepairQuantity(Material material, int qty)
         {
-            material.QuantityUsed -= amount;
+            material.InRepairQty += qty;
+
             return material;
+        }
+
+        public Material FinishRepair(Material material, int qty, bool deleted)
+        {
+            if (!deleted)
+            {
+                material.InRepairQty -= qty;
+            }
+            else
+            {
+                material.DeletedQty += qty;
+            }
+
+            return material;
+        }
+
+        /// <summary>
+        /// Removes the given amount of the current material. (No Used check because every material in use is considered used.)
+        /// </summary>
+        /// <param name="material">Current material to update.</param>
+        /// <param name="qty">The amount to delete.</param>
+        /// <param name="isUsed">Flag whether the material is from usedQty or newQty.</param>
+        /// <returns>The updated material.</returns>
+        /// <exception cref="ArgumentNullException">When method params are invalid</exception>
+        public Material DeleteQuantity(Material material, int qty)
+        {
+            material.InUseAmount -= qty;
+            material.UsedQty -= qty;
+
+            material.DeletedQty += qty;
+
+            return material;
+        }
+
+        private void ValidateQuantity(Material material, int askedQty, bool isUsed)
+        {
+            int materialQty = isUsed ? material.UsedQty : material.NewQty;
+
+            //TODO: catch exc higher
+            if (materialQty < askedQty)
+            {
+                throw new Exception($"The asked quantity is higher than current quantity for id {material.Id}.");
+            }
         }
 
     }

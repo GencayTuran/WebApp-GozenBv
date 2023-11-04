@@ -69,8 +69,6 @@ namespace WebApp_GozenBv.Controllers
             return View(logs);
         }
 
-        
-
         [HttpGet]
         public async Task<IActionResult> Details(string id)
         {
@@ -121,9 +119,9 @@ namespace WebApp_GozenBv.Controllers
                 viewData.Add(new MaterialViewData
                 {
                     MaterialId = material.Id,
-                    QuantityNew = material.QuantityNew,
-                    QuantityUsed = material.QuantityUsed,
-                    ProductNameCode = material.ProductName + " - " + material.ProductCode
+                    QuantityNew = material.NewQty,
+                    QuantityUsed = material.UsedQty,
+                    ProductNameCode = material.Name + " - " + material.Brand
                 });
             }
 

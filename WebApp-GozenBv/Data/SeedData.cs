@@ -125,7 +125,7 @@ namespace WebApp_GozenBv.Data
                 {
                     var rndMaterialId = rnd.Next(1, 6);
                     var material = _context.Material.Where(s => s.Id == rndMaterialId).FirstOrDefault();
-                    string productNameCode = (material.ProductName + " " + material.ProductCode).ToUpper();
+                    string productNameCode = (material.Name + " " + material.Brand).ToUpper();
                     int rndMaterialAmount = rnd.Next(1, 4);
                     bool rndDamaged = arrDamaged[rnd.Next(0, 4)];
                     bool damaged = materialLogs[i].Damaged ? rndDamaged : false;
@@ -174,47 +174,47 @@ namespace WebApp_GozenBv.Data
             var material = new Material[5];
             material[0] = new Material
             {
-                ProductName = "Kniptang",
-                QuantityNew = 75,
-                MinQuantity = 50,
-                QuantityUsed = 20,
-                ProductCode = "Knipex",
+                Name = "Kniptang",
+                NewQty = 75,
+                MinQty = 50,
+                UsedQty = 20,
+                Brand = "Knipex",
                 Cost = 20
             };
 
             material[1] = new Material
             {
-                ProductName = "Boormachine",
-                QuantityNew = 80,
-                MinQuantity = 15,
-                QuantityUsed = 20,
-                ProductCode = "Makita",
+                Name = "Boormachine",
+                NewQty = 80,
+                MinQty = 15,
+                UsedQty = 20,
+                Brand = "Makita",
                 Cost = 50
             };
             material[2] = new Material
             {
-                ProductName = "Slijper",
-                QuantityNew = 50,
-                MinQuantity = 20,
-                QuantityUsed = 20,
-                ProductCode = "Bosch",
+                Name = "Slijper",
+                NewQty = 50,
+                MinQty = 20,
+                UsedQty = 20,
+                Brand = "Bosch",
                 Cost = 80
             };
             material[3] = new Material
             {
-                ProductName = "Hamer",
-                QuantityNew = 50,
-                MinQuantity = 50,
-                QuantityUsed = 20,
-                ProductCode = "Hitachi",
+                Name = "Hamer",
+                NewQty = 50,
+                MinQty = 50,
+                UsedQty = 20,
+                Brand = "Hitachi",
             };
             material[4] = new Material
             {
-                ProductName = "Kniptang",
-                QuantityNew = 50,
-                MinQuantity = 25,
-                QuantityUsed = 20,
-                ProductCode = "Andere",
+                Name = "Kniptang",
+                NewQty = 50,
+                MinQty = 25,
+                UsedQty = 20,
+                Brand = "Andere",
                 Cost = 20
             };
 

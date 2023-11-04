@@ -38,14 +38,14 @@ namespace WebApp_GozenBv.Controllers
                 lstMaterialViewModel.Add(new MaterialViewModel
                 {
                     Id = material.Id,
-                    ProductName = material.ProductName,
-                    ProductCode = material.ProductCode,
-                    QuantityNew = material.QuantityNew,
-                    MinQuantity = material.MinQuantity,
-                    QuantityUsed = material.QuantityUsed,
+                    Name = material.Name,
+                    Brand = material.Brand,
+                    NewQty = material.NewQty,
+                    MinQty = material.MinQty,
+                    UsedQty = material.UsedQty,
                     NoReturn = material.NoReturn,
                     Cost = material.Cost,
-                    TotalQty = material.QuantityNew + material.QuantityUsed
+                    TotalQty = material.NewQty + material.UsedQty
                 });
             }
 
@@ -65,14 +65,14 @@ namespace WebApp_GozenBv.Controllers
             MaterialViewModel materialViewModel = new()
             {
                 Id = material.Id,
-                ProductName = material.ProductName,
-                ProductCode = material.ProductCode,
-                QuantityNew = material.QuantityNew,
-                MinQuantity = material.MinQuantity,
-                QuantityUsed = material.QuantityUsed,
+                Name = material.Name,
+                Brand = material.Brand,
+                NewQty = material.NewQty,
+                MinQty = material.MinQty,
+                UsedQty = material.UsedQty,
                 NoReturn = material.NoReturn,
                 Cost = material.Cost,
-                TotalQty = material.QuantityNew + material.QuantityUsed
+                TotalQty = material.NewQty + material.UsedQty
             };
 
             if (material == null)

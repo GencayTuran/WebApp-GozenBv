@@ -56,9 +56,9 @@ namespace WebApp_GozenBv.Managers
 
             foreach (var item in material)
             {
-                if (item.QuantityNew < item.MinQuantity)
+                if (item.NewQty < item.MinQty)
                 {
-                    if (item.QuantityNew != 0)
+                    if (item.NewQty != 0)
                     {
                         materialAlerts.Add(new MaterialAlertViewModel()
                         {

@@ -73,13 +73,13 @@
                                         <a class="btn btn-light w-100 mb-1" asp-action="Details" asp-controller="Material" asp-route-id="@materialAlert.Material.Id">
                                             <div class="d-flex">
                                                 <p class="col-1 mb-0">@materialAlert.Material.Id.</p>
-                                                <p class="col-2 mb-0">@materialAlert.Material.ProductName</p>
-                                                <p class="col-2 mb-0">@materialAlert.Material.ProductCode</p>
+                                                <p class="col-2 mb-0">@materialAlert.Material.Name</p>
+                                                <p class="col-2 mb-0">@materialAlert.Material.Brand</p>
                                                 <div class="col-7">
                                                     <p class="mb-0">
                                                         @if (materialAlert.Status == MaterialAlertsConst.LessThanMinimum)
                                                         {
-                                                            <b>Amount less than minimum (current Qty: @materialAlert.Material.QuantityNew)</b>
+                                                            <b>Amount less than minimum (current Qty: @materialAlert.Material.NewQty)</b>
                                                         }
                                                         else if (materialAlert.Status == MaterialAlertsConst.Empty)
                                                         {
