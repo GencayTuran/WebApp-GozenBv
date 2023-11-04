@@ -27,7 +27,7 @@
         </tbody>
         <thead>
             <tr>
-                <th>@Html.DisplayNameFor(model => model.ItemsUndamaged)</th>
+                <th>@Html.DisplayNameFor(model => model.Items)</th>
             </tr>
             <tr>
                 <th>@Html.DisplayNameFor(model => model.MaterialLogItem.MaterialId)</th>
@@ -36,7 +36,7 @@
             </tr>
         </thead>
         <tbody>
-            @foreach (var item in Model.ItemsUndamaged)
+            @foreach (var item in Model.Items)
             {
                 <tr>
                     <td>@item.MaterialId</td>

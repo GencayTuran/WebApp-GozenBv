@@ -21,6 +21,11 @@ namespace WebApp_GozenBv.Managers.Interfaces
         void ManageMaterialLog(MaterialLog log, EntityOperation operation);
         Task ManageMaterialLogItemsAsync(List<MaterialLogItem> items, EntityOperation operation);
         void ManageMaterialLogItems(List<MaterialLogItem> items, EntityOperation operation);
-	}
+
+        MaterialLog MapMaterialLogStatusCreated(MaterialLog original, MaterialLog incoming);
+        MaterialLogItem MapMaterialLogItemStatusCreated(MaterialLogItem incoming);
+        MaterialLogItem MapMaterialLogItemStatusReturned(MaterialLogItem incoming);
+        MaterialLogItem MapMaterialLogItemStatusReturnedDamaged(MaterialLogItem incoming);
+    }
 }
 

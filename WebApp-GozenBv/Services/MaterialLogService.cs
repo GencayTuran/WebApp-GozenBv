@@ -54,7 +54,7 @@ namespace WebApp_GozenBv.Services
                 LogDate = incomingViewModel.MaterialLogDate,
                 EmployeeId = incomingViewModel.EmployeeId,
                 Version = 1
-                
+
             };
             await _logManager.ManageMaterialLogAsync(newLog, EntityOperation.Create);
 
@@ -93,8 +93,11 @@ namespace WebApp_GozenBv.Services
             //get original model
             var logDetails = await _logManager.MapMaterialLogDetails(incomingLog.MaterialLog.LogId);
             var log = logDetails.MaterialLog;
-            var undamagedItems = logDetails.ItemsUndamaged;
+            var materialLogItems = logDetails.Items;
             var damagedItems = logDetails.ItemsDamaged;
+
+            List<MaterialLogItem> modifiedItems = new();
+            List<string> validationErrors = new();
 
             string statusName;
 
@@ -103,96 +106,84 @@ namespace WebApp_GozenBv.Services
                 case MaterialLogStatusConst.Created:
                     statusName = MaterialLogStatusConst.CreatedName;
 
-                    //at create, everything can be changed.
-                    //return the create Get view with the already created log and items to further edit where needed.
+                    if (log.Approved)
+                    {
+                        //TODO: catch higher
+                        throw new Exception($"Is already approved at '{statusName}' state and so is readonly state. No edit possible.");
+                    }
 
+                    if (!LogModified(log, incomingLog.MaterialLog) && !LogItemsModified(materialLogItems, incomingLog.Items))
+                    {
+                        //TODO: catch higher
+                        throw new Exception($"Nothing no modify. Are you sure you have made any changes?");
+                    }
 
+                    if (LogModified(log, incomingLog.MaterialLog))
+                    {
+                        var updatedLog = _logManager.MapMaterialLogStatusCreated(log, incomingLog.MaterialLog);
+                        await _logManager.ManageMaterialLogAsync(updatedLog, EntityOperation.Create);
+                    }
+
+                    if (LogItemsModified(materialLogItems, incomingLog.Items))
+                    {
+                        foreach (var item in incomingLog.Items)
+                        {
+                            var updatedItem = _logManager.MapMaterialLogItemStatusCreated(item);
+                            modifiedItems.Add(updatedItem);
+                        }
+                        await _logManager.ManageMaterialLogItemsAsync(modifiedItems, EntityOperation.Create);
+                    }
                     break;
+
                 case MaterialLogStatusConst.Returned:
                     statusName = MaterialLogStatusConst.ReturnedName;
 
-                    //
+                    if (log.Approved)
+                    {
+                        //TODO: catch higher
+                        throw new Exception($"Is already approved at '{statusName}' state and so is readonly state. No edit possible.");
+                    }
 
+                    if (!LogItemsModified(materialLogItems, incomingLog.Items))
+                    {
+                        //TODO: catch higher
+                        throw new Exception($"Nothing no modify. Are you sure you have made any changes?");
+                    }
+
+                    //only damaged amount, inrepairamount and deletedamount editable. also not damaged items can be damaged edited
+
+                    if (!log.Damaged)
+                    {
+                        foreach (var item in incomingLog.Items)
+                        {
+                            var updatedItem = _logManager.MapMaterialLogItemStatusReturned(item);
+                            modifiedItems.Add(item);
+                        }
+                    }
+                    else
+                    {
+                        foreach (var item in incomingLog.Items)
+                        {
+                            var updatedItem = _logManager.MapMaterialLogItemStatusReturned(item);
+                            modifiedItems.Add(item);
+                        }
+
+                        foreach (var item in incomingLog.ItemsDamaged)
+                        {
+                            var updatedItem = _logManager.MapMaterialLogItemStatusReturnedDamaged(item);
+                            modifiedItems.Add(item);
+                        }
+                    }
                     break;
                 default:
                     throw new Exception("No edit possible at other than Created or Returned state.");
-            }
-
-            if (log.Approved)
-            {
-                //TODO: catch higher
-                throw new Exception($"Is already approved at '{statusName}' state and so is readonly state. No edit possible.");
-            }
-
-            //compare each class with incoming
-            if (LogModified(log, incomingLog.MaterialLog))
-            {
-                await _logManager.ManageMaterialLogAsync(incomingLog.MaterialLog, EntityOperation.Update);
-            }
-            if (LogItemsModified(undamagedItems, incomingLog.ItemsUndamaged))
-            {
-                List<MaterialLogItem> modifiedItems = new();
-                List<Material> modifiedMaterials = new();
-                foreach (var item in undamagedItems)
-                {
-                    var incomingItem = incomingLog.ItemsUndamaged.FirstOrDefault(i => i.Id == i.Id);
-                    // check if they arent equal here (override equals)
-                    if (!_equalityHelper.AreEqual(item, incomingItem))
-                    {
-                        if (incomingItem.MaterialAmount != item.MaterialAmount)
-                        {
-                            var material = await _materialManager.MapMaterialAsync(incomingItem.MaterialId);
-                            var amountDifference = item.MaterialAmount - incomingItem.MaterialAmount;
-                        }
-                        //TODO: further checks of props
-                        
-                        modifiedItems.Add(incomingItem);
-                    }
-                }
-
-                if (modifiedMaterials.Any())
-                {
-                    await _materialManager.ManageMaterialsAsync(modifiedMaterials, EntityOperation.Update);
-                }
-                await _logManager.ManageMaterialLogItemsAsync(modifiedItems, EntityOperation.Update);
-            }
-            if (LogItemsModified(logDetails.ItemsDamaged, incomingLog.ItemsDamaged))
-            {
-                List<MaterialLogItem> modifiedItems = new();
-                List<Material> modifiedMaterials = new();
-                foreach (var originalItem in logDetails.ItemsUndamaged)
-                {
-                    var incomingItem = incomingLog.ItemsUndamaged.FirstOrDefault(item => item.Id == originalItem.Id);
-                    // check if they arent equal here (override equals)
-                    if (!_equalityHelper.AreEqual(originalItem, incomingItem))
-                    {
-                        if (MaterialAmountModified(originalItem, incomingItem))
-                        {
-                            var material = await _materialManager.MapMaterialAsync(incomingItem.MaterialId);
-
-                            if (incomingItem.MaterialAmount != originalItem.MaterialAmount)
-                            {
-                                var amountDifference = originalItem.MaterialAmount - incomingItem.MaterialAmount;
-                                //update material amount
-                                modifiedMaterials.Add(_materialHelper.UpdateMaterialQty(material, amountDifference, incomingItem.Used));
-                            }
-
-                            //TODO: further checks of props + this function is a copy from above.
-                        }
-
-
-                        modifiedItems.Add(incomingItem);
-                    }
-                }
-
-                await _logManager.ManageMaterialLogItemsAsync(incomingLog.ItemsDamaged, EntityOperation.Update);
             }
         }
         public void HandleReturn(MaterialLogDetailViewModel incomingReturn)
         {
             string logId = incomingReturn.MaterialLog.LogId;
             var damaged = incomingReturn.MaterialLog.Damaged;
-            
+
             var log = _logManager.MapMaterialLog(logId);
             var logItems = _logManager.MapMaterialLogItems(logId);
 
@@ -324,12 +315,16 @@ namespace WebApp_GozenBv.Services
         }
 
         private bool LogModified(MaterialLog original, MaterialLog incoming) => !_equalityHelper.AreEqual(original, incoming);
-        private bool LogItemsModified(List<MaterialLogItem> original, List<MaterialLogItem> incoming) => !original.SequenceEqual(incoming); //TODO: check if this works right
+        private bool LogItemsModified(List<MaterialLogItem> original, List<MaterialLogItem> incoming) => !_equalityHelper.AreCollectionsEqual(original, incoming);
         private bool MaterialAmountModified(MaterialLogItem original, MaterialLogItem incoming)
             =>
             original.MaterialAmount != incoming.MaterialAmount ||
             original.DamagedAmount != incoming.DamagedAmount ||
             original.RepairedAmount != incoming.RepairedAmount ||
             original.DeletedAmount != incoming.DeletedAmount;
+
+        
+
+        
     }
 }

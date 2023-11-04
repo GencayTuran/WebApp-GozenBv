@@ -9,5 +9,6 @@ namespace WebApp_GozenBv.Helpers.Interfaces
         Material ToRepairQuantity(Material material, int qty);
         Material FinishRepair(Material material, int qty, bool deleted);
         Material DeleteQuantity(Material material, int qty);
+        void ValidateQuantity(Material material, int askedQty, bool isUsed);
     }
 }

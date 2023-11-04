@@ -22,7 +22,7 @@ namespace WebApp_GozenBv.ViewComponents
                 LogId = logId,
                 EmployeeId = log.MaterialLog.EmployeeId,
                 LogDate = log.MaterialLog.LogDate,
-                Items = log.ItemsUndamaged,
+                Items = log.Items,
             };
 
             return View(viewModel);

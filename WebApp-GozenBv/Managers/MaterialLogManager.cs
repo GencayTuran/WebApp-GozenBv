@@ -1,8 +1,10 @@
 ﻿using Microsoft.AspNetCore.Routing;
 using Microsoft.EntityFrameworkCore;
+using Microsoft.Graph;
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Security.Cryptography;
 using System.Text.Json;
 using System.Threading.Tasks;
 using WebApp_GozenBv.Constants;
@@ -14,18 +16,18 @@ using WebApp_GozenBv.ViewModels;
 
 namespace WebApp_GozenBv.Managers
 {
-	public class MaterialLogManager : IMaterialLogManager
-	{
+    public class MaterialLogManager : IMaterialLogManager
+    {
         private readonly IMaterialLogDataHandler _logData;
         private readonly IMaterialLogItemDataHandler _itemData;
 
         public MaterialLogManager(
             IMaterialLogDataHandler logData,
             IMaterialLogItemDataHandler itemData)
-		{
+        {
             _logData = logData;
             _itemData = itemData;
-		}
+        }
 
         public async Task ManageMaterialLogAsync(MaterialLog log, EntityOperation operation)
         {
@@ -76,6 +78,12 @@ namespace WebApp_GozenBv.Managers
         public async Task<MaterialLogDetailViewModel> MapMaterialLogDetails(string logId)
         {
             var log = await _logData.GetMaterialLogByLogIdAsync(logId);
+
+            if (log == null)
+            {
+                throw new ArgumentNullException($"MaterialLog with logId {logId} does not exist.");
+            }
+
             List<MaterialLogItem> undamagedItems, damagedItems = new();
 
             if (log.Damaged)
@@ -101,7 +109,7 @@ namespace WebApp_GozenBv.Managers
                     Status = log.Status,
                     Damaged = log.Damaged,
                 },
-                ItemsUndamaged = undamagedItems,
+                Items = undamagedItems,
                 ItemsDamaged = damagedItems,
                 EmployeeFullName = (log.Employee.Name + " " + log.Employee.Surname).ToUpper(),
             };
@@ -148,6 +156,82 @@ namespace WebApp_GozenBv.Managers
         {
             return _itemData.GetItemsByLogId(logId);
         }
+
+        public MaterialLog MapMaterialLogStatusCreated(MaterialLog original, MaterialLog incoming)
+        {
+            return new MaterialLog()
+            {
+                LogDate = incoming.LogDate,
+                EmployeeId = incoming.EmployeeId,
+                LogId = incoming.LogId,
+                ReturnDate = incoming.ReturnDate,
+                Damaged = false,
+                Status = EditStatus.Created,
+                Approved = false,
+                Version = original.Version++
+            };
+        }
+
+        public MaterialLogItem MapMaterialLogItemStatusCreated(MaterialLogItem incoming)
+        {
+            return new MaterialLogItem()
+            {
+                LogId = incoming.LogId,
+                MaterialId = incoming.MaterialId,
+                MaterialAmount = incoming.MaterialAmount,
+                ProductNameCode = incoming.ProductNameCode,
+                NoReturn = incoming.NoReturn,
+                Cost = incoming.Cost,
+                Used = incoming.Used,
+                IsDamaged = false,
+                DamagedAmount = 0,
+                RepairedAmount = 0,
+                DeletedAmount = 0,
+                EditStatus = EditStatus.Created,
+                Version = incoming.Version++
+            };
+        }
+
+        public MaterialLogItem MapMaterialLogItemStatusReturned(MaterialLogItem incoming)
+        {
+            return new MaterialLogItem()
+            {
+                LogId = incoming.LogId,
+                MaterialId = incoming.MaterialId,
+                MaterialAmount = incoming.MaterialAmount,
+                ProductNameCode = incoming.ProductNameCode,
+                NoReturn = incoming.NoReturn,
+                Cost = incoming.Cost,
+                Used = incoming.Used,
+                IsDamaged = false,
+                DamagedAmount = 0,
+                RepairedAmount = 0,
+                DeletedAmount = 0,
+                EditStatus = EditStatus.Returned,
+                Version = incoming.Version++
+            };
+        }
+
+        public MaterialLogItem MapMaterialLogItemStatusReturnedDamaged(MaterialLogItem incoming)
+        {
+            return new MaterialLogItem()
+            {
+                LogId = incoming.LogId,
+                MaterialId = incoming.MaterialId,
+                MaterialAmount = incoming.MaterialAmount,
+                ProductNameCode = incoming.ProductNameCode,
+                NoReturn = incoming.NoReturn,
+                Cost = incoming.Cost,
+                Used = incoming.Used,
+                IsDamaged = false,
+                DamagedAmount = incoming.DamagedAmount,
+                RepairedAmount = incoming.RepairedAmount,
+                DeletedAmount = incoming.DeletedAmount,
+                EditStatus = EditStatus.Returned,
+                Version = incoming.Version++
+            };
+        }
+
     }
 }
 

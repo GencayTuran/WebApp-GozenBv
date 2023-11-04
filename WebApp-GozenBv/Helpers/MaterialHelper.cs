@@ -78,7 +78,7 @@ namespace WebApp_GozenBv.Helpers
             return material;
         }
 
-        private void ValidateQuantity(Material material, int askedQty, bool isUsed)
+        public void ValidateQuantity(Material material, int askedQty, bool isUsed)
         {
             int materialQty = isUsed ? material.UsedQty : material.NewQty;
 
