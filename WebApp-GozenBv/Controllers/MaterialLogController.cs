@@ -92,41 +92,7 @@ namespace WebApp_GozenBv.Controllers
             return View();
         }
 
-        private async Task<List<EmployeeViewData>> MapEmployeesViewData()
-        {
-            var employees = await _employeeManager.MapEmployeesAsync();
-            var viewData = new List<EmployeeViewData>();
 
-            foreach (var employee in employees)
-            {
-                viewData.Add(new EmployeeViewData
-                {
-                    EmployeeId = employee.Id,
-                    EmployeeFullName = employee.Name + " " + employee.Surname,
-                });
-            }
-
-            return viewData;
-        }
-
-        private async Task<List<MaterialViewData>> MapMaterialsViewData()
-        {
-            var materials = await _materialManager.MapMaterialsAsync();
-            var viewData = new List<MaterialViewData>();
-
-            foreach (var material in materials)
-            {
-                viewData.Add(new MaterialViewData
-                {
-                    MaterialId = material.Id,
-                    QuantityNew = material.NewQty,
-                    QuantityUsed = material.UsedQty,
-                    ProductNameCode = material.Name + " - " + material.Brand
-                });
-            }
-
-            return viewData;
-        }
 
         [HttpPost]
         [ValidateAntiForgeryToken]
@@ -288,6 +254,42 @@ namespace WebApp_GozenBv.Controllers
             await _userLogService.StoreLogAsync(ControllerNames.MaterialLog, ActionConst.Delete, logId);
 
             return RedirectToAction(nameof(Index));
+        }
+
+        private async Task<List<EmployeeViewData>> MapEmployeesViewData()
+        {
+            var employees = await _employeeManager.MapEmployeesAsync();
+            var viewData = new List<EmployeeViewData>();
+
+            foreach (var employee in employees)
+            {
+                viewData.Add(new EmployeeViewData
+                {
+                    EmployeeId = employee.Id,
+                    EmployeeFullName = employee.Name + " " + employee.Surname,
+                });
+            }
+
+            return viewData;
+        }
+
+        private async Task<List<MaterialViewData>> MapMaterialsViewData()
+        {
+            var materials = await _materialManager.MapMaterialsAsync();
+            var viewData = new List<MaterialViewData>();
+
+            foreach (var material in materials)
+            {
+                viewData.Add(new MaterialViewData
+                {
+                    MaterialId = material.Id,
+                    QuantityNew = material.NewQty,
+                    QuantityUsed = material.UsedQty,
+                    ProductNameCode = material.Name + " - " + material.Brand
+                });
+            }
+
+            return viewData;
         }
 
         private List<MaterialLog> CheckFilters(List<MaterialLog> logs, List<SortViewModel> lstStatus,

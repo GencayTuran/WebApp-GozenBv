@@ -46,21 +46,22 @@ namespace WebApp_GozenBv.Services
 
             string logId = Guid.NewGuid().ToString();
 
-            //new materiallog
+            //new Log
             var newLog = new MaterialLog()
             {
                 LogId = logId,
                 Status = MaterialLogStatusConst.Created,
                 LogDate = incomingViewModel.MaterialLogDate,
-                EmployeeId = incomingViewModel.EmployeeId
+                EmployeeId = incomingViewModel.EmployeeId,
+                Version = 1
+                
             };
             await _logManager.ManageMaterialLogAsync(newLog, EntityOperation.Create);
 
             List<MaterialLogItem> newItems = new();
-            List<Material> updatedMaterials = new();
             foreach (var item in selectedItems)
             {
-                //new MaterialLogItem
+                //new Item
                 MaterialLogItem newItem = new();
                 var material = await _materialManager.MapMaterialAsync(item.MaterialId);
 
@@ -78,10 +79,11 @@ namespace WebApp_GozenBv.Services
                 newItem.LogId = logId;
                 newItem.ProductNameCode = (material.Name + " " + material.Brand).ToUpper();
 
+                newItem.Version = 1;
+                newItem.EditStatus = EditStatus.Created;
+
                 newItems.Add(newItem);
-                updatedMaterials.Add(_materialHelper.TakeMaterial(material, item.Amount, item.Used));
             }
-            await _materialManager.ManageMaterialsAsync(updatedMaterials, EntityOperation.Update);
             await _logManager.ManageMaterialLogItemsAsync(newItems, EntityOperation.Create);
 
             return logId;
@@ -94,9 +96,32 @@ namespace WebApp_GozenBv.Services
             var undamagedItems = logDetails.ItemsUndamaged;
             var damagedItems = logDetails.ItemsDamaged;
 
-            if (IsReadOnlyState(log.Status))
+            string statusName;
+
+            switch (log.Status)
             {
-                throw new Exception("Is read-only state. No edit possible.");
+                case MaterialLogStatusConst.Created:
+                    statusName = MaterialLogStatusConst.CreatedName;
+
+                    //at create, everything can be changed.
+                    //return the create Get view with the already created log and items to further edit where needed.
+
+
+                    break;
+                case MaterialLogStatusConst.Returned:
+                    statusName = MaterialLogStatusConst.ReturnedName;
+
+                    //
+
+                    break;
+                default:
+                    throw new Exception("No edit possible at other than Created or Returned state.");
+            }
+
+            if (log.Approved)
+            {
+                //TODO: catch higher
+                throw new Exception($"Is already approved at '{statusName}' state and so is readonly state. No edit possible.");
             }
 
             //compare each class with incoming
@@ -118,8 +143,6 @@ namespace WebApp_GozenBv.Services
                         {
                             var material = await _materialManager.MapMaterialAsync(incomingItem.MaterialId);
                             var amountDifference = item.MaterialAmount - incomingItem.MaterialAmount;
-                            //update material amount
-                            modifiedMaterials.Add(_materialHelper.UpdateMaterialQty(material, amountDifference, incomingItem.Used));
                         }
                         //TODO: further checks of props
                         
@@ -308,6 +331,5 @@ namespace WebApp_GozenBv.Services
             original.DamagedAmount != incoming.DamagedAmount ||
             original.RepairedAmount != incoming.RepairedAmount ||
             original.DeletedAmount != incoming.DeletedAmount;
-        private bool IsReadOnlyState(int status) => status == MaterialLogStatusConst.Returned;
     }
 }

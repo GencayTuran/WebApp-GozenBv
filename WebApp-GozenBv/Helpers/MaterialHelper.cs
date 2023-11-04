@@ -28,7 +28,6 @@ namespace WebApp_GozenBv.Helpers
 
             return material;
         }
-
         
 
         public Material ReturnQuantity(Material material, int qty)
@@ -48,6 +47,7 @@ namespace WebApp_GozenBv.Helpers
 
         public Material FinishRepair(Material material, int qty, bool deleted)
         {
+            //TODO: qty is always 1 here beacause every ticket is per qtyAmount?
             if (!deleted)
             {
                 material.InRepairQty -= qty;

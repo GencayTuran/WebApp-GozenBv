@@ -21,6 +21,8 @@ namespace WebApp_GozenBv.Models
 
         public bool Damaged { get; set; }
         public int Status { get; set; }
+        public bool Approved { get; set; }
 
+        public int Version { get; set; }
     }
 }
