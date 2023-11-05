@@ -26,6 +26,9 @@ namespace WebApp_GozenBv.Managers.Interfaces
         MaterialLogItem MapMaterialLogItemStatusCreated(MaterialLogItem incoming);
         MaterialLogItem MapMaterialLogItemStatusReturned(MaterialLogItem incoming);
         MaterialLogItem MapMaterialLogItemStatusReturnedDamaged(MaterialLogItem incoming);
+
+        public MaterialLog MapReturnedLog(MaterialLog log);
+        public MaterialLogItem MapReturnedItem(MaterialLogItem item);
     }
 }
 

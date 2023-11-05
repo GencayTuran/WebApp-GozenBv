@@ -106,8 +106,8 @@
                 @if (status == MaterialLogStatusConst.Returned)
                 {
                     <th>@Html.DisplayNameFor(model => model.MaterialLogItem.DamagedAmount)</th>
-                    <th>@Html.DisplayNameFor(model => model.MaterialLogItem.RepairedAmount)</th>
-                    <th>@Html.DisplayNameFor(model => model.MaterialLogItem.DeletedAmount)</th>
+                    <th>@Html.DisplayNameFor(model => model.MaterialLogItem.RepairAmount)</th>
+                    <th>@Html.DisplayNameFor(model => model.MaterialLogItem.DeleteAmount)</th>
                 }
             </tr>
         </thead>
@@ -127,8 +127,8 @@
                     @if (status == MaterialLogStatusConst.Returned)
                     {
                         <td>@item.DamagedAmount</td>
-                        <td>@item.RepairedAmount</td>
-                        <td>@item.DeletedAmount</td>
+                        <td>@item.RepairAmount</td>
+                        <td>@item.DeleteAmount</td>
                     }
                 </tr>
             }

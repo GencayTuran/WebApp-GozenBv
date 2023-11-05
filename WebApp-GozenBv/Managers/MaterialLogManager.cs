@@ -166,7 +166,7 @@ namespace WebApp_GozenBv.Managers
                 LogId = incoming.LogId,
                 ReturnDate = incoming.ReturnDate,
                 Damaged = false,
-                Status = EditStatus.Created,
+                Status = MaterialLogStatusConst.Created,
                 Approved = false,
                 Version = original.Version++
             };
@@ -185,8 +185,8 @@ namespace WebApp_GozenBv.Managers
                 Used = incoming.Used,
                 IsDamaged = false,
                 DamagedAmount = 0,
-                RepairedAmount = 0,
-                DeletedAmount = 0,
+                RepairAmount = 0,
+                DeleteAmount = 0,
                 EditStatus = EditStatus.Created,
                 Version = incoming.Version++
             };
@@ -205,8 +205,8 @@ namespace WebApp_GozenBv.Managers
                 Used = incoming.Used,
                 IsDamaged = false,
                 DamagedAmount = 0,
-                RepairedAmount = 0,
-                DeletedAmount = 0,
+                RepairAmount = 0,
+                DeleteAmount = 0,
                 EditStatus = EditStatus.Returned,
                 Version = incoming.Version++
             };
@@ -225,10 +225,45 @@ namespace WebApp_GozenBv.Managers
                 Used = incoming.Used,
                 IsDamaged = false,
                 DamagedAmount = incoming.DamagedAmount,
-                RepairedAmount = incoming.RepairedAmount,
-                DeletedAmount = incoming.DeletedAmount,
+                RepairAmount = incoming.RepairAmount,
+                DeleteAmount = incoming.DeleteAmount,
                 EditStatus = EditStatus.Returned,
                 Version = incoming.Version++
+            };
+        }
+
+        public MaterialLog MapReturnedLog(MaterialLog log)
+        {
+            return new MaterialLog()
+            {
+                LogDate = log.LogDate,
+                EmployeeId = log.EmployeeId,
+                LogId = log.LogId,
+                ReturnDate = log.ReturnDate,
+                Damaged = log.Damaged,
+                Status = MaterialLogStatusConst.Returned,
+                Approved = false,
+                Version = log.Version++
+            };
+        }
+
+        public MaterialLogItem MapReturnedItem(MaterialLogItem item)
+        {
+            return new MaterialLogItem()
+            {
+                LogId = item.LogId,
+                MaterialId = item.MaterialId,
+                MaterialAmount = item.MaterialAmount,
+                ProductNameCode = item.ProductNameCode,
+                NoReturn = item.NoReturn,
+                Cost = item.Cost,
+                Used = item.Used,
+                IsDamaged = item.IsDamaged,
+                DamagedAmount = item.DamagedAmount,
+                RepairAmount = item.RepairAmount,
+                DeleteAmount = item.DeleteAmount,
+                EditStatus = EditStatus.Returned,
+                Version = item.Version++
             };
         }
 

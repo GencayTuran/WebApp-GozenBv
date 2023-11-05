@@ -68,8 +68,8 @@ namespace WebApp_GozenBv.Services
                 if (material.NoReturn)
                 {
                     newItem.DamagedAmount = null;
-                    newItem.RepairedAmount = null;
-                    newItem.DeletedAmount = null;
+                    newItem.RepairAmount = null;
+                    newItem.DeleteAmount = null;
                 }
 
                 newItem.MaterialId = item.MaterialId;
@@ -157,7 +157,7 @@ namespace WebApp_GozenBv.Services
                         foreach (var item in incomingLog.Items)
                         {
                             var updatedItem = _logManager.MapMaterialLogItemStatusReturned(item);
-                            modifiedItems.Add(item);
+                            modifiedItems.Add(updatedItem);
                         }
                     }
                     else
@@ -165,13 +165,13 @@ namespace WebApp_GozenBv.Services
                         foreach (var item in incomingLog.Items)
                         {
                             var updatedItem = _logManager.MapMaterialLogItemStatusReturned(item);
-                            modifiedItems.Add(item);
+                            modifiedItems.Add(updatedItem);
                         }
 
                         foreach (var item in incomingLog.ItemsDamaged)
                         {
                             var updatedItem = _logManager.MapMaterialLogItemStatusReturnedDamaged(item);
-                            modifiedItems.Add(item);
+                            modifiedItems.Add(updatedItem);
                         }
                     }
                     break;
@@ -181,14 +181,13 @@ namespace WebApp_GozenBv.Services
         }
         public void HandleReturn(MaterialLogDetailViewModel incomingReturn)
         {
+            //incoming
             string logId = incomingReturn.MaterialLog.LogId;
             var damaged = incomingReturn.MaterialLog.Damaged;
 
+            //original
             var log = _logManager.MapMaterialLog(logId);
-            var logItems = _logManager.MapMaterialLogItems(logId);
-
-
-            List<Material> modifiedMaterials = new();
+            var originalLogItems = _logManager.MapMaterialLogItems(logId);
 
             if (log == null)
             {
@@ -196,6 +195,9 @@ namespace WebApp_GozenBv.Services
             }
 
             log.ReturnDate = DateTime.Now;
+            log.Status = MaterialLogStatusConst.Returned;
+
+            List<MaterialLogItem> mappedItems = new();
 
             if (damaged)
             {
@@ -204,53 +206,39 @@ namespace WebApp_GozenBv.Services
                     {
                         PropertyNameCaseInsensitive = true
                     });
-
-                log.Status = MaterialLogStatusConst.DamagedAwaitingAction;
                 log.Damaged = damaged;
 
-                List<MaterialLogItem> modifiedItems = new();
-
-                //update MaterialLogItems
-                foreach (var item in logItems)
+                foreach (var item in originalLogItems)
                 {
                     var damagedItem = damagedMaterials.FirstOrDefault(di => di.MaterialId == item.MaterialId);
-                    var originalMaterial = _materialManager.MapMaterial(item.MaterialId);
 
                     if (damagedItem != null)
                     {
                         item.DamagedAmount = damagedItem.DamagedAmount;
+                        item.RepairAmount = damagedItem.RepairAmount;
+                        item.DeleteAmount = damagedItem.DeleteAmount;
                         item.IsDamaged = true;
-                        modifiedItems.Add(item);
+                    }
 
-                        //undamaged amount of material adding to used
-                        var notDamagedAmount = item.MaterialAmount - damagedItem.DamagedAmount;
-                        if (notDamagedAmount != 0)
-                        {
-                            modifiedMaterials.Add(_materialHelper.AddToUsed(originalMaterial, notDamagedAmount));
-                        }
-                    }
-                    else
-                    {
-                        //adding all amount of material
-                        modifiedMaterials.Add(_materialHelper.AddToUsed(originalMaterial, item.MaterialAmount));
-                    }
+                    var mappedItem = _logManager.MapReturnedItem(item);
+                    mappedItems.Add(mappedItem);
                 }
-                _logManager.ManageMaterialLogItems(modifiedItems, EntityOperation.Update);
             }
-            else //TODO: else added afterwards.. was this missing? is this correct?
+            else
             {
-                log.Status = MaterialLogStatusConst.Returned;
-
-                //material add to used
-                foreach (var item in logItems)
+                foreach (var item in originalLogItems)
                 {
-                    var originalMaterial = _materialManager.MapMaterial(item.MaterialId);
-                    modifiedMaterials.Add(_materialHelper.AddToUsed(originalMaterial, item.MaterialAmount));
+                    var mappedItem = _logManager.MapReturnedItem(item);
+                    mappedItems.Add(mappedItem);
                 }
             }
-            _logManager.ManageMaterialLog(log, EntityOperation.Update);
-            _materialManager.ManageMaterials(modifiedMaterials, EntityOperation.Update);
+
+            _logManager.ManageMaterialLogItems(mappedItems, EntityOperation.Create);
+
+            var mappedLog = _logManager.MapReturnedLog(log);
+            _logManager.ManageMaterialLog(mappedLog, EntityOperation.Create);
         }
+
         public async Task HandleDamaged(MaterialLogDetailViewModel incomingComplete)
         {
             var logId = incomingComplete.MaterialLog.LogId;
@@ -281,8 +269,8 @@ namespace WebApp_GozenBv.Services
                 if (damagedItem != null)
                 {
                     var originalMaterial = await _materialManager.MapMaterialAsync(damagedItem.MaterialId);
-                    item.RepairedAmount = damagedItem.RepairedAmount;
-                    item.DeletedAmount = damagedItem.DeletedAmount;
+                    item.RepairAmount = damagedItem.RepairedAmount;
+                    item.DeleteAmount = damagedItem.DeletedAmount;
 
                     modifiedItems.Add(item);
                     modifiedMaterials.Add(_materialHelper.AddToUsed(originalMaterial, damagedItem.RepairedAmount));
@@ -320,11 +308,11 @@ namespace WebApp_GozenBv.Services
             =>
             original.MaterialAmount != incoming.MaterialAmount ||
             original.DamagedAmount != incoming.DamagedAmount ||
-            original.RepairedAmount != incoming.RepairedAmount ||
-            original.DeletedAmount != incoming.DeletedAmount;
+            original.RepairAmount != incoming.RepairAmount ||
+            original.DeleteAmount != incoming.DeleteAmount;
 
-        
 
-        
+
+
     }
 }

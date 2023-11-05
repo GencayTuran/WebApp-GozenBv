@@ -144,8 +144,8 @@ namespace WebApp_GozenBv.Data
                         IsDamaged = damaged,
                         Cost = material.Cost,
                         DamagedAmount = rndDamagedAmount,
-                        RepairedAmount = rndRepairedAmount,
-                        DeletedAmount = rndDeletedAmount,
+                        RepairAmount = rndRepairedAmount,
+                        DeleteAmount = rndDeletedAmount,
                         Used = used
                     });
 

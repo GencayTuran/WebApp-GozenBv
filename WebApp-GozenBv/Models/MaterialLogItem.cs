@@ -17,8 +17,8 @@ namespace WebApp_GozenBv.Models
         public bool Used { get; set; }
         public bool IsDamaged { get; set; }
         public int? DamagedAmount { get; set; }
-        public int? RepairedAmount { get; set; }
-        public int? DeletedAmount { get; set; }
+        public int? RepairAmount { get; set; }
+        public int? DeleteAmount { get; set; }
 
         public int EditStatus { get; set; }
         public int Version { get; set; }
