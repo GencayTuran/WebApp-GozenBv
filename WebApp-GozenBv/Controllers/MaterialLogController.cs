@@ -164,6 +164,15 @@ namespace WebApp_GozenBv.Controllers
             return View(incomingEdit);
         }
 
+        [HttpPost]
+        public async Task<IActionResult> ApproveLog(string logId)
+        {
+            await _logService.HandleApprove(logId);
+
+            return RedirectToAction("Details", new RouteValueDictionary(
+                    new { ControllerContext = "MaterialLog", Action = "Details", Id = logId }));
+        }
+
         [HttpGet]
         public async Task<IActionResult> ReturnItems(string id)
         {

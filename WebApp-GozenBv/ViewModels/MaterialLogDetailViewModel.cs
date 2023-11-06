@@ -21,7 +21,6 @@ namespace WebApp_GozenBv.ViewModels
         public MaterialLog MaterialLog { get; set; }
         public MaterialLogItem MaterialLogItem { get; set; }
         public List<MaterialLogItem> Items { get; set; }
-        public List<MaterialLogItem> ItemsDamaged { get; set; }
         public string EmployeeFullName { get; set; }
         public string DamagedMaterial { get; set; }
     }

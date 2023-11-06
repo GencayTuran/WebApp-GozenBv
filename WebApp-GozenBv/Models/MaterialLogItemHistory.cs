@@ -6,6 +6,7 @@ namespace WebApp_GozenBv.Models
     public class MaterialLogItemHistory
     {
         public int Id { get; set; }
+        public int MaterialLogItemId { get; set; }
         public string LogId { get; set; }
         public int Version { get; set; } 
 

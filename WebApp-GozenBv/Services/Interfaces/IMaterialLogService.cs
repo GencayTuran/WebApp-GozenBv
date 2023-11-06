@@ -11,5 +11,6 @@ namespace WebApp_GozenBv.Services.Interfaces
         Task HandleDamaged(MaterialLogDetailViewModel incomingComplete);
 
         Task HandleDelete(string logId);
+        Task HandleApprove(string logId);
     }
 }

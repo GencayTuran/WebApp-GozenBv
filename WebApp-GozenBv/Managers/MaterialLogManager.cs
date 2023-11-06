@@ -11,6 +11,7 @@ using System.Threading.Tasks;
 using WebApp_GozenBv.Constants;
 using WebApp_GozenBv.DataHandlers;
 using WebApp_GozenBv.DataHandlers.Interfaces;
+using WebApp_GozenBv.DTOs;
 using WebApp_GozenBv.Helpers;
 using WebApp_GozenBv.Managers.Interfaces;
 using WebApp_GozenBv.Models;
@@ -80,6 +81,8 @@ namespace WebApp_GozenBv.Managers
         {
             return await _logData.QueryMaterialLogs();
         }
+
+        //TODO: check if still needed. DTOs will replace backend ViewModels.
         public async Task<MaterialLogDetailViewModel> GetMaterialLogDetails(string logId)
         {
             var log = await _logData.QueryMaterialLogByLogIdAsync(logId);
@@ -117,6 +120,23 @@ namespace WebApp_GozenBv.Managers
                 Items = undamagedItems,
                 ItemsDamaged = damagedItems,
                 EmployeeFullName = (log.Employee.Name + " " + log.Employee.Surname).ToUpper(),
+            };
+        }
+        public async Task<MaterialLogDTO> GetMaterialLogDTO(string logId)
+        {
+            var log = await _logData.QueryMaterialLogByLogIdAsync(logId);
+
+            if (log == null)
+            {
+                throw new ArgumentNullException($"MaterialLog with logId {logId} does not exist.");
+            }
+
+            var items = await _itemData.QueryItemsByLogIdAsync(logId);
+
+            return new MaterialLogDTO
+            {
+                MaterialLog = log,
+                MaterialLogItems = items
             };
         }
 
@@ -162,106 +182,9 @@ namespace WebApp_GozenBv.Managers
             return _itemData.QueryItemsByLogId(logId);
         }
 
-        
-
-        //public MaterialLogItem MapMaterialLogItemStatusCreated(MaterialLogItem incoming)
-        //{
-        //    return new MaterialLogItem()
-        //    {
-        //        LogId = incoming.LogId,
-        //        MaterialId = incoming.MaterialId,
-        //        MaterialAmount = incoming.MaterialAmount,
-        //        ProductNameCode = incoming.ProductNameCode,
-        //        NoReturn = incoming.NoReturn,
-        //        Cost = incoming.Cost,
-        //        Used = incoming.Used,
-        //        IsDamaged = false,
-        //        DamagedAmount = 0,
-        //        RepairAmount = 0,
-        //        DeleteAmount = 0,
-        //        EditStatus = EditStatus.Created,
-        //        Version = incoming.Version++
-        //    };
-        //}
-
-        //public MaterialLogItem MapMaterialLogItemStatusReturned(MaterialLogItem incoming)
-        //{
-        //    return new MaterialLogItem()
-        //    {
-        //        LogId = incoming.LogId,
-        //        MaterialId = incoming.MaterialId,
-        //        MaterialAmount = incoming.MaterialAmount,
-        //        ProductNameCode = incoming.ProductNameCode,
-        //        NoReturn = incoming.NoReturn,
-        //        Cost = incoming.Cost,
-        //        Used = incoming.Used,
-        //        IsDamaged = false,
-        //        DamagedAmount = 0,
-        //        RepairAmount = 0,
-        //        DeleteAmount = 0,
-        //        EditStatus = EditStatus.Returned,
-        //        Version = incoming.Version++
-        //    };
-        //}
-
-        //public MaterialLogItem MapMaterialLogItemStatusReturnedDamaged(MaterialLogItem incoming)
-        //{
-        //    return new MaterialLogItem()
-        //    {
-        //        LogId = incoming.LogId,
-        //        MaterialId = incoming.MaterialId,
-        //        MaterialAmount = incoming.MaterialAmount,
-        //        ProductNameCode = incoming.ProductNameCode,
-        //        NoReturn = incoming.NoReturn,
-        //        Cost = incoming.Cost,
-        //        Used = incoming.Used,
-        //        IsDamaged = false,
-        //        DamagedAmount = incoming.DamagedAmount,
-        //        RepairAmount = incoming.RepairAmount,
-        //        DeleteAmount = incoming.DeleteAmount,
-        //        EditStatus = EditStatus.Returned,
-        //        Version = incoming.Version++
-        //    };
-        //}
-
-        //public MaterialLog MapReturnedLog(MaterialLog log)
-        //{
-        //    return new MaterialLog()
-        //    {
-        //        LogDate = log.LogDate,
-        //        EmployeeId = log.EmployeeId,
-        //        LogId = log.LogId,
-        //        ReturnDate = log.ReturnDate,
-        //        Damaged = log.Damaged,
-        //        Status = MaterialLogStatusConst.Returned,
-        //        Approved = false,
-        //        Version = log.Version++
-        //    };
-        //}
-
-        //public MaterialLogItem MapReturnedItem(MaterialLogItem item)
-        //{
-        //    return new MaterialLogItem()
-        //    {
-        //        LogId = item.LogId,
-        //        MaterialId = item.MaterialId,
-        //        MaterialAmount = item.MaterialAmount,
-        //        ProductNameCode = item.ProductNameCode,
-        //        NoReturn = item.NoReturn,
-        //        Cost = item.Cost,
-        //        Used = item.Used,
-        //        IsDamaged = item.IsDamaged,
-        //        DamagedAmount = item.DamagedAmount,
-        //        RepairAmount = item.RepairAmount,
-        //        DeleteAmount = item.DeleteAmount,
-        //        EditStatus = EditStatus.Returned,
-        //        Version = item.Version++
-        //    };
-        //}
-
         public async Task ManageMaterialLogHistoryAsync(MaterialLogHistory entity)
         {
-           await _historyData.CreateMaterialLogHistoryAsync(entity);
+            await _historyData.CreateMaterialLogHistoryAsync(entity);
         }
 
         public async Task ManageMaterialLogItemsHistoryAsync(List<MaterialLogItemHistory> collection)
@@ -306,8 +229,10 @@ namespace WebApp_GozenBv.Managers
             {
                 mappedItems.Add(new MaterialLogItemHistory()
                 {
+                    MaterialLogItemId = item.Id,
                     LogId = item.LogId,
                     MaterialId = item.MaterialId,
+                    Material = item.Material,
                     MaterialAmount = item.MaterialAmount,
                     Used = item.Used,
                     IsDamaged = item.IsDamaged,
@@ -315,7 +240,7 @@ namespace WebApp_GozenBv.Managers
                     RepairAmount = item.RepairAmount,
                     DeleteAmount = item.DeleteAmount,
                     EditTimestamp = DateTime.Now,
-                    Version =  latestVersion++
+                    Version = latestVersion++
                 });
             }
 
@@ -332,60 +257,54 @@ namespace WebApp_GozenBv.Managers
         }
 
         //TODO: this isnt only a Map anymore. rename to Handle?
-        public async Task<List<MaterialLogItem>> MapUpdatedMaterialLogItems(List<MaterialLogItem> originalItems, List<MaterialLogItem> incomingItems, int status)
+        public List<MaterialLogItem> MapUpdatedItems_StatusCreated(List<MaterialLogItem> originalItems, List<MaterialLogItem> incomingItems)
         {
             var mappedItems = new List<MaterialLogItem>();
 
-            //check if status created or returned
-            switch (status)
+            //iterate original
+            foreach (var item in originalItems)
             {
-                case MaterialLogStatusConst.Created:
-                    //iterate original
-                    foreach (var item in originalItems)
-                    {
-                        //find match
-                        //TODO: is this a good expression?
-                        var match = incomingItems.FirstOrDefault(x => x.Id == item.Id && x.LogId == x.LogId);
+                //find match
+                //TODO: is this a good expression?
+                var match = incomingItems.FirstOrDefault(x => x.Id == item.Id && x.LogId == x.LogId);
 
-                        if (match != null)
-                        {
-                            item.MaterialId = match.MaterialId;
-                            item.MaterialAmount = match.MaterialAmount;
-                            item.Used = match.Used;
+                if (match != null)
+                {
+                    item.MaterialId = match.MaterialId;
+                    item.MaterialAmount = match.MaterialAmount;
+                    item.Used = match.Used;
 
-                            //add to updateList
-                            mappedItems.Add(item);
-                        }
-                    }
-                    break;
+                    //add to updateList
+                    mappedItems.Add(item);
+                }
+            }
 
-                case MaterialLogStatusConst.Returned:
-                    foreach (var item in originalItems)
-                    {
-                        //find match
-                        //TODO: is this a good expression?
-                        var match = incomingItems.FirstOrDefault(x => x.Id == item.Id && x.LogId == x.LogId);
+            return mappedItems;
+        }
 
-                        if (match == null)
-                        {
-                            throw new ArgumentNullException("No matching item found. Fatal error.");
-                        }
+        public List<MaterialLogItem> MapUpdatedItems_StatusReturned(List<MaterialLogItem> originalLogItems, List<MaterialLogItem> incomingLogItems)
+        {
+            var mappedItems = new List<MaterialLogItem>();
 
-                        item.MaterialAmount = match.MaterialAmount;
-                        item.Used = match.Used;
-                        item.IsDamaged = match.IsDamaged;
-                        item.DamagedAmount = match.DamagedAmount;
-                        item.RepairAmount = match.RepairAmount;
-                        item.DeleteAmount = match.DeleteAmount;
+            foreach (var item in originalLogItems)
+            {
+                //find match
+                //TODO: is this a good expression?
+                var match = originalLogItems.FirstOrDefault(x => x.Id == item.Id && x.LogId == x.LogId);
 
-                        //add to updateList
-                        mappedItems.Add(item);
-                    }
-                    
-                    break;
+                if (match == null)
+                {
+                    throw new ArgumentNullException("No matching item found. Fatal error.");
+                }
 
-                default:
-                    throw new Exception($"Status id {status} is invalid.");
+                //TODO: dont forget in the view to set the amounts to null when item turns ot not damaged. Proper reset!
+                item.IsDamaged = match.IsDamaged;
+                item.DamagedAmount = match.DamagedAmount;
+                item.RepairAmount = match.RepairAmount;
+                item.DeleteAmount = match.DeleteAmount;
+
+                //add to updateList
+                mappedItems.Add(item);
             }
             return mappedItems;
         }

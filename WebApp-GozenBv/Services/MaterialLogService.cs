@@ -44,6 +44,8 @@ namespace WebApp_GozenBv.Services
                         PropertyNameCaseInsensitive = true
                     });
 
+            await ValidateItems(selectedItems);
+
             string logId = Guid.NewGuid().ToString();
 
             //new Log
@@ -80,103 +82,101 @@ namespace WebApp_GozenBv.Services
 
             return logId;
         }
+
+        private async Task ValidateItems(List<MaterialLogSelectedItemViewModel> selectedItems)
+        {
+            foreach (var item in selectedItems)
+            {
+                var material = await _materialManager.GetMaterialAsync(item.MaterialId);
+                _materialHelper.ValidateQuantity(material, item.Amount, item.Used);
+            }
+        }
+
         public async Task HandleEdit(MaterialLogDetailViewModel incomingLog)
         {
             //get original model
-            var logDetails = await _logManager.GetMaterialLogDetails(incomingLog.MaterialLog.LogId);
-            var log = logDetails.MaterialLog;
-            var materialLogItems = logDetails.Items;
-            var damagedItems = logDetails.ItemsDamaged;
+            var originalLogDetails = await _logManager.GetMaterialLogDTO(incomingLog.MaterialLog.LogId);
+            var originalLog = originalLogDetails.MaterialLog;
+            var originalItems = originalLogDetails.MaterialLogItems;
             string statusName;
 
             List<MaterialLogItem> modifiedItems = new();
 
-            switch (log.Status)
+
+
+            switch (originalLog.Status)
             {
                 case MaterialLogStatusConst.Created:
                     statusName = MaterialLogStatusConst.CreatedName;
 
-                    if (log.Approved)
+                    if (originalLog.Approved)
                     {
                         //TODO: catch higher
                         throw new Exception($"Is already approved at '{statusName}' state and so is readonly state. No edit possible.");
                     }
 
-                    if (!LogModified(log, incomingLog.MaterialLog) && !LogItemsModified(materialLogItems, incomingLog.Items, log.Status))
+                    if (!LogModified(originalLog, incomingLog.MaterialLog) && !LogItemsModified(originalItems, incomingLog.Items, originalLog.Status))
                     {
                         //TODO: catch higher
                         throw new Exception($"Nothing no modify. Are you sure you have made any changes?");
                     }
 
-                    if (LogModified(log, incomingLog.MaterialLog))
+                    if (LogModified(originalLog, incomingLog.MaterialLog))
                     {
-                        //map original to history
-                        var mappedHistory = await _logManager.MapLogHistoryAsync(log);
-
-                        //create record for history
-                        await _logManager.ManageMaterialLogHistoryAsync(mappedHistory);
-                        
                         //map the update
-                        var updatedLog = _logManager.MapUpdatedMaterialLog(log, incomingLog.MaterialLog);
-
+                        var updatedLog = _logManager.MapUpdatedMaterialLog(originalLog, incomingLog.MaterialLog);
                         //update the log
                         await _logManager.ManageMaterialLogAsync(updatedLog, EntityOperation.Update);
+
+                        //map original to history
+                        var mappedHistory = await _logManager.MapLogHistoryAsync(originalLog);
+                        //create record for history
+                        await _logManager.ManageMaterialLogHistoryAsync(mappedHistory);
+
                     }
 
-                    if (LogItemsModified(materialLogItems, incomingLog.Items, log.Status))
+                    if (LogItemsModified(originalItems, incomingLog.Items, originalLog.Status))
                     {
-                        //map original items to history
-                        var mappedHistory = await _logManager.MapLogItemsHistoryAsync(materialLogItems);
+                        //map the update
+                        var updatedItems = _logManager.MapUpdatedItems_StatusCreated(originalItems, incomingLog.Items);
+                        //update items
+                        await _logManager.ManageMaterialLogItemsAsync(updatedItems, EntityOperation.Update);
 
+                        //map original items to history
+                        var mappedHistory = await _logManager.MapLogItemsHistoryAsync(originalItems);
                         //create records for history
                         await _logManager.ManageMaterialLogItemsHistoryAsync(mappedHistory);
 
-                        //map the update
-                        var updatedItems = await _logManager.MapUpdatedMaterialLogItems(materialLogItems, incomingLog.Items, log.Status);
-
-                        //update items
-                        await _logManager.ManageMaterialLogItemsAsync(updatedItems, EntityOperation.Update);
                     }
                     break;
 
                 case MaterialLogStatusConst.Returned:
                     statusName = MaterialLogStatusConst.ReturnedName;
 
-                    if (log.Approved)
+                    if (originalLog.Approved)
                     {
                         //TODO: catch higher
                         throw new Exception($"Is already approved at '{statusName}' state and so is readonly state. No edit possible.");
                     }
 
-                    if (!LogItemsModified(materialLogItems, incomingLog.Items, log.Status))
+                    if (!LogItemsModified(originalItems, incomingLog.Items, originalLog.Status))
                     {
                         //TODO: catch higher
                         throw new Exception($"Nothing no modify. Are you sure you have made any changes?");
                     }
 
                     //only damaged amount, inrepairamount and deletedamount editable. also not damaged items can be damaged edited
-
-                    if (!log.Damaged)
+                    if (LogItemsModified(originalItems, incomingLog.Items, originalLog.Status))
                     {
-                        foreach (var item in incomingLog.Items)
-                        {
-                            var updatedItem = _logManager.MapMaterialLogItemStatusReturned(item);
-                            modifiedItems.Add(updatedItem);
-                        }
-                    }
-                    else
-                    {
-                        foreach (var item in incomingLog.Items)
-                        {
-                            var updatedItem = _logManager.MapMaterialLogItemStatusReturned(item);
-                            modifiedItems.Add(updatedItem);
-                        }
+                        //map the update
+                        var updatedItems = _logManager.MapUpdatedItems_StatusReturned(originalItems, incomingLog.Items);
+                        //update items
+                        await _logManager.ManageMaterialLogItemsAsync(updatedItems, EntityOperation.Update);
 
-                        foreach (var item in incomingLog.ItemsDamaged)
-                        {
-                            var updatedItem = _logManager.MapMaterialLogItemStatusReturnedDamaged(item);
-                            modifiedItems.Add(updatedItem);
-                        }
+                        //map original items to history
+                        var mappedHistory = await _logManager.MapLogItemsHistoryAsync(originalItems);
+                        //create records for history
+                        await _logManager.ManageMaterialLogItemsHistoryAsync(mappedHistory);
                     }
                     break;
                 default:
@@ -313,7 +313,7 @@ namespace WebApp_GozenBv.Services
                 || original.ReturnDate != incoming.ReturnDate
                 || original.EmployeeId != incoming.EmployeeId;
         }
-        private bool LogItemsModified(List<MaterialLogItem> original, List<MaterialLogItem> incoming, int status) 
+        private bool LogItemsModified(List<MaterialLogItem> original, List<MaterialLogItem> incoming, int status)
             => !_equalityHelper.AreEditableFieldsEqual(original, incoming, status);
         private bool MaterialAmountModified(MaterialLogItem original, MaterialLogItem incoming)
             =>
@@ -322,8 +322,12 @@ namespace WebApp_GozenBv.Services
             original.RepairAmount != incoming.RepairAmount ||
             original.DeleteAmount != incoming.DeleteAmount;
 
+        public async Task HandleApprove(string logId)
+        {
+            //check for status
 
-
-
+            //if created
+            //
+        }
     }
 }

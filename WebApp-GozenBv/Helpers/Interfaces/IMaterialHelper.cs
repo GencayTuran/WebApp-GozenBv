@@ -1,4 +1,5 @@
-﻿using WebApp_GozenBv.Models;
+﻿using System.Threading.Tasks;
+using WebApp_GozenBv.Models;
 
 namespace WebApp_GozenBv.Helpers.Interfaces
 {
