@@ -19,6 +19,7 @@ namespace WebApp_GozenBv.DataHandlers
         void CreateItems(List<MaterialLogItem> items);
         void UpdateItems(List<MaterialLogItem> items);
         void DeleteItems(List<MaterialLogItem> items);
+        Task DeleteItemAsync(MaterialLogItem item);
     }
 }
 

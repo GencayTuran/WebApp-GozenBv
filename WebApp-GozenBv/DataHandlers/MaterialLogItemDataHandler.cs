@@ -76,12 +76,19 @@ namespace WebApp_GozenBv.DataHandlers
         {
             return await _context.MaterialLogItems
                             .Where(s => s.LogId == logCode)
-                            .Where(s => !s.IsDamaged || s.NoReturn).ToListAsync();
+                            .Include(s => s.Material)
+                            .Where(s => !s.IsDamaged || s.Material.NoReturn).ToListAsync();
         }
 
         public List<MaterialLogItem> QueryItemsByLogId(string logId)
         {
             return _context.MaterialLogItems.Where(i => i.LogId.Equals(logId)).ToList();
+        }
+
+        public async Task DeleteItemAsync(MaterialLogItem item)
+        {
+            _context.MaterialLogItems.Remove(item);
+            await _context.SaveChangesAsync();
         }
     }
 }

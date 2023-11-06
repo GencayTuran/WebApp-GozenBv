@@ -3,6 +3,7 @@ using System;
 using WebApp_GozenBv.Helpers.Interfaces;
 using System.Collections.Generic;
 using WebApp_GozenBv.Models;
+using WebApp_GozenBv.Constants;
 
 namespace WebApp_GozenBv.Helpers
 {
@@ -54,5 +55,50 @@ namespace WebApp_GozenBv.Helpers
             return !enumerator1.MoveNext() && !enumerator2.MoveNext();
         }
 
+        public bool AreEditableFieldsEqual(List<MaterialLogItem> original, List<MaterialLogItem> incoming, int status)
+        {
+            if (original == null || incoming == null)
+            {
+                throw new ArgumentNullException("One or more collections are null.");
+            }
+
+            if (original.Count != incoming.Count)
+            {
+                return false;
+            }
+
+            switch (status)
+            {
+                case MaterialLogStatusConst.Created:
+                    for (int i = 0; i < original.Count; i++)
+                    {
+                        if (original[i].MaterialId != incoming[i]?.MaterialId
+                            || original[i].MaterialAmount != incoming[i]?.MaterialAmount
+                            || original[i].Used != incoming[i]?.Used)
+                        {
+                            return false;
+                        }
+                    }
+                    break;
+                case MaterialLogStatusConst.Returned:
+                    for (int i = 0; i < original.Count; i++)
+                    {
+                        if (original[i].MaterialId != incoming[i]?.MaterialId
+                            || original[i].MaterialAmount != incoming[i]?.MaterialAmount
+                            || original[i].Used != incoming[i]?.Used
+                            || original[i].IsDamaged != incoming[i]?.IsDamaged
+                            || original[i].DamagedAmount != incoming[i]?.DamagedAmount
+                            || original[i].RepairAmount != incoming[i]?.RepairAmount
+                            || original[i].DeleteAmount != incoming[i]?.DeleteAmount)
+                        {
+                            return false;
+                        }
+                    }
+                    break;
+                default:
+                    throw new Exception($"Status id {status} is invalid.");
+            }
+            return true;
+        }
     }
 }
