@@ -19,14 +19,14 @@ namespace WebApp_GozenBv.DataHandlers
             _context = context;
         }
 
-        public async Task<IEnumerable<CarMaintenance>> GetCarMaintenances(Expression<Func<CarMaintenance, bool>> filterExpression)
+        public async Task<IEnumerable<CarMaintenance>> QueryCarMaintenances(Expression<Func<CarMaintenance, bool>> filterExpression)
         {
             return filterExpression != null ?
                 await _context.CarMaintenances.Where(filterExpression).ToListAsync()
                 : await _context.CarMaintenances.Select(x => x).ToListAsync();
         }
 
-        public async Task<CarMaintenance> GetCarMaintenanceById(int? id)
+        public async Task<CarMaintenance> QueryCarMaintenanceById(int? id)
         {
             return await _context.CarMaintenances.FindAsync(id);
         }
@@ -49,7 +49,7 @@ namespace WebApp_GozenBv.DataHandlers
             await _context.SaveChangesAsync();
         }
 
-        public Task<List<CarMaintenance>> GetCarMaintenances()
+        public Task<List<CarMaintenance>> QueryCarMaintenances()
         {
             return _context.CarMaintenances.ToListAsync();
         }

@@ -55,7 +55,7 @@ namespace WebApp_GozenBv.Controllers
         [HttpGet]
         public async Task<IActionResult> Index(string searchString, int sortStatus, int sortOrder)
         {
-            var logs = await _logManager.MapMaterialLogs();
+            var logs = await _logManager.GetMaterialLogs();
 
             var lstStatusSort = _searchHelper.GetStatusSortList();
             var lstOrderSort = _searchHelper.GetSortOrderList();
@@ -79,15 +79,15 @@ namespace WebApp_GozenBv.Controllers
                 return PartialView("_EntityNotFound");
             }
 
-            return View(await _logManager.MapMaterialLogDetails(logCode));
+            return View(await _logManager.GetMaterialLogDetails(logCode));
         }
 
         [HttpGet]
         public async Task<IActionResult> Create()
         {
             ViewData["DateToday"] = DateTime.Today.ToString("yyyy-MM-dd");
-            ViewData["Employees"] = new SelectList(await MapEmployeesViewData(), "EmployeeId", "EmployeeFullName");
-            ViewData["Materials"] = new SelectList(await MapMaterialsViewData(), "MaterialId", "ProductNameCode");
+            ViewData["Employees"] = new SelectList(await GetEmployeesViewData(), "EmployeeId", "EmployeeFullName");
+            ViewData["Materials"] = new SelectList(await GetMaterialsViewData(), "MaterialId", "ProductNameCode");
 
             return View();
         }
@@ -126,15 +126,15 @@ namespace WebApp_GozenBv.Controllers
                 return NotFound();
             }
             var logId = id;
-            var log = await _logManager.MapMaterialLogAsync(logId);
+            var log = await _logManager.GetMaterialLogAsync(logId);
 
             if (log == null)
             {
                 return NotFound();
             }
 
-            ViewData["Employees"] = new SelectList(await MapEmployeesViewData(), "EmployeeId", "EmployeeFullName");
-            ViewData["Materials"] = new SelectList(await MapMaterialsViewData(), "MaterialId", "ProductNameCode");
+            ViewData["Employees"] = new SelectList(await GetEmployeesViewData(), "EmployeeId", "EmployeeFullName");
+            ViewData["Materials"] = new SelectList(await GetMaterialsViewData(), "MaterialId", "ProductNameCode");
             return View(new MaterialLogEditViewModel()
             {
                 LogId = logId,
@@ -160,7 +160,7 @@ namespace WebApp_GozenBv.Controllers
                     
                 }
             }
-            ViewData["Employees"] = new SelectList(await _employeeManager.MapEmployeesAsync(), "Id", "Id", incomingEdit.MaterialLog.EmployeeId);
+            ViewData["Employees"] = new SelectList(await _employeeManager.GetEmployeesAsync(), "Id", "Id", incomingEdit.MaterialLog.EmployeeId);
             return View(incomingEdit);
         }
 
@@ -174,7 +174,7 @@ namespace WebApp_GozenBv.Controllers
                 return NotFound();
             }
 
-            var logDetails = await _logManager.MapMaterialLogDetails(logCode);
+            var logDetails = await _logManager.GetMaterialLogDetails(logCode);
 
             if (logDetails == null)
             {
@@ -215,7 +215,7 @@ namespace WebApp_GozenBv.Controllers
                 return NotFound();
             }
 
-            return View(await _logManager.MapMaterialLogDetails(logId));
+            return View(await _logManager.GetMaterialLogDetails(logId));
         }
 
         [HttpPost]
@@ -241,7 +241,7 @@ namespace WebApp_GozenBv.Controllers
                 return NotFound();
             }
 
-            return View(await _logManager.MapMaterialLogDetails(logId));
+            return View(await _logManager.GetMaterialLogDetails(logId));
         }
         
         [HttpPost, ActionName("Delete")]
@@ -256,9 +256,9 @@ namespace WebApp_GozenBv.Controllers
             return RedirectToAction(nameof(Index));
         }
 
-        private async Task<List<EmployeeViewData>> MapEmployeesViewData()
+        private async Task<List<EmployeeViewData>> GetEmployeesViewData()
         {
-            var employees = await _employeeManager.MapEmployeesAsync();
+            var employees = await _employeeManager.GetEmployeesAsync();
             var viewData = new List<EmployeeViewData>();
 
             foreach (var employee in employees)
@@ -273,9 +273,9 @@ namespace WebApp_GozenBv.Controllers
             return viewData;
         }
 
-        private async Task<List<MaterialViewData>> MapMaterialsViewData()
+        private async Task<List<MaterialViewData>> GetMaterialsViewData()
         {
-            var materials = await _materialManager.MapMaterialsAsync();
+            var materials = await _materialManager.GetMaterialsAsync();
             var viewData = new List<MaterialViewData>();
 
             foreach (var material in materials)

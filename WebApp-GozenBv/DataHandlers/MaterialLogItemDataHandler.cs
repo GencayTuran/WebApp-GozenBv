@@ -54,17 +54,17 @@ namespace WebApp_GozenBv.DataHandlers
         }
 
 
-        public async Task<List<MaterialLogItem>> GetItemsByLogIdAsync(string logCode)
+        public async Task<List<MaterialLogItem>> QueryItemsByLogIdAsync(string logCode)
         {
             return await _context.MaterialLogItems.Where(i => i.LogId.Equals(logCode)).ToListAsync();
         }
 
-        public async Task<List<MaterialLogItem>> GetItemsByLogId(string logCode, Expression<Func<MaterialLogItem, bool>> filter)
+        public async Task<List<MaterialLogItem>> QueryItemsByLogId(string logCode, Expression<Func<MaterialLogItem, bool>> filter)
         {
             return await _context.MaterialLogItems.Where(i => i.LogId.Equals(logCode)).Where(filter).ToListAsync();
         }
 
-        public async Task<List<MaterialLogItem>> GetDamagedItemsByLogId(string logCode)
+        public async Task<List<MaterialLogItem>> QueryDamagedItemsByLogId(string logCode)
         {
             return await _context.MaterialLogItems
                     .Where(s => s.LogId == logCode)
@@ -72,14 +72,14 @@ namespace WebApp_GozenBv.DataHandlers
                     .ToListAsync();
         }
 
-        public async Task<List<MaterialLogItem>> GetUnDamagedItemsByLogId(string logCode)
+        public async Task<List<MaterialLogItem>> QueryUnDamagedItemsByLogId(string logCode)
         {
             return await _context.MaterialLogItems
                             .Where(s => s.LogId == logCode)
                             .Where(s => !s.IsDamaged || s.NoReturn).ToListAsync();
         }
 
-        public List<MaterialLogItem> GetItemsByLogId(string logId)
+        public List<MaterialLogItem> QueryItemsByLogId(string logId)
         {
             return _context.MaterialLogItems.Where(i => i.LogId.Equals(logId)).ToList();
         }

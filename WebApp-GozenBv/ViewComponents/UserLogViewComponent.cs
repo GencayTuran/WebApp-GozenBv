@@ -4,19 +4,19 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
 using WebApp_GozenBv.Constants;
-using WebApp_GozenBv.Services.Interfaces;
+using WebApp_GozenBv.Managers.Interfaces;
 using WebApp_GozenBv.ViewModels;
 
 namespace WebApp_GozenBv.ViewComponents
 {
     public class UserLogViewComponent : ViewComponent
     {
-        private readonly IUserLogService _userLogService;
-        private readonly IUserService _userService;
-        public UserLogViewComponent(IUserLogService userLogService, IUserService userService)
+        private readonly IUserLogManager _userLogManager;
+        private readonly IUserManager _userManager;
+        public UserLogViewComponent(IUserLogManager userLogManager, IUserManager userManager)
         {
-            _userLogService = userLogService;
-            _userService= userService;
+            _userLogManager = userLogManager;
+            _userManager= userManager;
         }
 
         public async Task<IViewComponentResult> InvokeAsync(int view, string entityId, int controllerId)
@@ -26,20 +26,20 @@ namespace WebApp_GozenBv.ViewComponents
             switch (view)
             {
                 case ViewTypeConst.Controller:
-                    userLogs = await _userLogService.GetLogsByControllerAsync(controllerId);
+                    userLogs = await _userLogManager.MapLogsByControllerAsync(controllerId);
                     break;
                 case ViewTypeConst.Entity:
-                    userLogs = await _userLogService.ArrangeLogsByEntityAsync(entityId, controllerId);
+                    userLogs = await _userLogManager.MapLogsByEntityAsync(entityId, controllerId);
                     break;
                 case ViewTypeConst.User:
-                    var user = _userService.ArrangeCurrentUserAsync();
-                    userLogs = await _userLogService.ArrangeLogsByUserAsync(user.Id);
+                    var user = _userManager.MapCurrentUserAsync();
+                    userLogs = await _userLogManager.MapLogsByUserAsync(user.Id);
                     break;
                 case ViewTypeConst.All:
-                    userLogs = await _userLogService.ArrangeUserLogsAsync();
+                    userLogs = await _userLogManager.MapUserLogsAsync();
                     break;
                 case ViewTypeConst.Limit:
-                    var logs = await _userLogService.ArrangeUserLogsAsync();
+                    var logs = await _userLogManager.MapUserLogsAsync();
                     userLogs.AddRange(logs.Take(20));
                     break;
                 default:

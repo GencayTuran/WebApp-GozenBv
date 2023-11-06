@@ -30,7 +30,7 @@ namespace WebApp_GozenBv.Controllers
         [HttpGet]
         public async Task<IActionResult> Index()
         {
-            var materials = await _manager.MapMaterialsAsync();
+            var materials = await _manager.GetMaterialsAsync();
             List<MaterialViewModel> lstMaterialViewModel = new();
 
             foreach (var material in materials)
@@ -60,7 +60,7 @@ namespace WebApp_GozenBv.Controllers
                 return NotFound();
             }
 
-            var material = await _manager.MapMaterialAsync(id);
+            var material = await _manager.GetMaterialAsync(id);
 
             MaterialViewModel materialViewModel = new()
             {
@@ -86,7 +86,7 @@ namespace WebApp_GozenBv.Controllers
         [HttpGet]
         public IActionResult Create()
         {
-            //var productBrands = _manager.MapProductBrands();
+            //var productBrands = _manager.GetProductBrands();
 
             //ViewData["ProductBrands"] = productBrands;
             return View();
@@ -119,7 +119,7 @@ namespace WebApp_GozenBv.Controllers
                 return NotFound();
             }
 
-            var material = await _manager.MapMaterialAsync(id);
+            var material = await _manager.GetMaterialAsync(id);
             if (material == null)
             {
                 return NotFound();
@@ -155,7 +155,7 @@ namespace WebApp_GozenBv.Controllers
                 return NotFound();
             }
 
-            var material = await _manager.MapMaterialAsync(id);
+            var material = await _manager.GetMaterialAsync(id);
 
             if (material == null)
             {
@@ -169,7 +169,7 @@ namespace WebApp_GozenBv.Controllers
         [ValidateAntiForgeryToken]
         public async Task<IActionResult> DeleteConfirmed(int id)
         {
-            var material = await _manager.MapMaterialAsync(id);
+            var material = await _manager.GetMaterialAsync(id);
             await _manager.ManageMaterial(material, EntityOperation.Delete);
 
             await _userLogService.StoreLogAsync(ControllerNames.Material, ActionConst.Delete, material.Id.ToString());

@@ -8,11 +8,11 @@ namespace WebApp_GozenBv.DataHandlers
 {
 	public interface IMaterialLogItemDataHandler
 	{
-        Task<List<MaterialLogItem>> GetItemsByLogIdAsync(string logId);
-        List<MaterialLogItem> GetItemsByLogId(string logId);
-        Task<List<MaterialLogItem>> GetItemsByLogId(string logId, Expression<Func<MaterialLogItem, bool>> filter);
-        Task<List<MaterialLogItem>> GetDamagedItemsByLogId(string logId);
-        Task<List<MaterialLogItem>> GetUnDamagedItemsByLogId(string logId);
+        Task<List<MaterialLogItem>> QueryItemsByLogIdAsync(string logId);
+        List<MaterialLogItem> QueryItemsByLogId(string logId);
+        Task<List<MaterialLogItem>> QueryItemsByLogId(string logId, Expression<Func<MaterialLogItem, bool>> filter);
+        Task<List<MaterialLogItem>> QueryDamagedItemsByLogId(string logId);
+        Task<List<MaterialLogItem>> QueryUnDamagedItemsByLogId(string logId);
         Task CreateItemsAsync(List<MaterialLogItem> items);
         Task UpdateItemsAsync(List<MaterialLogItem> items);
         Task DeleteItemsAsync(List<MaterialLogItem> items);

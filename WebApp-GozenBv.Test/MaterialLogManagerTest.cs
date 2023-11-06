@@ -189,7 +189,7 @@ namespace WebApp_GozenBv.Test
             _materialLogDataMock.Setup(d => d.GetMaterialLogByLogId(logId)).Returns(expectedLog);
 
             // Act
-            var result = _manager.MapMaterialLog(logId);
+            var result = _manager.GetMaterialLog(logId);
 
             // Assert
             Assert.AreEqual(expectedLog, result);
@@ -204,7 +204,7 @@ namespace WebApp_GozenBv.Test
             _materialLogItemDataMock.Setup(d => d.GetItemsByLogId(logId)).Returns(expectedItems);
 
             // Act
-            var result = _manager.MapMaterialLogItems(logId);
+            var result = _manager.GetMaterialLogItems(logId);
 
             // Assert
             CollectionAssert.AreEqual(expectedItems, result);

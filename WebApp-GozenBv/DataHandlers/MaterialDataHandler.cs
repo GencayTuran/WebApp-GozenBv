@@ -39,17 +39,17 @@ namespace WebApp_GozenBv.DataHandlers
             await _context.SaveChangesAsync();
         }
 
-        public async Task<List<Material>> GetAllMaterialsAsync()
+        public async Task<List<Material>> QueryAllMaterialsAsync()
         {
             return await _context.Material.ToListAsync();
         }
 
-        public async Task<Material> GetMaterialByIdAsync(int? id)
+        public async Task<Material> QueryMaterialByIdAsync(int? id)
         {
             return await _context.Material.FindAsync(id);
         }
 
-        public Material GetMaterialById(int? id)
+        public Material QueryMaterialById(int? id)
         {
             return _context.Material.Find(id);
         }

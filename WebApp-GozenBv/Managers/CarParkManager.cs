@@ -25,14 +25,14 @@ namespace WebApp_GozenBv.Managers
             _maintenanceData = carMaintenanceData;
         }
 
-        public async Task<List<CarIndexViewModel>> MapCarsAndFutureMaintenances()
+        public async Task<List<CarIndexViewModel>> GetCarsAndFutureMaintenances()
         {
             List<CarIndexViewModel> carIndexViewModel = new();
-            var cars = await _carData.GetCars();
+            var cars = await _carData.QueryCars();
 
             foreach (var car in cars)
             {
-                var carMaintenaces = (await _maintenanceData.GetCarMaintenances(maintenance => maintenance.CarId == car.Id && !maintenance.Done)).ToList();
+                var carMaintenaces = (await _maintenanceData.QueryCarMaintenances(maintenance => maintenance.CarId == car.Id && !maintenance.Done)).ToList();
                 carIndexViewModel.Add(new CarIndexViewModel
                 {
                     Car = car,
@@ -43,10 +43,10 @@ namespace WebApp_GozenBv.Managers
             return carIndexViewModel;
         }
 
-        public async Task<CarDetailsViewModel> MapCarAndAllMaintenances(int? id)
+        public async Task<CarDetailsViewModel> GetCarAndAllMaintenances(int? id)
         {
-            var car = await _carData.GetCarById(id);
-            var maintenances = (await _maintenanceData.GetCarMaintenances(c => c.CarId == id && !c.Done)).ToList();
+            var car = await _carData.QueryCarById(id);
+            var maintenances = (await _maintenanceData.QueryCarMaintenances(c => c.CarId == id && !c.Done)).ToList();
 
             CarDetailsViewModel carDetailsViewModel = new CarDetailsViewModel
             {
@@ -57,9 +57,9 @@ namespace WebApp_GozenBv.Managers
             return carDetailsViewModel;
         }
 
-        public async Task<CarPark> MapCar(int? id)
+        public async Task<CarPark> GetCar(int? id)
         {
-            return await _carData.GetCarById(id);
+            return await _carData.QueryCarById(id);
         }
 
         public async Task ManageCar(CarPark car, EntityOperation operation)
@@ -76,7 +76,7 @@ namespace WebApp_GozenBv.Managers
                     await _carData.DeleteCar(car);
 
                     //deleting all maintenances realted to this car
-                    var maintenances = await _maintenanceData.GetCarMaintenances(m => m.CarId == car.Id);
+                    var maintenances = await _maintenanceData.QueryCarMaintenances(m => m.CarId == car.Id);
                     foreach (var maintenance in maintenances)
                     {
                         await _maintenanceData.DeleteCarMaintenance(maintenance);
@@ -91,7 +91,7 @@ namespace WebApp_GozenBv.Managers
             {
                 case EntityOperation.Create:
 
-                    var carId = (await _carData.GetCars()).LastOrDefault().Id;
+                    var carId = (await _carData.QueryCars()).LastOrDefault().Id;
 
                     if (carMaintenance.MaintenanceDate != null && !String.IsNullOrEmpty(carMaintenance.MaintenanceInfo))
                     {
@@ -129,7 +129,7 @@ namespace WebApp_GozenBv.Managers
             {
                 case EntityOperation.Create:
 
-                    var carId = (await _carData.GetCars()).LastOrDefault().Id;
+                    var carId = (await _carData.QueryCars()).LastOrDefault().Id;
 
                     foreach (var maintenance in carMaintenances)
                     {
@@ -170,18 +170,18 @@ namespace WebApp_GozenBv.Managers
             }
         }
 
-        public async Task<CarMaintenance> MapCarMaintenance(int? id)
+        public async Task<CarMaintenance> GetCarMaintenance(int? id)
         {
-            return await _maintenanceData.GetCarMaintenanceById(id);
+            return await _maintenanceData.QueryCarMaintenanceById(id);
         }
 
         #region alerts
-        public async Task<List<CarAlertViewModel>> MapCarAlerts()
+        public async Task<List<CarAlertViewModel>> GetCarAlerts()
         {
             List<CarAlertViewModel> carAlerts = new();
 
-            var cars = await _carData.GetCars();
-            var maintenances = await _maintenanceData.GetCarMaintenances();
+            var cars = await _carData.QueryCars();
+            var maintenances = await _maintenanceData.QueryCarMaintenances();
 
             foreach (var car in cars)
             {
@@ -208,7 +208,7 @@ namespace WebApp_GozenBv.Managers
 
             foreach (var maintenance in maintenances)
             {
-                var car = await _carData.GetCarById(maintenance.CarId);
+                var car = await _carData.QueryCarById(maintenance.CarId);
 
                 if (maintenance.MaintenanceDate != null)
                 {

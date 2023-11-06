@@ -6,7 +6,7 @@ namespace WebApp_GozenBv.DataHandlers
 {
     public interface IUserDataHandler
     {
-        Task<User> GetCurrentUserAsync();
+        Task<User> QueryCurrentUserAsync();
     }
 }
 

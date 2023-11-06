@@ -15,7 +15,7 @@ namespace WebApp_GozenBv.DataHandlers
             _context = context;
         }
 
-        public async Task<User> GetCurrentUserAsync()
+        public async Task<User> QueryCurrentUserAsync()
         {
             //TODO change to current user instead of fix email
             return await _context.Users

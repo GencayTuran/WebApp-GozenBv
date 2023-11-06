@@ -25,7 +25,7 @@ namespace WebApp_GozenBv.DataHandlers
             await _context.SaveChangesAsync();
         }
 
-        public async Task<List<UserLog>> GetLogsByControllerIdAsync(int controllerId)
+        public async Task<List<UserLog>> QueryLogsByControllerIdAsync(int controllerId)
         {
             return await _context.UserLogs
                 .Include(u => u.User)
@@ -34,7 +34,7 @@ namespace WebApp_GozenBv.DataHandlers
                 .ToListAsync();
         }
 
-        public Task<List<UserLog>> GetLogsByEntityIdAsync(string entityId, int controllerId)
+        public Task<List<UserLog>> QueryLogsByEntityIdAsync(string entityId, int controllerId)
         {
             return _context.UserLogs
                 .Include(u => u.User)
@@ -44,7 +44,7 @@ namespace WebApp_GozenBv.DataHandlers
                 .ToListAsync();
         }
 
-        public async Task<List<UserLog>> GetUserLogsAsync()
+        public async Task<List<UserLog>> QueryUserLogsAsync()
         {
             return await _context.UserLogs
                 .Include(u => u.User)
@@ -52,7 +52,7 @@ namespace WebApp_GozenBv.DataHandlers
                 .ToListAsync();
         }
 
-        public async Task<List<UserLog>> GetUserLogsByIdAsync(int id)
+        public async Task<List<UserLog>> QueryUserLogsByIdAsync(int id)
         {
             return await _context.UserLogs
                         .Include(u => u.User)

@@ -16,7 +16,7 @@ namespace WebApp_GozenBv.ViewComponents
 
         public async Task<IViewComponentResult> InvokeAsync(string logId)
         {
-            var log = await _logManager.MapMaterialLogDetails(logId);
+            var log = await _logManager.GetMaterialLogDetails(logId);
             var viewModel = new LogCreatedEditViewModel()
             {
                 LogId = logId,

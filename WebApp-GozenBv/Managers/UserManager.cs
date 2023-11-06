@@ -13,9 +13,20 @@ namespace WebApp_GozenBv.Managers
         {
             _userData = userData;
         }
+        public async Task<User> GetCurrentUserAsync()
+        {
+            return await _userData.QueryCurrentUserAsync();
+        }
+
         public async Task<User> MapCurrentUserAsync()
         {
-            return await _userData.GetCurrentUserAsync();
+            var user = await GetCurrentUserAsync();
+            return user;
+        }
+
+        public async Task<int> MapCurrentUserIdAsync(User user)
+        {
+            return (await GetCurrentUserAsync()).Id;
         }
     }
 }

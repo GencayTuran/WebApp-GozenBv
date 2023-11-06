@@ -7,8 +7,5 @@ namespace WebApp_GozenBv.Services.Interfaces
     {
         //int GetCurrentUserId(Microsoft.Graph.User mgUser);
         //Task<Microsoft.Graph.User> GetCurrentUser();
-
-        Task<int> ArrangeCurrentUserIdAsync(User user);
-        Task<User> ArrangeCurrentUserAsync();
     }
 }

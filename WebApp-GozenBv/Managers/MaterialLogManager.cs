@@ -61,23 +61,23 @@ namespace WebApp_GozenBv.Managers
             }
         }
 
-        public async Task<MaterialLog> MapMaterialLogAsync(string logId)
+        public async Task<MaterialLog> GetMaterialLogAsync(string logId)
         {
-            return await _logData.GetMaterialLogByLogIdAsync(logId);
+            return await _logData.QueryMaterialLogByLogIdAsync(logId);
         }
 
-        public async Task<List<MaterialLogItem>> MapMaterialLogItemsAsync(string logId)
+        public async Task<List<MaterialLogItem>> GetMaterialLogItemsAsync(string logId)
         {
-            return await _itemData.GetItemsByLogIdAsync(logId);
+            return await _itemData.QueryItemsByLogIdAsync(logId);
         }
 
-        public async Task<List<MaterialLog>> MapMaterialLogs()
+        public async Task<List<MaterialLog>> GetMaterialLogs()
         {
-            return await _logData.GetMaterialLogs();
+            return await _logData.QueryMaterialLogs();
         }
-        public async Task<MaterialLogDetailViewModel> MapMaterialLogDetails(string logId)
+        public async Task<MaterialLogDetailViewModel> GetMaterialLogDetails(string logId)
         {
-            var log = await _logData.GetMaterialLogByLogIdAsync(logId);
+            var log = await _logData.QueryMaterialLogByLogIdAsync(logId);
 
             if (log == null)
             {
@@ -88,12 +88,12 @@ namespace WebApp_GozenBv.Managers
 
             if (log.Damaged)
             {
-                undamagedItems = await _itemData.GetUnDamagedItemsByLogId(logId);
-                damagedItems = await _itemData.GetDamagedItemsByLogId(logId);
+                undamagedItems = await _itemData.QueryUnDamagedItemsByLogId(logId);
+                damagedItems = await _itemData.QueryDamagedItemsByLogId(logId);
             }
             else
             {
-                undamagedItems = await _itemData.GetItemsByLogIdAsync(logId);
+                undamagedItems = await _itemData.QueryItemsByLogIdAsync(logId);
             }
 
             return new MaterialLogDetailViewModel
@@ -147,14 +147,14 @@ namespace WebApp_GozenBv.Managers
             }
         }
 
-        public MaterialLog MapMaterialLog(string logId)
+        public MaterialLog GetMaterialLog(string logId)
         {
-            return _logData.GetMaterialLogByLogId(logId);
+            return _logData.QueryMaterialLogByLogId(logId);
         }
 
-        public List<MaterialLogItem> MapMaterialLogItems(string logId)
+        public List<MaterialLogItem> GetMaterialLogItems(string logId)
         {
-            return _itemData.GetItemsByLogId(logId);
+            return _itemData.QueryItemsByLogId(logId);
         }
 
         public MaterialLog MapMaterialLogStatusCreated(MaterialLog original, MaterialLog incoming)
@@ -168,7 +168,6 @@ namespace WebApp_GozenBv.Managers
                 Damaged = false,
                 Status = MaterialLogStatusConst.Created,
                 Approved = false,
-                Version = original.Version++
             };
         }
 
@@ -212,7 +211,7 @@ namespace WebApp_GozenBv.Managers
             };
         }
 
-        public MaterialLogItem MapMaterialLogItemStatusReturnedDamaged(MaterialLogItem incoming)
+        public MaterialLogItem GetMaterialLogItemStatusReturnedDamaged(MaterialLogItem incoming)
         {
             return new MaterialLogItem()
             {

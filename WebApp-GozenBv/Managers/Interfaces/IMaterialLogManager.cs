@@ -10,12 +10,12 @@ namespace WebApp_GozenBv.Managers.Interfaces
 {
 	public interface IMaterialLogManager
 	{
-		Task<List<MaterialLog>> MapMaterialLogs();
-        Task<MaterialLog> MapMaterialLogAsync(string logId);
-        MaterialLog MapMaterialLog(string logId);
-        Task<List<MaterialLogItem>> MapMaterialLogItemsAsync(string logId);
-        List<MaterialLogItem> MapMaterialLogItems(string logId);
-		Task<MaterialLogDetailViewModel> MapMaterialLogDetails(string logCode);
+		Task<List<MaterialLog>> GetMaterialLogs();
+        Task<MaterialLog> GetMaterialLogAsync(string logId);
+        MaterialLog GetMaterialLog(string logId);
+        Task<List<MaterialLogItem>> GetMaterialLogItemsAsync(string logId);
+        List<MaterialLogItem> GetMaterialLogItems(string logId);
+		Task<MaterialLogDetailViewModel> GetMaterialLogDetails(string logCode);
 
         Task ManageMaterialLogAsync(MaterialLog log, EntityOperation operation);
         void ManageMaterialLog(MaterialLog log, EntityOperation operation);

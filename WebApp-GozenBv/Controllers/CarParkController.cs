@@ -32,7 +32,7 @@ namespace WebApp_GozenBv.Controllers
         [HttpGet]
         public async Task<IActionResult> Index()
         {
-            return View(await _manager.MapCarsAndFutureMaintenances());
+            return View(await _manager.GetCarsAndFutureMaintenances());
         }
 
         [HttpGet]
@@ -43,7 +43,7 @@ namespace WebApp_GozenBv.Controllers
                 return NotFound();
             }
 
-            var car = await _manager.MapCarAndAllMaintenances(id);
+            var car = await _manager.GetCarAndAllMaintenances(id);
 
             if (car == null)
             {
@@ -87,7 +87,7 @@ namespace WebApp_GozenBv.Controllers
                 return NotFound();
             }
 
-            var carPark = await _manager.MapCarAndAllMaintenances(id);
+            var carPark = await _manager.GetCarAndAllMaintenances(id);
 
             if (carPark == null)
             {
@@ -142,7 +142,7 @@ namespace WebApp_GozenBv.Controllers
                 return NotFound();
             }
 
-            var car = await _manager.MapCar(id);
+            var car = await _manager.GetCar(id);
 
             if (car == null)
             {
@@ -157,7 +157,7 @@ namespace WebApp_GozenBv.Controllers
         [ValidateAntiForgeryToken]
         public async Task<IActionResult> DeleteConfirmed(int id)
         {
-            var car = await _manager.MapCar(id);
+            var car = await _manager.GetCar(id);
             if (car == null)
             {
                 return NotFound();
@@ -172,7 +172,7 @@ namespace WebApp_GozenBv.Controllers
 
         public async Task<IActionResult> CompleteAlert(int id)
         {
-            var maintenance = await _manager.MapCarMaintenance(id);
+            var maintenance = await _manager.GetCarMaintenance(id);
             maintenance.Done = true;
 
             await _manager.ManageCarMaintenance(maintenance, EntityOperation.Update);
@@ -183,7 +183,7 @@ namespace WebApp_GozenBv.Controllers
 
         private bool CarParkExists(int id)
         {
-            return _manager.MapCar(id) != null;
+            return _manager.GetCar(id) != null;
         }
     }
 }
