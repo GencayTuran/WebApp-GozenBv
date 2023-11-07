@@ -23,12 +23,12 @@ namespace WebApp_GozenBv.Managers
     {
         private readonly IMaterialLogDataHandler _logData;
         private readonly IMaterialLogItemDataHandler _itemData;
-        private readonly IHistoryDataHandler _historyData;
+        private readonly IEditHistoryDataHandler _historyData;
 
         public MaterialLogManager(
             IMaterialLogDataHandler logData,
             IMaterialLogItemDataHandler itemData,
-            IHistoryDataHandler historyData)
+            IEditHistoryDataHandler historyData)
         {
             _logData = logData;
             _itemData = itemData;
@@ -182,12 +182,12 @@ namespace WebApp_GozenBv.Managers
             return _itemData.QueryItemsByLogId(logId);
         }
 
-        public async Task ManageMaterialLogHistoryAsync(MaterialLogHistory entity)
+        public async Task ManageMaterialLogHistoryAsync(LogEditHistory entity)
         {
             await _historyData.CreateMaterialLogHistoryAsync(entity);
         }
 
-        public async Task ManageMaterialLogItemsHistoryAsync(List<MaterialLogItemHistory> collection)
+        public async Task ManageMaterialLogItemsHistoryAsync(List<ItemEditHistory> collection)
         {
             await _historyData.CreateMaterialLogItemsHistoryAsync(collection);
         }
@@ -202,12 +202,12 @@ namespace WebApp_GozenBv.Managers
             return await _historyData.QueryLatestLogItemsVersion(logId);
         }
 
-        public async Task<MaterialLogHistory> MapLogHistoryAsync(MaterialLog log)
+        public async Task<LogEditHistory> MapLogHistoryAsync(MaterialLog log)
         {
             //TODO: does this return null or 0? if 0, just add ++ to map, else go do a check.
             var latestVersion = await _historyData.QueryLatestLogVersion(log.LogId);
 
-            return new MaterialLogHistory()
+            return new LogEditHistory()
             {
                 LogId = log.LogId,
                 LogDate = log.LogDate,
@@ -219,15 +219,15 @@ namespace WebApp_GozenBv.Managers
             };
         }
 
-        public async Task<List<MaterialLogItemHistory>> MapLogItemsHistoryAsync(List<MaterialLogItem> items)
+        public async Task<List<ItemEditHistory>> MapLogItemsHistoryAsync(List<MaterialLogItem> items)
         {
             //TODO: does this return null or 0? if 0, just add ++ to map, else go do a check.
             var latestVersion = await _historyData.QueryLatestLogItemsVersion(items[0]?.LogId);
 
-            var mappedItems = new List<MaterialLogItemHistory>();
+            var mappedItems = new List<ItemEditHistory>();
             foreach (var item in items)
             {
-                mappedItems.Add(new MaterialLogItemHistory()
+                mappedItems.Add(new ItemEditHistory()
                 {
                     MaterialLogItemId = item.Id,
                     LogId = item.LogId,

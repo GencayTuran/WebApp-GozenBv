@@ -20,7 +20,7 @@ namespace WebApp_GozenBv.Data
         public DbSet<UserLog> UserLogs { get; set; }
         public DbSet<User> Users { get; set; }
 
-        public DbSet<MaterialLogHistory> MaterialLogHistory { get; set; }
-        public DbSet<MaterialLogItemHistory> MaterialLogItemsHistory { get; set; }
+        public DbSet<LogEditHistory> MaterialLogHistory { get; set; }
+        public DbSet<ItemEditHistory> MaterialLogItemsHistory { get; set; }
     }
 }

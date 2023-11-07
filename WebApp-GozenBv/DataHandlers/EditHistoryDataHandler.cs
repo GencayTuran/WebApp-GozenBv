@@ -9,21 +9,21 @@ using WebApp_GozenBv.Models;
 
 namespace WebApp_GozenBv.DataHandlers
 {
-    public class HistoryDataHandler : IHistoryDataHandler
+    public class EditHistoryDataHandler : IEditHistoryDataHandler
     {
         private readonly DataDbContext _context;
-        public HistoryDataHandler(DataDbContext context)
+        public EditHistoryDataHandler(DataDbContext context)
         {
             _context = context;
         }
 
-        public async Task CreateMaterialLogHistoryAsync(MaterialLogHistory entity)
+        public async Task CreateMaterialLogHistoryAsync(LogEditHistory entity)
         {
             _context.Add(entity);
             await _context.SaveChangesAsync();
         }
 
-        public async Task CreateMaterialLogItemsHistoryAsync(List<MaterialLogItemHistory> collection)
+        public async Task CreateMaterialLogItemsHistoryAsync(List<ItemEditHistory> collection)
         {
             _context.AddRange(collection);
             await _context.SaveChangesAsync();
@@ -45,7 +45,7 @@ namespace WebApp_GozenBv.DataHandlers
                  .FirstOrDefaultAsync()).Version;
         }
 
-        public async Task<List<MaterialLogItemHistory>> QueryMaterialLogItemsHistoryAsync(string logId)
+        public async Task<List<ItemEditHistory>> QueryMaterialLogItemsHistoryAsync(string logId)
         {
             return await _context.MaterialLogItemsHistory
                 .Where(x => x.LogId == logId)
@@ -53,7 +53,7 @@ namespace WebApp_GozenBv.DataHandlers
                 .ToListAsync();
         }
 
-        public async Task<List<MaterialLogHistory>> QueryMaterialLogsHistoryAsync(string logId)
+        public async Task<List<LogEditHistory>> QueryMaterialLogsHistoryAsync(string logId)
         {
             return await _context.MaterialLogHistory
                 .Where(x => x.LogId == logId)

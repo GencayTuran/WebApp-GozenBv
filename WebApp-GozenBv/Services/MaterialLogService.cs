@@ -44,7 +44,7 @@ namespace WebApp_GozenBv.Services
                         PropertyNameCaseInsensitive = true
                     });
 
-            await ValidateItems(selectedItems);
+            selectedItems = await ValidateItems(selectedItems);
 
             string logId = Guid.NewGuid().ToString();
 
@@ -83,13 +83,30 @@ namespace WebApp_GozenBv.Services
             return logId;
         }
 
-        private async Task ValidateItems(List<MaterialLogSelectedItemViewModel> selectedItems)
+        private async Task<List<MaterialLogSelectedItemViewModel>> ValidateItems(List<MaterialLogSelectedItemViewModel> selectedItems)
         {
-            foreach (var item in selectedItems)
+            var mergedItems = MergeItems(selectedItems);
+
+            foreach (var item in mergedItems)
             {
                 var material = await _materialManager.GetMaterialAsync(item.MaterialId);
                 _materialHelper.ValidateQuantity(material, item.Amount, item.Used);
             }
+
+            return mergedItems;
+        }
+
+        //TODO: check if this works correctly
+        private List<MaterialLogSelectedItemViewModel> MergeItems(List<MaterialLogSelectedItemViewModel> selectedItems)
+        {
+            return selectedItems
+                .GroupBy(x => new { x.MaterialId, x.Used })
+                .Select(group => new MaterialLogSelectedItemViewModel
+                {
+                    MaterialId = group.Key.MaterialId,
+                    Amount = group.Sum(x => x.Amount),
+                    Used = group.Key.Used
+                }).ToList();
         }
 
         public async Task HandleEdit(MaterialLogDetailViewModel incomingLog)
@@ -101,8 +118,6 @@ namespace WebApp_GozenBv.Services
             string statusName;
 
             List<MaterialLogItem> modifiedItems = new();
-
-
 
             switch (originalLog.Status)
             {
@@ -132,7 +147,6 @@ namespace WebApp_GozenBv.Services
                         var mappedHistory = await _logManager.MapLogHistoryAsync(originalLog);
                         //create record for history
                         await _logManager.ManageMaterialLogHistoryAsync(mappedHistory);
-
                     }
 
                     if (LogItemsModified(originalItems, incomingLog.Items, originalLog.Status))
@@ -146,7 +160,6 @@ namespace WebApp_GozenBv.Services
                         var mappedHistory = await _logManager.MapLogItemsHistoryAsync(originalItems);
                         //create records for history
                         await _logManager.ManageMaterialLogItemsHistoryAsync(mappedHistory);
-
                     }
                     break;
 

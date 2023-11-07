@@ -66,7 +66,7 @@ namespace WebApp_GozenBv
             services.AddTransient<IMaterialLogDataHandler, MaterialLogDataHandler>();
             services.AddTransient<IMaterialLogItemDataHandler, MaterialLogItemDataHandler>();
 
-            services.AddTransient<IHistoryDataHandler, HistoryDataHandler>();
+            services.AddTransient<IEditHistoryDataHandler, EditHistoryDataHandler>();
         }
 
         public void Configure(IApplicationBuilder app, IWebHostEnvironment env)

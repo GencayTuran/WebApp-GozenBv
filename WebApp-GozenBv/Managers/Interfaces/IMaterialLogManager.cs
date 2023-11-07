@@ -23,14 +23,14 @@ namespace WebApp_GozenBv.Managers.Interfaces
         void ManageMaterialLog(MaterialLog log, EntityOperation operation);
         Task ManageMaterialLogItemsAsync(List<MaterialLogItem> items, EntityOperation operation);
         void ManageMaterialLogItems(List<MaterialLogItem> items, EntityOperation operation);
-        Task ManageMaterialLogHistoryAsync(MaterialLogHistory entity);
-        Task ManageMaterialLogItemsHistoryAsync(List<MaterialLogItemHistory> collection);
+        Task ManageMaterialLogHistoryAsync(LogEditHistory entity);
+        Task ManageMaterialLogItemsHistoryAsync(List<ItemEditHistory> collection);
 
         Task<int> GetLatestLogVersion(string logId);
         Task<int> GetLatestLogItemsVersion(string logId);
 
-        Task<MaterialLogHistory> MapLogHistoryAsync(MaterialLog log);
-        Task<List<MaterialLogItemHistory>> MapLogItemsHistoryAsync(List<MaterialLogItem> items);
+        Task<LogEditHistory> MapLogHistoryAsync(MaterialLog log);
+        Task<List<ItemEditHistory>> MapLogItemsHistoryAsync(List<MaterialLogItem> items);
         MaterialLog MapUpdatedMaterialLog(MaterialLog original, MaterialLog incoming);
         List<MaterialLogItem> MapUpdatedItems_StatusCreated(List<MaterialLogItem> originalItems, List<MaterialLogItem> incomingItems);
         List<MaterialLogItem> MapUpdatedItems_StatusReturned(List<MaterialLogItem> originalLogItems, List<MaterialLogItem> incomingLogItems);

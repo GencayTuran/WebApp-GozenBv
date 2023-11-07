@@ -3,7 +3,7 @@ using System;
 
 namespace WebApp_GozenBv.Models
 {
-    public class MaterialLogItemHistory
+    public class ItemEditHistory
     {
         public int Id { get; set; }
         public int MaterialLogItemId { get; set; }
