@@ -67,6 +67,9 @@ namespace WebApp_GozenBv
             services.AddTransient<IMaterialLogItemDataHandler, MaterialLogItemDataHandler>();
 
             services.AddTransient<IEditHistoryDataHandler, EditHistoryDataHandler>();
+
+            services.AddTransient<IRepairTicketManager, RepairTicketManager>();
+            services.AddTransient<IRepairTicketDataHandler, IRepairTicketDataHandler>();
         }
 
         public void Configure(IApplicationBuilder app, IWebHostEnvironment env)

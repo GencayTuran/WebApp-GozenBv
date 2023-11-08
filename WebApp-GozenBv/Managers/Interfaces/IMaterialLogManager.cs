@@ -32,8 +32,10 @@ namespace WebApp_GozenBv.Managers.Interfaces
         Task<LogEditHistory> MapLogHistoryAsync(MaterialLog log);
         Task<List<ItemEditHistory>> MapLogItemsHistoryAsync(List<MaterialLogItem> items);
         MaterialLog MapUpdatedMaterialLog(MaterialLog original, MaterialLog incoming);
-        List<MaterialLogItem> MapUpdatedItems_StatusCreated(List<MaterialLogItem> originalItems, List<MaterialLogItem> incomingItems);
+        List<MaterialLogItem> ReplaceItems_StatusCreated(List<MaterialLogItem> originalItems, List<MaterialLogItem> incomingItems);
         List<MaterialLogItem> MapUpdatedItems_StatusReturned(List<MaterialLogItem> originalLogItems, List<MaterialLogItem> incomingLogItems);
+        List<MaterialLogItem> MapSelectedItems(List<MaterialLogSelectedItemViewModel> selectedItems);
+        List<MaterialLogItem> MapNewItems(List<MaterialLogItem> incomingItems, string logId);
     }
 }
 

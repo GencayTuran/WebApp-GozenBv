@@ -12,6 +12,7 @@ using WebApp_GozenBv.Helpers.Interfaces;
 using System.Linq;
 using Microsoft.EntityFrameworkCore;
 using System.Security.Cryptography;
+using WebApp_GozenBv.DTOs;
 
 namespace WebApp_GozenBv.Services
 {
@@ -22,19 +23,22 @@ namespace WebApp_GozenBv.Services
         private readonly IEmployeeManager _employeeManager;
         private readonly IMaterialHelper _materialHelper;
         private readonly IEqualityHelper _equalityHelper;
+        private readonly IRepairTicketManager _repairManager;
 
         public MaterialLogService(
             IMaterialLogManager logManager,
             IMaterialManager materialManager,
             IEqualityHelper equalityHelper,
             IEmployeeManager employeeManager,
-            IMaterialHelper materialHelper)
+            IMaterialHelper materialHelper,
+            IRepairTicketManager repairManager)
         {
             _logManager = logManager;
             _materialManager = materialManager;
             _equalityHelper = equalityHelper;
             _materialHelper = materialHelper;
             _employeeManager = employeeManager;
+            _repairManager = repairManager;
         }
         public async Task<string> HandleCreate(MaterialLogCreateViewModel incomingViewModel)
         {
@@ -44,7 +48,8 @@ namespace WebApp_GozenBv.Services
                         PropertyNameCaseInsensitive = true
                     });
 
-            selectedItems = await ValidateItems(selectedItems);
+            var mappedItems = _logManager.MapSelectedItems(selectedItems);
+            var incomingItems = await ValidateItems(mappedItems);
 
             string logId = Guid.NewGuid().ToString();
 
@@ -58,55 +63,10 @@ namespace WebApp_GozenBv.Services
             };
             await _logManager.ManageMaterialLogAsync(newLog, EntityOperation.Create);
 
-            List<MaterialLogItem> newItems = new();
-            foreach (var item in selectedItems)
-            {
-                //new Item
-                MaterialLogItem newItem = new();
-                var material = await _materialManager.GetMaterialAsync(item.MaterialId);
-
-                if (material.NoReturn)
-                {
-                    newItem.DamagedAmount = null;
-                    newItem.RepairAmount = null;
-                    newItem.DeleteAmount = null;
-                }
-                newItem.MaterialId = item.MaterialId;
-                newItem.MaterialAmount = item.Amount;
-                newItem.Used = item.Used;
-                newItem.LogId = logId;
-
-                newItems.Add(newItem);
-            }
+            var newItems = _logManager.MapNewItems(incomingItems, logId);
             await _logManager.ManageMaterialLogItemsAsync(newItems, EntityOperation.Create);
 
             return logId;
-        }
-
-        private async Task<List<MaterialLogSelectedItemViewModel>> ValidateItems(List<MaterialLogSelectedItemViewModel> selectedItems)
-        {
-            var mergedItems = MergeItems(selectedItems);
-
-            foreach (var item in mergedItems)
-            {
-                var material = await _materialManager.GetMaterialAsync(item.MaterialId);
-                _materialHelper.ValidateQuantity(material, item.Amount, item.Used);
-            }
-
-            return mergedItems;
-        }
-
-        //TODO: check if this works correctly
-        private List<MaterialLogSelectedItemViewModel> MergeItems(List<MaterialLogSelectedItemViewModel> selectedItems)
-        {
-            return selectedItems
-                .GroupBy(x => new { x.MaterialId, x.Used })
-                .Select(group => new MaterialLogSelectedItemViewModel
-                {
-                    MaterialId = group.Key.MaterialId,
-                    Amount = group.Sum(x => x.Amount),
-                    Used = group.Key.Used
-                }).ToList();
         }
 
         public async Task HandleEdit(MaterialLogDetailViewModel incomingLog)
@@ -117,12 +77,12 @@ namespace WebApp_GozenBv.Services
             var originalItems = originalLogDetails.MaterialLogItems;
             string statusName;
 
-            List<MaterialLogItem> modifiedItems = new();
 
             switch (originalLog.Status)
             {
                 case MaterialLogStatusConst.Created:
                     statusName = MaterialLogStatusConst.CreatedName;
+                    var incomingItems = await ValidateItems(incomingLog.Items);
 
                     if (originalLog.Approved)
                     {
@@ -130,7 +90,7 @@ namespace WebApp_GozenBv.Services
                         throw new Exception($"Is already approved at '{statusName}' state and so is readonly state. No edit possible.");
                     }
 
-                    if (!LogModified(originalLog, incomingLog.MaterialLog) && !LogItemsModified(originalItems, incomingLog.Items, originalLog.Status))
+                    if (!LogModified(originalLog, incomingLog.MaterialLog) && !LogItemsModified(originalItems, incomingItems, originalLog.Status))
                     {
                         //TODO: catch higher
                         throw new Exception($"Nothing no modify. Are you sure you have made any changes?");
@@ -138,28 +98,31 @@ namespace WebApp_GozenBv.Services
 
                     if (LogModified(originalLog, incomingLog.MaterialLog))
                     {
-                        //map the update
-                        var updatedLog = _logManager.MapUpdatedMaterialLog(originalLog, incomingLog.MaterialLog);
-                        //update the log
-                        await _logManager.ManageMaterialLogAsync(updatedLog, EntityOperation.Update);
-
                         //map original to history
                         var mappedHistory = await _logManager.MapLogHistoryAsync(originalLog);
                         //create record for history
                         await _logManager.ManageMaterialLogHistoryAsync(mappedHistory);
+
+                        //map the update
+                        var updatedLog = _logManager.MapUpdatedMaterialLog(originalLog, incomingLog.MaterialLog);
+                        //update the log
+                        await _logManager.ManageMaterialLogAsync(updatedLog, EntityOperation.Update);
                     }
 
-                    if (LogItemsModified(originalItems, incomingLog.Items, originalLog.Status))
+                    if (LogItemsModified(originalItems, incomingItems, originalLog.Status))
                     {
-                        //map the update
-                        var updatedItems = _logManager.MapUpdatedItems_StatusCreated(originalItems, incomingLog.Items);
-                        //update items
-                        await _logManager.ManageMaterialLogItemsAsync(updatedItems, EntityOperation.Update);
-
                         //map original items to history
                         var mappedHistory = await _logManager.MapLogItemsHistoryAsync(originalItems);
                         //create records for history
                         await _logManager.ManageMaterialLogItemsHistoryAsync(mappedHistory);
+
+                        //replace items
+                        await _logManager.ManageMaterialLogItemsAsync(originalItems, EntityOperation.Delete);
+                        await _logManager.ManageMaterialLogItemsAsync(incomingItems, EntityOperation.Create);
+
+                        var newItems = _logManager.ReplaceItems_StatusCreated(originalItems, incomingItems);
+                        //update items
+                        await _logManager.ManageMaterialLogItemsAsync(newItems, EntityOperation.Create);
                     }
                     break;
 
@@ -181,40 +144,47 @@ namespace WebApp_GozenBv.Services
                     //only damaged amount, inrepairamount and deletedamount editable. also not damaged items can be damaged edited
                     if (LogItemsModified(originalItems, incomingLog.Items, originalLog.Status))
                     {
-                        //map the update
-                        var updatedItems = _logManager.MapUpdatedItems_StatusReturned(originalItems, incomingLog.Items);
-                        //update items
-                        await _logManager.ManageMaterialLogItemsAsync(updatedItems, EntityOperation.Update);
-
                         //map original items to history
                         var mappedHistory = await _logManager.MapLogItemsHistoryAsync(originalItems);
                         //create records for history
                         await _logManager.ManageMaterialLogItemsHistoryAsync(mappedHistory);
+
+                        //map the update
+                        var updatedItems = _logManager.MapUpdatedItems_StatusReturned(originalItems, incomingLog.Items);
+                        //update items
+                        await _logManager.ManageMaterialLogItemsAsync(updatedItems, EntityOperation.Update);
                     }
                     break;
                 default:
                     throw new Exception("No edit possible at other than Created or Returned state.");
             }
         }
-        public void HandleReturn(MaterialLogDetailViewModel incomingReturn)
+        public async Task HandleReturn(MaterialLogDetailViewModel incomingReturn)
         {
             //incoming
             string logId = incomingReturn.MaterialLog.LogId;
             var damaged = incomingReturn.MaterialLog.Damaged;
 
             //original
-            var log = _logManager.GetMaterialLog(logId);
-            var originalLogItems = _logManager.GetMaterialLogItems(logId);
+            var log = await _logManager.GetMaterialLogAsync(logId);
+            var originalLogItems = await _logManager.GetMaterialLogItemsAsync(logId);
 
             if (log == null)
             {
                 throw new NullReferenceException($"log with Id {logId} does not exist");
             }
 
+            if (!log.Approved)
+            {
+                throw new Exception($"Log with id {logId} is not approved yet. It needs to be approved before returning it.");
+            }
+
             log.ReturnDate = DateTime.Now;
             log.Status = MaterialLogStatusConst.Returned;
+            //reset approved
+            log.Approved = false;
 
-            List<MaterialLogItem> mappedItems = new();
+            List<MaterialLogItem> modifiedItems = new();
 
             if (damaged)
             {
@@ -223,6 +193,7 @@ namespace WebApp_GozenBv.Services
                     {
                         PropertyNameCaseInsensitive = true
                     });
+
                 log.Damaged = damaged;
 
                 foreach (var item in originalLogItems)
@@ -236,67 +207,105 @@ namespace WebApp_GozenBv.Services
                         item.DeleteAmount = damagedItem.DeleteAmount;
                         item.IsDamaged = true;
                     }
-
-                    var mappedItem = _logManager.MapReturnedItem(item);
-                    mappedItems.Add(mappedItem);
-                }
-            }
-            else
-            {
-                foreach (var item in originalLogItems)
-                {
-                    var mappedItem = _logManager.MapReturnedItem(item);
-                    mappedItems.Add(mappedItem);
-                }
-            }
-
-            _logManager.ManageMaterialLogItems(mappedItems, EntityOperation.Create);
-
-            var mappedLog = _logManager.MapReturnedLog(log);
-            _logManager.ManageMaterialLog(mappedLog, EntityOperation.Create);
-        }
-
-        public async Task HandleDamaged(MaterialLogDetailViewModel incomingComplete)
-        {
-            var logId = incomingComplete.MaterialLog.LogId;
-            var originalLog = await _logManager.GetMaterialLogAsync(logId);
-            var originalItems = await _logManager.GetMaterialLogItemsAsync(logId);
-
-            List<Material> modifiedMaterials = new();
-            List<MaterialLogItem> modifiedItems = new();
-
-            if (originalLog == null)
-            {
-                throw new NullReferenceException($"log with Id {logId} does not exist");
-            }
-
-            originalLog.Status = MaterialLogStatusConst.Returned;
-
-            var completeDamagedMaterials = JsonSerializer.Deserialize<List<CompleteDamagedMaterialViewModel>>(incomingComplete.DamagedMaterial,
-                    new JsonSerializerOptions
-                    {
-                        PropertyNameCaseInsensitive = true
-                    });
-
-            //update MaterialLogItems
-            foreach (var item in originalItems)
-            {
-                var damagedItem = completeDamagedMaterials.FirstOrDefault(di => di.MaterialId == item.MaterialId);
-
-                if (damagedItem != null)
-                {
-                    var originalMaterial = await _materialManager.MapMaterialAsync(damagedItem.MaterialId);
-                    item.RepairAmount = damagedItem.RepairedAmount;
-                    item.DeleteAmount = damagedItem.DeletedAmount;
-
                     modifiedItems.Add(item);
-                    modifiedMaterials.Add(_materialHelper.AddToUsed(originalMaterial, damagedItem.RepairedAmount));
                 }
             }
-            await _logManager.ManageMaterialLogAsync(originalLog, EntityOperation.Update);
+
             await _logManager.ManageMaterialLogItemsAsync(modifiedItems, EntityOperation.Update);
-            await _materialManager.ManageMaterialsAsync(modifiedMaterials, EntityOperation.Update);
+            await _logManager.ManageMaterialLogAsync(log, EntityOperation.Update);
         }
+
+        public async Task HandleApprove(string logId)
+        {
+            var materialLogDTO = await _logManager.GetMaterialLogDTO(logId);
+            var status = materialLogDTO.MaterialLog.Status;
+
+            switch (status)
+            {
+                case MaterialLogStatusConst.Created:
+                    await ApproveCreate(materialLogDTO);
+                    break;
+                case MaterialLogStatusConst.Returned:
+                    await ApproveReturn(materialLogDTO);
+                    break;
+                default:
+                    throw new Exception("Fatal error. Status is not Created or Returned.");
+            }
+        }
+
+        public async Task ApproveCreate(MaterialLogDTO materialLogDTO)
+        {
+            //set to approved
+            materialLogDTO.MaterialLog.Approved = true;
+
+            //modify materials
+            var modifiedMaterials = new List<Material>();
+            foreach (var item in materialLogDTO.MaterialLogItems)
+            {
+                var material = await _materialManager.GetMaterialAsync(item.MaterialId);
+                modifiedMaterials.Add(_materialHelper.TakeQuantity(material, item.MaterialAmount, item.Used));
+            }
+            //update
+            _materialManager.ManageMaterials(modifiedMaterials, EntityOperation.Update);
+            _logManager.ManageMaterialLog(materialLogDTO.MaterialLog, EntityOperation.Update);
+        }
+        public async Task ApproveReturn(MaterialLogDTO materialLogDTO)
+        {
+            //set to approved
+            materialLogDTO.MaterialLog.Approved = true;
+
+            //modify materials
+            var modifiedMaterials = new List<Material>();
+            foreach (var item in materialLogDTO.MaterialLogItems)
+            {
+                var material = await _materialManager.GetMaterialAsync(item.MaterialId);
+
+                if (item.IsDamaged)
+                {
+                    //if repair any -> repairticket/item
+                    if (item.RepairAmount > 0)
+                    {
+                        material = _materialHelper.ToRepairQuantity(material, (int)item.RepairAmount);
+
+                        var tickets = new List<RepairTicket>();
+                        for (int i = 0; i < item.RepairAmount; i++)
+                        {
+                            tickets.Add(new RepairTicket()
+                            {
+                                LogId = item.LogId,
+                                Status = RepairTicketStatus.AwaitingAction,
+                                MaterialId = item.MaterialId,
+                                Material = material
+                            });
+                        }
+                        await _repairManager.ManageTicketsAsync(tickets, EntityOperation.Create);
+
+                    }
+
+                    //if delete any -> deleteamount
+                    if (item.DeleteAmount > 0)
+                    {
+                        material = _materialHelper.DeleteQuantity(material, (int)item.DeleteAmount);
+                    }
+
+                    //undamaged items in MaterialAmount
+                    if (item.MaterialAmount > item.DamagedAmount)
+                    {
+                        var undamagedAmount = item.MaterialAmount - (int)item.DamagedAmount;
+                        material = _materialHelper.ReturnQuantity(material, undamagedAmount);
+                    }
+                }
+                else
+                {
+                    material = _materialHelper.ReturnQuantity(material, item.MaterialAmount);
+                }
+                modifiedMaterials.Add(material);
+            }
+            //update
+            _materialManager.ManageMaterials(modifiedMaterials, EntityOperation.Update);
+            _logManager.ManageMaterialLog(materialLogDTO.MaterialLog, EntityOperation.Update);
+        }
+
         public async Task HandleDelete(string logId)
         {
             //TODO
@@ -335,12 +344,31 @@ namespace WebApp_GozenBv.Services
             original.RepairAmount != incoming.RepairAmount ||
             original.DeleteAmount != incoming.DeleteAmount;
 
-        public async Task HandleApprove(string logId)
+        private async Task<List<MaterialLogItem>> ValidateItems(List<MaterialLogItem> selectedItems)
         {
-            //check for status
+            var mergedItems = MergeItems(selectedItems);
 
-            //if created
-            //
+            foreach (var item in mergedItems)
+            {
+                var material = await _materialManager.GetMaterialAsync(item.MaterialId);
+                _materialHelper.ValidateQuantity(material, item.MaterialAmount, item.Used);
+            }
+
+            return mergedItems;
         }
+
+        //TODO: check if this works correctly and if necessary (you can restrict user from view maybe)
+        private List<MaterialLogItem> MergeItems(List<MaterialLogItem> selectedItems)
+        {
+            return selectedItems
+                .GroupBy(x => new { x.MaterialId, x.Used })
+                .Select(group => new MaterialLogItem
+                {
+                    MaterialId = group.Key.MaterialId,
+                    MaterialAmount = group.Sum(x => x.MaterialAmount),
+                    Used = group.Key.Used
+                }).ToList();
+        }
+
     }
 }

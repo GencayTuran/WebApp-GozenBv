@@ -28,7 +28,6 @@ namespace WebApp_GozenBv.Helpers
 
             return material;
         }
-        
 
         public Material ReturnQuantity(Material material, int qty)
         {

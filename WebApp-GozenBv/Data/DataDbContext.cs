@@ -22,5 +22,7 @@ namespace WebApp_GozenBv.Data
 
         public DbSet<LogEditHistory> MaterialLogHistory { get; set; }
         public DbSet<ItemEditHistory> MaterialLogItemsHistory { get; set; }
+        public DbSet<RepairTicket> RepairTickets { get; set; }
+
     }
 }

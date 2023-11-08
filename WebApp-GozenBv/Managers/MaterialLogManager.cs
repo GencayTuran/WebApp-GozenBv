@@ -256,32 +256,6 @@ namespace WebApp_GozenBv.Managers
             return original;
         }
 
-        //TODO: this isnt only a Map anymore. rename to Handle?
-        public List<MaterialLogItem> MapUpdatedItems_StatusCreated(List<MaterialLogItem> originalItems, List<MaterialLogItem> incomingItems)
-        {
-            var mappedItems = new List<MaterialLogItem>();
-
-            //iterate original
-            foreach (var item in originalItems)
-            {
-                //find match
-                //TODO: is this a good expression?
-                var match = incomingItems.FirstOrDefault(x => x.Id == item.Id && x.LogId == x.LogId);
-
-                if (match != null)
-                {
-                    item.MaterialId = match.MaterialId;
-                    item.MaterialAmount = match.MaterialAmount;
-                    item.Used = match.Used;
-
-                    //add to updateList
-                    mappedItems.Add(item);
-                }
-            }
-
-            return mappedItems;
-        }
-
         public List<MaterialLogItem> MapUpdatedItems_StatusReturned(List<MaterialLogItem> originalLogItems, List<MaterialLogItem> incomingLogItems)
         {
             var mappedItems = new List<MaterialLogItem>();
@@ -307,6 +281,40 @@ namespace WebApp_GozenBv.Managers
                 mappedItems.Add(item);
             }
             return mappedItems;
+        }
+
+        public List<MaterialLogItem> MapSelectedItems(List<MaterialLogSelectedItemViewModel> selectedItems)
+        {
+            var mappedItems = new List<MaterialLogItem>();
+            foreach (var item in selectedItems)
+            {
+                mappedItems.Add(new MaterialLogItem()
+                {
+                    MaterialId = item.MaterialId,
+                    MaterialAmount = item.Amount,
+                    Used = item.Used
+                });
+            }
+            return mappedItems;
+        }
+
+        public List<MaterialLogItem> MapNewItems(List<MaterialLogItem> incomingItems, string logId)
+        {
+            List<MaterialLogItem> newItems = new();
+            foreach (var item in incomingItems)
+            {
+                //new Item
+                MaterialLogItem newItem = new();
+                
+                newItem.MaterialId = item.MaterialId;
+                newItem.MaterialAmount = item.MaterialAmount;
+                newItem.Used = item.Used;
+                newItem.LogId = logId;
+
+                newItems.Add(newItem);
+            }
+
+            return newItems;
         }
     }
 }
