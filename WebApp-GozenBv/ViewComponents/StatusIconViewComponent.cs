@@ -7,11 +7,12 @@ namespace WebApp_GozenBv.ViewComponents
 {
     public class StatusIconViewComponent : ViewComponent
     {
-        public async Task<IViewComponentResult> InvokeAsync(int status, bool isDamaged)
+        public async Task<IViewComponentResult> InvokeAsync(int status, bool isDamaged, bool isApproved)
         {
             var statusIconViewModel = new StatusIconViewModel();
             statusIconViewModel.Status = status;
             statusIconViewModel.IsDamaged = isDamaged;
+            statusIconViewModel.IsApproved = isApproved;
 
             return View(statusIconViewModel);
         }

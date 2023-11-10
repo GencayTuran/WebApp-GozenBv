@@ -249,6 +249,7 @@ namespace WebApp_GozenBv.Services
             _materialManager.ManageMaterials(modifiedMaterials, EntityOperation.Update);
             _logManager.ManageMaterialLog(materialLogDTO.MaterialLog, EntityOperation.Update);
         }
+
         public async Task ApproveReturn(MaterialLogDTO materialLogDTO)
         {
             //set to approved
@@ -308,24 +309,25 @@ namespace WebApp_GozenBv.Services
 
         public async Task HandleDelete(string logId)
         {
-            //TODO
-            //check status
-            //rollback extract or add amount back based on status
-            //check for damaged undamaged items
+            var logDTO = await _logManager.GetMaterialLogDTO(logId);
+            var status = logDTO.MaterialLog.Status;
+            var approved = logDTO.MaterialLog.Approved;
 
-            var materialLog = await _logManager.GetMaterialLogAsync(logId);
-
-            var materialLogItems = await _logManager.GetMaterialLogItemsAsync(logId);
-
-            //update material & remove its materiallogitems
-            foreach (var item in materialLogItems)
+            //only deleting when created is not approved.
+            if (status != MaterialLogStatusConst.Created || approved)
             {
-                //var material = await GetMaterialAsync(item.MaterialId);
-                //_context.Update(MaterialHelper.UpdateMaterialQty(material, item.MaterialAmount, item.Used));
-                //_context.MaterialLogItems.Remove(item);
+                //TODO: catch higher
+                throw new Exception("Cannot delete log after approved creation.");
             }
 
-            //remove from database
+            await DeleteCreate(logDTO);
+        }
+
+        public async Task DeleteCreate(MaterialLogDTO materialLogDTO)
+        {
+            //remove log and its materiallogitems
+            await _logManager.ManageMaterialLogAsync(materialLogDTO.MaterialLog, EntityOperation.Delete);
+            await _logManager.ManageMaterialLogItemsAsync(materialLogDTO.MaterialLogItems, EntityOperation.Delete);
         }
 
         private bool LogModified(MaterialLog original, MaterialLog incoming)
@@ -369,6 +371,5 @@ namespace WebApp_GozenBv.Services
                     Used = group.Key.Used
                 }).ToList();
         }
-
     }
 }

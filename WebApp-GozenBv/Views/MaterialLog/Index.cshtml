@@ -1,5 +1,6 @@
 ﻿@using WebApp_GozenBv.Constants;
-@model IEnumerable<WebApp_GozenBv.Models.MaterialLog>
+@using WebApp_GozenBv.Models;
+@model IEnumerable<MaterialLog>
 
 @{
     ViewData["Title"] = "Index";
@@ -60,7 +61,7 @@
         {
             <tr id="trMaterialLog" onclick="ToDetails(@item.Id)">
                 <td>
-                    <vc:status-icon status="item.Status" is-damaged="item.Damaged"></vc:status-icon>
+                    <vc:status-icon status="item.Status" is-damaged="item.Damaged" is-approved="item.Approved"></vc:status-icon>
                 </td>
                 <td>
                     @Html.DisplayFor(modelItem => item.Employee.Name)

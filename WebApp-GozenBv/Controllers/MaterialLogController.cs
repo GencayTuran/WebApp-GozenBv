@@ -92,8 +92,6 @@ namespace WebApp_GozenBv.Controllers
             return View();
         }
 
-
-
         [HttpPost]
         [ValidateAntiForgeryToken]
         public async Task<IActionResult> Create(MaterialLogCreateViewModel viewModel)
@@ -176,14 +174,14 @@ namespace WebApp_GozenBv.Controllers
         [HttpGet]
         public async Task<IActionResult> ReturnItems(string id)
         {
-            string logCode = id;
+            string logId = id;
 
-            if (logCode == null)
+            if (logId == null)
             {
                 return NotFound();
             }
 
-            var logDetails = await _logManager.GetMaterialLogDetails(logCode);
+            var logDetails = await _logManager.GetMaterialLogDetails(logId);
 
             if (logDetails == null)
             {
@@ -212,33 +210,6 @@ namespace WebApp_GozenBv.Controllers
             //TODO: more readable routevalue?
             return RedirectToAction("Details", new RouteValueDictionary(
                     new { ControllerContext = "MaterialLog", Action = "Details", Id = logId }));
-        }
-
-        [HttpGet]
-        public async Task<IActionResult> CompleteDamaged(string id)
-        {
-            string logId = id;
-
-            if (logId.IsNullOrEmpty())
-            {
-                return NotFound();
-            }
-
-            return View(await _logManager.GetMaterialLogDetails(logId));
-        }
-
-        [HttpPost]
-        public async Task<IActionResult> CompleteDamaged(MaterialLogDetailViewModel incomingCompleteDamaged)
-        {
-            string logId = incomingCompleteDamaged.MaterialLog.LogId;
-
-            await _logService.HandleDamaged(incomingCompleteDamaged);
-            
-            await _userLogService.StoreLogAsync(ControllerNames.MaterialLog, ActionConst.CompleteDamaged, logId);
-
-            //TODO: routeValue could be more readable
-            return RedirectToAction("Details", new RouteValueDictionary(
-                new { ControllerContext = "MaterialLog", Action = "Details", Id = logId }));
         }
 
         [HttpGet]
