@@ -3,22 +3,48 @@
 
 @{
     ViewData["Title"] = "Edit";
+    var status = Model.MaterialLog.Status;
+    var logId = Model.MaterialLog.LogId;
 }
 
 <h1>Edit</h1>
-
 <h4>MaterialLog</h4>
-<hr />
 
-@switch (Model.Status)
-{
-    case MaterialLogStatusConst.Created:
-        <vc:log-created-edit log-id="@Model.LogId"></vc:log-created-edit>
-        break;
-    case MaterialLogStatusConst.DamagedAwaitingAction:
-        @*viewComponent of log-damaged-edit here*@
-        break;
-}
+<form asp-action="Edit">
+    <div asp-validation-summary="ModelOnly" class="text-danger"></div>
+    <input type="hidden" asp-for="@logId" />
+
+    <div class="form-group mt-3">
+        <input type="submit" value="Save" class="btn btn-primary" />
+    </div>
+
+    <hr />
+    <div>
+        <div class="form-row">
+            <div class="form-group m-2">
+                <label asp-for="MaterialLog.LogDate" class="control-label"></label>
+                <input asp-for="MaterialLog.LogDate" class="form-control" />
+                <span asp-validation-for="MaterialLog.LogDate" class="text-danger"></span>
+            </div>
+            <div class="form-group m-2">
+                <label class="control-label">Employee</label>
+                <select asp-for="MaterialLog.EmployeeId" class="form-control" asp-items="ViewBag.Employees"></select>
+                <span asp-validation-for="MaterialLog.EmployeeId" class="text-danger"></span>
+            </div>
+
+        </div>
+    </div>
+    <hr />
+    @switch (status)
+    {
+        case MaterialLogStatusConst.Created:
+            <vc:log-created-edit log-id="@logId"></vc:log-created-edit>
+            break;
+        case MaterialLogStatusConst.Returned:
+            <vc:log-returned-edit log-id="@logId"></vc:log-returned-edit>
+            break;
+    }
+</form>
 
 <div>
     <a asp-action="Index">Back to List</a>

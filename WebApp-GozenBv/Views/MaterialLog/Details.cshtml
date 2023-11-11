@@ -23,8 +23,11 @@
         case MaterialLogStatusConst.Created:
             <a asp-action="Edit" asp-route-id="@logId">Edit</a>
             <a asp-action="Delete" asp-route-id="@logId">Delete</a>
-            <a asp-action="ApproveLog" asp-route-id="@logId">Approve Creation</a>
-            if (approved)
+
+            if (!approved)
+            {
+                <a asp-action="ApproveLog" asp-route-id="@logId">Approve Create</a>
+            } else
             {
                 <a asp-action="ReturnItems" asp-route-id="@logId">Return Items</a>
             }

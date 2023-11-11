@@ -1,0 +1,52 @@
+﻿@model WebApp_GozenBv.ViewModels.LogItemsReturnedEditViewModel
+
+<h5>Items</h5>
+<hr />
+<div>
+    <div>
+        <div class="flex-column d-flex">
+            <div class="flex-row d-flex mb-2">
+                <div class="col-md-3">Material</div>
+                <div class="col-md-3">MaterialAmount</div>
+                <div class="col-md-3">Used?</div>
+                <div class="col-md-3">Damaged?</div>
+                <div class="col-md-3">DamagedAmount</div>
+                <div class="col-md-3">RepairAmount</div>
+                <div class="col-md-3">DeleteAmount</div>
+            </div>
+
+            @for (int i = 0; i < Model.Items.Count; i++)
+            {
+                <div class="flex-row d-flex">
+                    <div class="col-md-3 form-group">
+                        <select asp-for="Items[i].MaterialId" asp-items="ViewBag.Materials" class="form-control"></select>
+                        <span asp-validation-for="Items[i].MaterialId" class="text-danger"></span>
+                    </div>
+                    <div class="col-md-3 form-group">
+                        <input asp-for="Items[i].MaterialAmount" class="form-control" />
+                        <span asp-validation-for="Items[i].MaterialAmount" class="text-danger"></span>
+                    </div>
+                    <div class="col-md-3 form-check">
+                        <input class="form-check-input" type="checkbox" disabled asp-for="Items[i].Used" class="form-control" />
+                    </div>
+                    <div class="col-md-3 form-check">
+                       <input class="form-check-input" type="checkbox" asp-for="Items[i].IsDamaged" class="form-control" />
+                    </div>
+                    @*disable damaged amounts when not damaged*@
+                    <div>
+                        <input asp-for="Items[i].DamagedAmount" class="form-control" />
+                        <span asp-validation-for="Items[i].DamagedAmount" class="text-danger"></span>
+                    </div>
+                    <div>
+                        <input asp-for="Items[i].RepairAmount" class="form-control" />
+                        <span asp-validation-for="Items[i].RepairAmount" class="text-danger"></span>
+                    </div>
+                    <div>
+                        <input asp-for="Items[i].DeleteAmount" class="form-control" />
+                        <span asp-validation-for="Items[i].DeleteAmount" class="text-danger"></span>
+                    </div>
+                </div>
+            }
+        </div>
+    </div>
+</div>

@@ -103,6 +103,7 @@ namespace WebApp_GozenBv.Managers
                 ReturnDate = log.ReturnDate,
                 Status = log.Status,
                 Damaged = log.Damaged,
+                Approved = log.Approved
             };
 
             List<MaterialLogItem> items = new();
@@ -347,7 +348,7 @@ namespace WebApp_GozenBv.Managers
             return newItems;
         }
 
-        public MaterialLogDTO MapViewModelToDTO(MaterialLogDetailViewModel viewModel)
+        public MaterialLogDTO MapViewModelToDTO(MaterialLogEditViewModel viewModel)
         {
             var log = new MaterialLog()
             {
@@ -363,8 +364,7 @@ namespace WebApp_GozenBv.Managers
             };
 
             var items = new List<MaterialLogItem>();
-            var itemsMerged = viewModel.Items.Concat(viewModel.ItemsDamaged);
-            foreach (var item in itemsMerged)
+            foreach (var item in viewModel.Items)
             {
                 items.Add(new MaterialLogItem()
                 {
@@ -372,7 +372,7 @@ namespace WebApp_GozenBv.Managers
                     LogId = item.LogId,
                     MaterialId = item.MaterialId,
                     MaterialAmount = item.MaterialAmount,
-                    Used = item.IsUsed,
+                    Used = item.Used,
                     IsDamaged = item.IsDamaged,
                     DamagedAmount = item.DamagedAmount,
                     RepairAmount = item.RepairAmount,
@@ -385,6 +385,29 @@ namespace WebApp_GozenBv.Managers
                 MaterialLog = log,
                 MaterialLogItems = items
             };
+        }
+
+        public MaterialLogEditViewModel MapLogEditViewModelAsync(MaterialLogEditViewModel incomingEdit, LogItemsCreatedEditViewModel itemsCreatedEdit, LogItemsReturnedEditViewModel itemsReturnedEdit)
+        {
+            var status = incomingEdit.MaterialLog.Status;
+
+            switch (status)
+            {
+                case MaterialLogStatusConst.Created:
+                    return new MaterialLogEditViewModel()
+                    {
+                        MaterialLog = incomingEdit.MaterialLog,
+                        Items = itemsCreatedEdit.Items,
+                    };
+                case MaterialLogStatusConst.Returned:
+                    return new MaterialLogEditViewModel()
+                    {
+                        MaterialLog = incomingEdit.MaterialLog,
+                        Items = itemsReturnedEdit.Items,
+                    };
+                default:
+                    throw new ArgumentNullException("Status was null.");
+            }
         }
     }
 }

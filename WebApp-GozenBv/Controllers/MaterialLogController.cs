@@ -125,6 +125,7 @@ namespace WebApp_GozenBv.Controllers
             }
             var logId = id;
             var log = await _logManager.GetMaterialLogAsync(logId);
+            var items = await _logManager.GetMaterialLogItemsAsync(logId);
 
             if (log == null)
             {
@@ -135,19 +136,21 @@ namespace WebApp_GozenBv.Controllers
             ViewData["Materials"] = new SelectList(await GetMaterialsViewData(), "MaterialId", "ProductNameCode");
             return View(new MaterialLogEditViewModel()
             {
-                LogId = logId,
-                Status = log.Status
+                MaterialLog = log,
+                Items = items
             });
         }
 
         [HttpPost]
         [ValidateAntiForgeryToken]
-        public async Task<IActionResult> Edit(MaterialLogDetailViewModel incomingEdit)
+        public async Task<IActionResult> Edit([FromBody] MaterialLogEditViewModel incomingEdit, LogItemsCreatedEditViewModel itemsCreatedEdit, LogItemsReturnedEditViewModel itemsReturnedEdit)
         { 
             if (ModelState.IsValid)
             {
                 try
                 {
+                    incomingEdit = _logManager.MapLogEditViewModelAsync(incomingEdit, itemsCreatedEdit, itemsReturnedEdit);
+
                     await _logService.HandleEdit(incomingEdit);
                     await _userLogService.StoreLogAsync(ControllerNames.MaterialLog, ActionConst.Edit, incomingEdit.MaterialLog.LogId);
                     return RedirectToAction(nameof(Index));

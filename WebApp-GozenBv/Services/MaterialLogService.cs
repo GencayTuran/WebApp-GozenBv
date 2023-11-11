@@ -74,15 +74,15 @@ namespace WebApp_GozenBv.Services
             return logId;
         }
 
-        public async Task HandleEdit(MaterialLogDetailViewModel incomingLog)
+        public async Task HandleEdit(MaterialLogEditViewModel incomingEdit)
         {
             //get original model
-            var originalLogDetails = await _logManager.GetMaterialLogDTO(incomingLog.MaterialLog.LogId);
+            var originalLogDetails = await _logManager.GetMaterialLogDTO(incomingEdit.MaterialLog.LogId);
             var originalLog = originalLogDetails.MaterialLog;
             var originalItems = originalLogDetails.MaterialLogItems;
             string statusName;
 
-            var incomingDTO = _logManager.MapViewModelToDTO(incomingLog);
+            var incomingDTO = _logManager.MapViewModelToDTO(incomingEdit);
 
             switch (originalLog.Status)
             {
@@ -221,6 +221,12 @@ namespace WebApp_GozenBv.Services
         {
             var materialLogDTO = await _logManager.GetMaterialLogDTO(logId);
             var status = materialLogDTO.MaterialLog.Status;
+            var alreadyApproved = materialLogDTO.MaterialLog.Approved;
+
+            if (alreadyApproved)
+            {
+                throw new Exception($"Log with id {logId} is already approved.");
+            }
 
             switch (status)
             {

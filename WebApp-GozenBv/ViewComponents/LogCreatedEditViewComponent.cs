@@ -18,11 +18,8 @@ namespace WebApp_GozenBv.ViewComponents
         public async Task<IViewComponentResult> InvokeAsync(string logId)
         {
             var log = await _logManager.GetMaterialLogDTO(logId);
-            var viewModel = new LogCreatedEditViewModel()
+            var viewModel = new LogItemsCreatedEditViewModel()
             {
-                LogId = logId,
-                EmployeeId = log.MaterialLog.EmployeeId,
-                LogDate = log.MaterialLog.LogDate,
                 Items = log.MaterialLogItems,
             };
 

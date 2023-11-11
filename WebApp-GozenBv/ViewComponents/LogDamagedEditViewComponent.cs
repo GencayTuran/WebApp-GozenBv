@@ -5,10 +5,10 @@ using WebApp_GozenBv.ViewModels;
 
 namespace WebApp_GozenBv.ViewComponents
 {
-    public class LogDamagedEditViewComponent : ViewComponent
+    public class LogReturnedEditViewComponent : ViewComponent
     {
         private readonly IMaterialLogManager _logManager;
-        public LogDamagedEditViewComponent(IMaterialLogManager logManager)
+        public LogReturnedEditViewComponent(IMaterialLogManager logManager)
         {
             _logManager = logManager;
         }
@@ -16,7 +16,7 @@ namespace WebApp_GozenBv.ViewComponents
         public async Task<IViewComponentResult> InvokeAsync(string logId)
         {
             var log = await _logManager.MapMaterialLogDetailViewModel(logId);
-            var viewModel = new LogDamagedEditViewModel()
+            var viewModel = new LogItemsReturnedEditViewModel()
             {
                 
             };
