@@ -27,8 +27,8 @@ namespace WebApp_GozenBv.ViewComponents
         {
             return View(new AlertsViewModel()
             {
-                CarAlerts = await _carParkManager.MapCarAlerts(),
-                MaterialAlerts = await _materialManager.MapMaterialAlerts(),
+                CarAlerts = await _carParkManager.GetCarAlerts(),
+                MaterialAlerts = await _materialManager.GetMaterialAlerts(),
             });
         }
     }

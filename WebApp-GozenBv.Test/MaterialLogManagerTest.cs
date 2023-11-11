@@ -6,6 +6,7 @@ using System.Text;
 using System.Threading.Tasks;
 using WebApp_GozenBv.Constants;
 using WebApp_GozenBv.DataHandlers;
+using WebApp_GozenBv.DataHandlers.Interfaces;
 using WebApp_GozenBv.Managers;
 using WebApp_GozenBv.Models;
 
@@ -16,12 +17,14 @@ namespace WebApp_GozenBv.Test
     {
         private Mock<IMaterialLogItemDataHandler> _materialLogItemDataMock;
         private Mock<IMaterialLogDataHandler> _materialLogDataMock;
+        private Mock<IEditHistoryDataHandler> _historyDataMock;
         private MaterialLogManager _manager;
         public MaterialLogManagerTest()
         {
             _materialLogDataMock = new Mock<IMaterialLogDataHandler>();
             _materialLogItemDataMock = new Mock<IMaterialLogItemDataHandler>();
-            _manager = new MaterialLogManager(_materialLogDataMock.Object, _materialLogItemDataMock.Object);
+            _historyDataMock = new Mock<IEditHistoryDataHandler>();
+            _manager = new MaterialLogManager(_materialLogDataMock.Object, _materialLogItemDataMock.Object, _historyDataMock.Object);
         }
 
         [TestMethod]
@@ -186,7 +189,7 @@ namespace WebApp_GozenBv.Test
             // Arrange
             var logId = "your_log_id";
             var expectedLog = new MaterialLog();
-            _materialLogDataMock.Setup(d => d.GetMaterialLogByLogId(logId)).Returns(expectedLog);
+            _materialLogDataMock.Setup(d => d.QueryMaterialLogByLogId(logId)).Returns(expectedLog);
 
             // Act
             var result = _manager.GetMaterialLog(logId);
@@ -201,7 +204,7 @@ namespace WebApp_GozenBv.Test
             // Arrange
             var logId = "your_log_id";
             var expectedItems = new List<MaterialLogItem>();
-            _materialLogItemDataMock.Setup(d => d.GetItemsByLogId(logId)).Returns(expectedItems);
+            _materialLogItemDataMock.Setup(d => d.QueryItemsByLogId(logId)).Returns(expectedItems);
 
             // Act
             var result = _manager.GetMaterialLogItems(logId);

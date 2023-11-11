@@ -3,6 +3,7 @@ using System.Threading.Tasks;
 using WebApp_GozenBv.Managers;
 using WebApp_GozenBv.Managers.Interfaces;
 using WebApp_GozenBv.ViewModels;
+using WebApp_GozenBv.Models;
 
 namespace WebApp_GozenBv.ViewComponents
 {
@@ -16,13 +17,13 @@ namespace WebApp_GozenBv.ViewComponents
 
         public async Task<IViewComponentResult> InvokeAsync(string logId)
         {
-            var log = await _logManager.GetMaterialLogDetails(logId);
+            var log = await _logManager.GetMaterialLogDTO(logId);
             var viewModel = new LogCreatedEditViewModel()
             {
                 LogId = logId,
                 EmployeeId = log.MaterialLog.EmployeeId,
                 LogDate = log.MaterialLog.LogDate,
-                Items = log.Items,
+                Items = log.MaterialLogItems,
             };
 
             return View(viewModel);

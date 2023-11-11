@@ -18,11 +18,11 @@
 
     @if (!Model.IsApproved)
     {
-        <img width="20" title="@LogIconTitles.Approved" src="~/resources/icons/red-exclamation-mark-svgrepo-com.svg" />
+        <img width="20" title="@LogIconTitles.NotApproved" src="~/resources/icons/red-exclamation-mark-svgrepo-com.svg" />
     }
 
     @if (Model.IsApproved)
     {
-        <img width="20" title="@LogIconTitles.NotApproved" src="~/resources/icons/check-svgrepo-com.svg" />
+        <img width="20" title="@LogIconTitles.Approved" src="~/resources/icons/check-svgrepo-com.svg" />
     }
 </div>

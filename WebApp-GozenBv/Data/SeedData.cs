@@ -139,10 +139,8 @@ namespace WebApp_GozenBv.Data
                     {
                         LogId = materialLogs[i].LogId,
                         MaterialId = material.Id,
-                        ProductNameCode = productNameCode,
                         MaterialAmount = rndMaterialAmount,
                         IsDamaged = damaged,
-                        Cost = material.Cost,
                         DamagedAmount = rndDamagedAmount,
                         RepairAmount = rndRepairedAmount,
                         DeleteAmount = rndDeletedAmount,

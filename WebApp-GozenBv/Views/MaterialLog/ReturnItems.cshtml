@@ -22,7 +22,7 @@
     <tbody>
         <tr>
             <td>@Html.DisplayFor(model => model.MaterialLog.LogDate)</td>
-            <td>@Html.DisplayFor(model => model.EmployeeFullName)</td>
+            <td>@Html.DisplayFor(model => model.MaterialLog.EmployeeFullName)</td>
             <td>@Html.DisplayFor(model => logId)</td>
         </tr>
     </tbody>
@@ -43,7 +43,7 @@
         {
             <tr class="materialLogItemRow">
                 <td><p class="labelMaterialId">@item.MaterialId</p></td>
-                <td><p>@item.ProductNameCode</p></td>
+                @*<td><p>@item.ProductNameCode</p></td>*@
                 <td><p>@item.MaterialAmount</p></td>
                 <td><input class="chkDamaged" type="checkbox" onclick="ChangeDamaged(this)" /></td>
                 <td>

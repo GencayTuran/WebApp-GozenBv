@@ -56,7 +56,7 @@ namespace WebApp_GozenBv.DataHandlers
 
         public async Task<List<MaterialLogItem>> QueryItemsByLogIdAsync(string logCode)
         {
-            return await _context.MaterialLogItems.Where(i => i.LogId.Equals(logCode)).ToListAsync();
+            return await _context.MaterialLogItems.Where(i => i.LogId.Equals(logCode)).Include(x => x.Material).ToListAsync();
         }
 
         public async Task<List<MaterialLogItem>> QueryItemsByLogId(string logCode, Expression<Func<MaterialLogItem, bool>> filter)
@@ -69,6 +69,7 @@ namespace WebApp_GozenBv.DataHandlers
             return await _context.MaterialLogItems
                     .Where(s => s.LogId == logCode)
                     .Where(s => s.IsDamaged == true)
+                    .Include(x => x.Material)
                     .ToListAsync();
         }
 
@@ -82,7 +83,7 @@ namespace WebApp_GozenBv.DataHandlers
 
         public List<MaterialLogItem> QueryItemsByLogId(string logId)
         {
-            return _context.MaterialLogItems.Where(i => i.LogId.Equals(logId)).ToList();
+            return _context.MaterialLogItems.Where(i => i.LogId.Equals(logId)).Include(x => x.Material).ToList();
         }
 
         public async Task DeleteItemAsync(MaterialLogItem item)

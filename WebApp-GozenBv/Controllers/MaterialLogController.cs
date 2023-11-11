@@ -72,14 +72,14 @@ namespace WebApp_GozenBv.Controllers
         [HttpGet]
         public async Task<IActionResult> Details(string id)
         {
-            string logCode = id;
+            string logId = id;
 
-            if (logCode.IsNullOrEmpty())
+            if (logId.IsNullOrEmpty())
             {
                 return PartialView("_EntityNotFound");
             }
 
-            return View(await _logManager.GetMaterialLogDetails(logCode));
+            return View(await _logManager.MapMaterialLogDetailViewModel(logId));
         }
 
         [HttpGet]
@@ -162,9 +162,9 @@ namespace WebApp_GozenBv.Controllers
             return View(incomingEdit);
         }
 
-        [HttpPost]
-        public async Task<IActionResult> ApproveLog(string logId)
+        public async Task<IActionResult> ApproveLog(string id)
         {
+            var logId = id;
             await _logService.HandleApprove(logId);
 
             return RedirectToAction("Details", new RouteValueDictionary(
@@ -181,7 +181,7 @@ namespace WebApp_GozenBv.Controllers
                 return NotFound();
             }
 
-            var logDetails = await _logManager.GetMaterialLogDetails(logId);
+            var logDetails = await _logManager.MapMaterialLogDetailViewModel(logId);
 
             if (logDetails == null)
             {
@@ -221,7 +221,7 @@ namespace WebApp_GozenBv.Controllers
                 return NotFound();
             }
 
-            return View(await _logManager.GetMaterialLogDetails(logId));
+            return View(await _logManager.MapMaterialLogDetailViewModel(logId));
         }
         
         [HttpPost, ActionName("Delete")]

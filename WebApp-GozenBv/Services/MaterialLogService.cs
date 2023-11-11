@@ -48,6 +48,11 @@ namespace WebApp_GozenBv.Services
                         PropertyNameCaseInsensitive = true
                     });
 
+            if (!selectedItems.Any())
+            {
+                throw new ArgumentNullException("No items in created log.");
+            }
+
             var mappedItems = _logManager.MapSelectedItems(selectedItems);
             var incomingItems = await ValidateItems(mappedItems);
 
@@ -77,12 +82,13 @@ namespace WebApp_GozenBv.Services
             var originalItems = originalLogDetails.MaterialLogItems;
             string statusName;
 
+            var incomingDTO = _logManager.MapViewModelToDTO(incomingLog);
 
             switch (originalLog.Status)
             {
                 case MaterialLogStatusConst.Created:
                     statusName = MaterialLogStatusConst.CreatedName;
-                    var incomingItems = await ValidateItems(incomingLog.Items);
+                    var incomingItems = await ValidateItems(incomingDTO.MaterialLogItems);
 
                     if (originalLog.Approved)
                     {
@@ -90,13 +96,13 @@ namespace WebApp_GozenBv.Services
                         throw new Exception($"Is already approved at '{statusName}' state and so is readonly state. No edit possible.");
                     }
 
-                    if (!LogModified(originalLog, incomingLog.MaterialLog) && !LogItemsModified(originalItems, incomingItems, originalLog.Status))
+                    if (!LogModified(originalLog, incomingDTO.MaterialLog) && !LogItemsModified(originalItems, incomingItems, originalLog.Status))
                     {
                         //TODO: catch higher
                         throw new Exception($"Nothing no modify. Are you sure you have made any changes?");
                     }
 
-                    if (LogModified(originalLog, incomingLog.MaterialLog))
+                    if (LogModified(originalLog, incomingDTO.MaterialLog))
                     {
                         //map original to history
                         var mappedHistory = await _logManager.MapLogHistoryAsync(originalLog);
@@ -104,7 +110,7 @@ namespace WebApp_GozenBv.Services
                         await _logManager.ManageMaterialLogHistoryAsync(mappedHistory);
 
                         //map the update
-                        var updatedLog = _logManager.MapUpdatedMaterialLog(originalLog, incomingLog.MaterialLog);
+                        var updatedLog = _logManager.MapUpdatedMaterialLog(originalLog, incomingDTO.MaterialLog);
                         //update the log
                         await _logManager.ManageMaterialLogAsync(updatedLog, EntityOperation.Update);
                     }
@@ -119,10 +125,6 @@ namespace WebApp_GozenBv.Services
                         //replace items
                         await _logManager.ManageMaterialLogItemsAsync(originalItems, EntityOperation.Delete);
                         await _logManager.ManageMaterialLogItemsAsync(incomingItems, EntityOperation.Create);
-
-                        var newItems = _logManager.ReplaceItems_StatusCreated(originalItems, incomingItems);
-                        //update items
-                        await _logManager.ManageMaterialLogItemsAsync(newItems, EntityOperation.Create);
                     }
                     break;
 
@@ -135,14 +137,14 @@ namespace WebApp_GozenBv.Services
                         throw new Exception($"Is already approved at '{statusName}' state and so is readonly state. No edit possible.");
                     }
 
-                    if (!LogItemsModified(originalItems, incomingLog.Items, originalLog.Status))
+                    if (!LogItemsModified(originalItems, incomingDTO.MaterialLogItems, originalLog.Status))
                     {
                         //TODO: catch higher
                         throw new Exception($"Nothing no modify. Are you sure you have made any changes?");
                     }
 
                     //only damaged amount, inrepairamount and deletedamount editable. also not damaged items can be damaged edited
-                    if (LogItemsModified(originalItems, incomingLog.Items, originalLog.Status))
+                    if (LogItemsModified(originalItems, incomingDTO.MaterialLogItems, originalLog.Status))
                     {
                         //map original items to history
                         var mappedHistory = await _logManager.MapLogItemsHistoryAsync(originalItems);
@@ -150,7 +152,7 @@ namespace WebApp_GozenBv.Services
                         await _logManager.ManageMaterialLogItemsHistoryAsync(mappedHistory);
 
                         //map the update
-                        var updatedItems = _logManager.MapUpdatedItems_StatusReturned(originalItems, incomingLog.Items);
+                        var updatedItems = _logManager.MapUpdatedItems_StatusReturned(originalItems, incomingDTO.MaterialLogItems);
                         //update items
                         await _logManager.ManageMaterialLogItemsAsync(updatedItems, EntityOperation.Update);
                     }

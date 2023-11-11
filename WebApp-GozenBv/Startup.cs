@@ -69,7 +69,7 @@ namespace WebApp_GozenBv
             services.AddTransient<IEditHistoryDataHandler, EditHistoryDataHandler>();
 
             services.AddTransient<IRepairTicketManager, RepairTicketManager>();
-            services.AddTransient<IRepairTicketDataHandler, IRepairTicketDataHandler>();
+            services.AddTransient<IRepairTicketDataHandler, RepairTicketDataHandler>();
         }
 
         public void Configure(IApplicationBuilder app, IWebHostEnvironment env)

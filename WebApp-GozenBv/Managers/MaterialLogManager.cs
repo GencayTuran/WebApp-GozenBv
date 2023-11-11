@@ -83,7 +83,7 @@ namespace WebApp_GozenBv.Managers
         }
 
         //TODO: check if still needed. DTOs will replace backend ViewModels.
-        public async Task<MaterialLogDetailViewModel> GetMaterialLogDetails(string logId)
+        public async Task<MaterialLogDetailViewModel> MapMaterialLogDetailViewModel(string logId)
         {
             var log = await _logData.QueryMaterialLogByLogIdAsync(logId);
 
@@ -92,35 +92,65 @@ namespace WebApp_GozenBv.Managers
                 throw new ArgumentNullException($"MaterialLog with logId {logId} does not exist.");
             }
 
-            List<MaterialLogItem> undamagedItems, damagedItems = new();
+            var materialLogViewModel = new MaterialLogViewModel
+            {
+                Id = log.Id,
+                LogId = log.LogId,
+                LogDate = log.LogDate,
+                Employee = log.Employee,
+                EmployeeId = log.EmployeeId,
+                EmployeeFullName = (log.Employee.Name + " " + log.Employee.Surname).ToUpper(),
+                ReturnDate = log.ReturnDate,
+                Status = log.Status,
+                Damaged = log.Damaged,
+            };
+
+            List<MaterialLogItem> items = new();
+            List<MaterialLogItemViewModel> itemsViewModel = new();
+            List<MaterialLogItemViewModel> itemsUndamaged = new();
+            List<MaterialLogItemViewModel> itemsDamaged = new();
+
+            items = await _itemData.QueryItemsByLogIdAsync(logId);
+
+            foreach (var item in items)
+            {
+                itemsViewModel.Add(new MaterialLogItemViewModel()
+                {
+                    Id = item.Id,
+                    LogId = item.LogId,
+                    MaterialId = item.MaterialId,
+                    MaterialAmount = item.MaterialAmount,
+                    ProductNameCode = (item.Material.Name + " " + item.Material.Brand).ToUpper(),
+                    NoReturn = item.Material.NoReturn,
+                    Cost = item.Material.Cost,
+                    IsUsed = item.Used,
+                    IsDamaged = item.IsDamaged,
+                    DamagedAmount = item.DamagedAmount,
+                    RepairAmount = item.RepairAmount,
+                    DeleteAmount = item.DeleteAmount
+                });
+            }
 
             if (log.Damaged)
             {
-                undamagedItems = await _itemData.QueryUnDamagedItemsByLogId(logId);
-                damagedItems = await _itemData.QueryDamagedItemsByLogId(logId);
-            }
-            else
-            {
-                undamagedItems = await _itemData.QueryItemsByLogIdAsync(logId);
+                itemsUndamaged = itemsViewModel.Where(x => !x.IsDamaged).ToList();
+                itemsDamaged = itemsViewModel.Where(x => x.IsDamaged).ToList();
+
+                return new MaterialLogDetailViewModel()
+                {
+                    MaterialLog = materialLogViewModel,
+                    Items = itemsUndamaged,
+                    ItemsDamaged = itemsDamaged,
+                };
             }
 
-            return new MaterialLogDetailViewModel
+            var result = new MaterialLogDetailViewModel()
             {
-                MaterialLog = new MaterialLog
-                {
-                    Id = log.Id,
-                    LogId = log.LogId,
-                    LogDate = log.LogDate,
-                    Employee = log.Employee,
-                    EmployeeId = log.EmployeeId,
-                    ReturnDate = log.ReturnDate,
-                    Status = log.Status,
-                    Damaged = log.Damaged,
-                },
-                Items = undamagedItems,
-                ItemsDamaged = damagedItems,
-                EmployeeFullName = (log.Employee.Name + " " + log.Employee.Surname).ToUpper(),
+                MaterialLog = materialLogViewModel,
+                Items = itemsViewModel
             };
+
+            return result;
         }
         public async Task<MaterialLogDTO> GetMaterialLogDTO(string logId)
         {
@@ -305,7 +335,7 @@ namespace WebApp_GozenBv.Managers
             {
                 //new Item
                 MaterialLogItem newItem = new();
-                
+
                 newItem.MaterialId = item.MaterialId;
                 newItem.MaterialAmount = item.MaterialAmount;
                 newItem.Used = item.Used;
@@ -315,6 +345,46 @@ namespace WebApp_GozenBv.Managers
             }
 
             return newItems;
+        }
+
+        public MaterialLogDTO MapViewModelToDTO(MaterialLogDetailViewModel viewModel)
+        {
+            var log = new MaterialLog()
+            {
+                Id = viewModel.MaterialLog.Id,
+                LogDate = viewModel.MaterialLog.LogDate,
+                EmployeeId = viewModel.MaterialLog.EmployeeId,
+                Employee = viewModel.MaterialLog.Employee,
+                LogId = viewModel.MaterialLog.LogId,
+                ReturnDate = viewModel.MaterialLog.ReturnDate,
+                Damaged = viewModel.MaterialLog.Damaged,
+                Status = viewModel.MaterialLog.Status,
+                Approved = viewModel.MaterialLog.Approved
+            };
+
+            var items = new List<MaterialLogItem>();
+            var itemsMerged = viewModel.Items.Concat(viewModel.ItemsDamaged);
+            foreach (var item in itemsMerged)
+            {
+                items.Add(new MaterialLogItem()
+                {
+                    Id = item.Id,
+                    LogId = item.LogId,
+                    MaterialId = item.MaterialId,
+                    MaterialAmount = item.MaterialAmount,
+                    Used = item.IsUsed,
+                    IsDamaged = item.IsDamaged,
+                    DamagedAmount = item.DamagedAmount,
+                    RepairAmount = item.RepairAmount,
+                    DeleteAmount = item.DeleteAmount
+                });
+            }
+
+            return new MaterialLogDTO
+            {
+                MaterialLog = log,
+                MaterialLogItems = items
+            };
         }
     }
 }

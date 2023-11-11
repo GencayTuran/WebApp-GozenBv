@@ -12,7 +12,7 @@ using WebApp_GozenBv.Data;
 namespace WebApp_GozenBv.Migrations
 {
     [DbContext(typeof(DataDbContext))]
-    [Migration("20231101195109_init")]
+    [Migration("20231110232840_init")]
     partial class init
     {
         protected override void BuildTargetModel(ModelBuilder modelBuilder)
@@ -112,6 +112,90 @@ namespace WebApp_GozenBv.Migrations
                     b.ToTable("Employees");
                 });
 
+            modelBuilder.Entity("WebApp_GozenBv.Models.ItemEditHistory", b =>
+                {
+                    b.Property<int>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("int");
+
+                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"), 1L, 1);
+
+                    b.Property<int?>("DamagedAmount")
+                        .HasColumnType("int");
+
+                    b.Property<int?>("DeleteAmount")
+                        .HasColumnType("int");
+
+                    b.Property<DateTime>("EditTimestamp")
+                        .HasColumnType("datetime2");
+
+                    b.Property<bool>("IsDamaged")
+                        .HasColumnType("bit");
+
+                    b.Property<string>("LogId")
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<int>("MaterialAmount")
+                        .HasColumnType("int");
+
+                    b.Property<int>("MaterialId")
+                        .HasColumnType("int");
+
+                    b.Property<int>("MaterialLogItemId")
+                        .HasColumnType("int");
+
+                    b.Property<int?>("RepairAmount")
+                        .HasColumnType("int");
+
+                    b.Property<bool>("Used")
+                        .HasColumnType("bit");
+
+                    b.Property<int>("Version")
+                        .HasColumnType("int");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("MaterialId");
+
+                    b.ToTable("MaterialLogItemsHistory");
+                });
+
+            modelBuilder.Entity("WebApp_GozenBv.Models.LogEditHistory", b =>
+                {
+                    b.Property<int>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("int");
+
+                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"), 1L, 1);
+
+                    b.Property<bool>("Damaged")
+                        .HasColumnType("bit");
+
+                    b.Property<DateTime>("EditTimestamp")
+                        .HasColumnType("datetime2");
+
+                    b.Property<int>("EmployeeId")
+                        .HasColumnType("int");
+
+                    b.Property<DateTime>("LogDate")
+                        .HasColumnType("datetime2");
+
+                    b.Property<string>("LogId")
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<DateTime?>("ReturnDate")
+                        .HasColumnType("datetime2");
+
+                    b.Property<int>("Version")
+                        .HasColumnType("int");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("EmployeeId");
+
+                    b.ToTable("MaterialLogHistory");
+                });
+
             modelBuilder.Entity("WebApp_GozenBv.Models.Material", b =>
                 {
                     b.Property<int>("Id")
@@ -120,27 +204,39 @@ namespace WebApp_GozenBv.Migrations
 
                     SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"), 1L, 1);
 
+                    b.Property<string>("Brand")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(max)");
+
                     b.Property<double?>("Cost")
                         .HasColumnType("float");
 
-                    b.Property<int>("MinQuantity")
+                    b.Property<int>("DeletedQty")
+                        .HasColumnType("int");
+
+                    b.Property<int>("InDepotAmount")
+                        .HasColumnType("int");
+
+                    b.Property<int>("InRepairQty")
+                        .HasColumnType("int");
+
+                    b.Property<int>("InUseAmount")
+                        .HasColumnType("int");
+
+                    b.Property<int>("MinQty")
+                        .HasColumnType("int");
+
+                    b.Property<string>("Name")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<int>("NewQty")
                         .HasColumnType("int");
 
                     b.Property<bool>("NoReturn")
                         .HasColumnType("bit");
 
-                    b.Property<string>("ProductCode")
-                        .IsRequired()
-                        .HasColumnType("nvarchar(max)");
-
-                    b.Property<string>("ProductName")
-                        .IsRequired()
-                        .HasColumnType("nvarchar(max)");
-
-                    b.Property<int>("QuantityNew")
-                        .HasColumnType("int");
-
-                    b.Property<int>("QuantityUsed")
+                    b.Property<int>("UsedQty")
                         .HasColumnType("int");
 
                     b.HasKey("Id");
@@ -155,6 +251,9 @@ namespace WebApp_GozenBv.Migrations
                         .HasColumnType("int");
 
                     SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"), 1L, 1);
+
+                    b.Property<bool>("Approved")
+                        .HasColumnType("bit");
 
                     b.Property<bool>("Damaged")
                         .HasColumnType("bit");
@@ -189,13 +288,10 @@ namespace WebApp_GozenBv.Migrations
 
                     SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"), 1L, 1);
 
-                    b.Property<double?>("Cost")
-                        .HasColumnType("float");
-
                     b.Property<int?>("DamagedAmount")
                         .HasColumnType("int");
 
-                    b.Property<int?>("DeletedAmount")
+                    b.Property<int?>("DeleteAmount")
                         .HasColumnType("int");
 
                     b.Property<bool>("IsDamaged")
@@ -210,13 +306,7 @@ namespace WebApp_GozenBv.Migrations
                     b.Property<int>("MaterialId")
                         .HasColumnType("int");
 
-                    b.Property<bool>("NoReturn")
-                        .HasColumnType("bit");
-
-                    b.Property<string>("ProductNameCode")
-                        .HasColumnType("nvarchar(max)");
-
-                    b.Property<int?>("RepairedAmount")
+                    b.Property<int?>("RepairAmount")
                         .HasColumnType("int");
 
                     b.Property<bool>("Used")
@@ -224,7 +314,36 @@ namespace WebApp_GozenBv.Migrations
 
                     b.HasKey("Id");
 
+                    b.HasIndex("MaterialId");
+
                     b.ToTable("MaterialLogItems");
+                });
+
+            modelBuilder.Entity("WebApp_GozenBv.Models.RepairTicket", b =>
+                {
+                    b.Property<int>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("int");
+
+                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"), 1L, 1);
+
+                    b.Property<string>("LogId")
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<int>("MaterialId")
+                        .HasColumnType("int");
+
+                    b.Property<string>("RepairInfo")
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<int>("Status")
+                        .HasColumnType("int");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("MaterialId");
+
+                    b.ToTable("RepairTickets");
                 });
 
             modelBuilder.Entity("WebApp_GozenBv.Models.User", b =>
@@ -276,6 +395,28 @@ namespace WebApp_GozenBv.Migrations
                     b.ToTable("UserLogs");
                 });
 
+            modelBuilder.Entity("WebApp_GozenBv.Models.ItemEditHistory", b =>
+                {
+                    b.HasOne("WebApp_GozenBv.Models.Material", "Material")
+                        .WithMany()
+                        .HasForeignKey("MaterialId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.Navigation("Material");
+                });
+
+            modelBuilder.Entity("WebApp_GozenBv.Models.LogEditHistory", b =>
+                {
+                    b.HasOne("WebApp_GozenBv.Models.Employee", "Employee")
+                        .WithMany()
+                        .HasForeignKey("EmployeeId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.Navigation("Employee");
+                });
+
             modelBuilder.Entity("WebApp_GozenBv.Models.MaterialLog", b =>
                 {
                     b.HasOne("WebApp_GozenBv.Models.Employee", "Employee")
@@ -285,6 +426,28 @@ namespace WebApp_GozenBv.Migrations
                         .IsRequired();
 
                     b.Navigation("Employee");
+                });
+
+            modelBuilder.Entity("WebApp_GozenBv.Models.MaterialLogItem", b =>
+                {
+                    b.HasOne("WebApp_GozenBv.Models.Material", "Material")
+                        .WithMany()
+                        .HasForeignKey("MaterialId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.Navigation("Material");
+                });
+
+            modelBuilder.Entity("WebApp_GozenBv.Models.RepairTicket", b =>
+                {
+                    b.HasOne("WebApp_GozenBv.Models.Material", "Material")
+                        .WithMany()
+                        .HasForeignKey("MaterialId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.Navigation("Material");
                 });
 
             modelBuilder.Entity("WebApp_GozenBv.Models.UserLog", b =>
