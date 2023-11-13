@@ -10,132 +10,148 @@
     var approved = Model.MaterialLog.Approved;
 }
 
-<h1>Details</h1>
+<div class="flex-row d-flex justify-content-between mb-4">
+    <div class="col-md-8">
+        <h1 class="mb-0">Details</h1>
+        <h4 class="text-muted">Material Log</h4>
+    </div>
 
-<h4>MaterialLog</h4>
-<hr />
+    <div class="d-flex flex-column col-2">
+        <a asp-action="Index" class="btn btn-dark mb-2">Back to List</a>
+        @if (!approved)
+        {
+            <a asp-action="Edit" asp-route-id="@logId" class="btn btn-primary mb-2">Edit</a>
+        }
+
+        @switch (status)
+        {
+            case MaterialLogStatusConst.Created:
+                <a asp-action="Delete" asp-route-id="@logId" class="btn btn-danger mb-2">Delete</a>
+
+                @if (!approved)
+                {
+                    <a asp-action="ApproveLog" asp-route-id="@logId" class="btn btn-info mb-2">Approve Create</a>
+                }
+                else
+                {
+                    <a asp-action="ReturnItems" asp-route-id="@logId" class="btn btn-info mb-2">Return Items</a>
+                }
+                break;
+
+            case MaterialLogStatusConst.Returned:
+                @if (!approved)
+                {
+                    <a asp-action="ApproveLog" asp-route-id="@logId" class="btn btn-info mb-2">Approve Return</a>
+                }
+                break;
+        }
+    </div>
+</div>
 
 <div class="d-flex flex-column">
-    <a asp-action="Index">Back to List</a>
 
-    @switch (status)
-    {
-        case MaterialLogStatusConst.Created:
-            <a asp-action="Edit" asp-route-id="@logId">Edit</a>
-            <a asp-action="Delete" asp-route-id="@logId">Delete</a>
+    <div class="flex-row d-flex">
+        <div class="col-md-9">
+            <table class="table table-bordered table-striped col-md-8">
+                <thead class="thead-dark">
+                    <tr>
+                        <th scope="col">@Html.DisplayNameFor(model => model.MaterialLog.LogDate)</th>
+                        <th scope="col">@Html.DisplayNameFor(model => model.MaterialLog.Employee)</th>
+                        <th scope="col">@Html.DisplayNameFor(model => model.MaterialLog.Status)</th>
+                        @if (status == MaterialLogStatusConst.Returned)
+                        {
+                            <th scope="col">@Html.DisplayNameFor(model => model.MaterialLog.ReturnDate)</th>
+                        }
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr>
+                        <td>@Html.DisplayFor(model => model.MaterialLog.LogDate)</td>
+                        <td>@Html.DisplayFor(model => model.MaterialLog.EmployeeFullName)</td>
+                        <td>
+                            <vc:status-icon status="@status" is-damaged="@Model.MaterialLog.Damaged" is-approved="@approved"></vc:status-icon>
+                        </td>
+                        @if (status == MaterialLogStatusConst.Returned)
+                        {
+                            <td>@Html.DisplayFor(model => model.MaterialLog.ReturnDate)</td>
+                        }
+                    </tr>
+                </tbody>
+            </table>
 
-            if (!approved)
-            {
-                <a asp-action="ApproveLog" asp-route-id="@logId">Approve Create</a>
-            } else
-            {
-                <a asp-action="ReturnItems" asp-route-id="@logId">Return Items</a>
-            }
-            break;
-
-        case MaterialLogStatusConst.Returned:
-            if (!approved)
-            {
-                <a asp-action="ApproveLog" asp-route-id="@logId">Approve Return</a>
-            }
-            break;
-    }
-</div>
-
-<table class="table">
-    <thead>
-        <tr>
-            <th scope="col">@Html.DisplayNameFor(model => model.MaterialLog.LogDate)</th>
-            <th scope="col">@Html.DisplayNameFor(model => model.MaterialLog.Employee)</th>
-            <th scope="col">@Html.DisplayNameFor(model => model.MaterialLog.Status)</th>
-            @if (status == MaterialLogStatusConst.Returned || status == MaterialLogStatusConst.DamagedAwaitingAction)
-            {
-                <th scope="col">@Html.DisplayNameFor(model => model.MaterialLog.ReturnDate)</th>
-            }
-        </tr>
-    </thead>
-    <tbody>
-        <tr>
-            <td>@Html.DisplayFor(model => model.MaterialLog.LogDate)</td>
-            <td>@Html.DisplayFor(model => model.MaterialLog.EmployeeFullName)</td>
-            <td>
-                <vc:status-icon status="@status" is-damaged="@Model.MaterialLog.Damaged"></vc:status-icon>
-            </td>
-            @if (status == MaterialLogStatusConst.Returned || status == MaterialLogStatusConst.DamagedAwaitingAction)
-            {
-                <td>@Html.DisplayFor(model => model.MaterialLog.ReturnDate)</td>
-            }
-        </tr>
-    </tbody>
-</table>
-
-<div>
-    <h5>Items</h5>
-</div>
-<table class="table" id="unDamagedItems">
-    <thead>
-        <tr>
-            <th>@Html.DisplayNameFor(model => model.MaterialLogItem)</th>
-            <th>@Html.DisplayNameFor(model => model.MaterialLogItem.MaterialAmount)</th>
-            <th>@Html.DisplayNameFor(model => model.MaterialLogItem.IsUsed)</th>
-        </tr>
-    </thead>
-    <tbody>
-        @foreach (var item in Model.Items)
-        {
-            <tr>
-                <td>@item.ProductNameCode</td>
-                <td>@item.MaterialAmount</td>
-                <td>@item.IsUsed</td>
-            </tr>
-        }
-    </tbody>
-</table>
-
-@if (Model.MaterialLog.Damaged)
-{
-    <div>
-        <h5>Damaged Items</h5>
-    </div>
-    <table class="table" id="damagedItems">
-        <thead>
-            <tr>
-                <th>@Html.DisplayNameFor(model => model.MaterialLogItem)</th>
-                <th>@Html.DisplayNameFor(model => model.MaterialLogItem.MaterialAmount)</th>
-                <th>@Html.DisplayNameFor(model => model.MaterialLogItem.Cost)</th>
-                <th>@Html.DisplayNameFor(model => model.MaterialLogItem.IsUsed)</th>
-                @if (log.Damaged)
-                {
-                    <th>@Html.DisplayNameFor(model => model.MaterialLogItem.DamagedAmount)</th>
-                    <th>@Html.DisplayNameFor(model => model.MaterialLogItem.RepairAmount)</th>
-                    <th>@Html.DisplayNameFor(model => model.MaterialLogItem.DeleteAmount)</th>
-                }
-            </tr>
-        </thead>
-        <tbody>
-            @foreach (var item in Model.ItemsDamaged)
-            {
-                <tr>
-                    <td>@item.ProductNameCode</td>
-                    <td>@item.MaterialAmount</td>
-                    <td>@item.Cost</td>
-                    <td>@item.IsUsed</td>
-                    @if (log.Damaged)
+            <div class="mb-3">
+                <h5 class="mb-0">Items</h5>
+            </div>
+            <table class="table table-bordered table-striped">
+                <thead class="thead-dark">
+                    <tr>
+                        <th>@Html.DisplayNameFor(model => model.MaterialLogItem)</th>
+                        <th>@Html.DisplayNameFor(model => model.MaterialLogItem.MaterialAmount)</th>
+                        <th>@Html.DisplayNameFor(model => model.MaterialLogItem.IsUsed)</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    @foreach (var item in Model.Items)
                     {
-                        <td>@item.DamagedAmount</td>
-                        <td>@item.RepairAmount</td>
-                        <td>@item.DeleteAmount</td>
+                        <tr>
+                            <td>@item.ProductNameCode</td>
+                            <td>@item.MaterialAmount</td>
+                            <td>@item.IsUsed</td>
+                        </tr>
                     }
-                </tr>
+                </tbody>
+            </table>
+
+            @if (Model.MaterialLog.Damaged)
+            {
+                <div class="mb-3">
+                    <h5 class="mb-0">Damaged Items</h5>
+                </div>
+                <table class="table table-bordered table-striped">
+                    <thead class="thead-dark">
+                        <tr>
+                            <th>@Html.DisplayNameFor(model => model.MaterialLogItem)</th>
+                            <th>@Html.DisplayNameFor(model => model.MaterialLogItem.MaterialAmount)</th>
+                            <th>@Html.DisplayNameFor(model => model.MaterialLogItem.Cost)</th>
+                            <th>@Html.DisplayNameFor(model => model.MaterialLogItem.IsUsed)</th>
+                            @if (log.Damaged)
+                            {
+                                <th>@Html.DisplayNameFor(model => model.MaterialLogItem.DamagedAmount)</th>
+                                <th>@Html.DisplayNameFor(model => model.MaterialLogItem.RepairAmount)</th>
+                                <th>@Html.DisplayNameFor(model => model.MaterialLogItem.DeleteAmount)</th>
+                            }
+                        </tr>
+                    </thead>
+                    <tbody>
+                        @foreach (var item in Model.ItemsDamaged)
+                        {
+                            <tr>
+                                <td>@item.ProductNameCode</td>
+                                <td>@item.MaterialAmount</td>
+                                <td>@item.Cost</td>
+                                <td>@item.IsUsed</td>
+                                @if (log.Damaged)
+                                {
+                                    <td>@item.DamagedAmount</td>
+                                    <td>@item.RepairAmount</td>
+                                    <td>@item.DeleteAmount</td>
+                                }
+                            </tr>
+                        }
+                    </tbody>
+                </table>
             }
-        </tbody>
-    </table>
-}
+        </div>
 
-<div>
-    <vc:user-log view="@ViewTypeConst.Entity" controller-id="@ControllerNames.MaterialLog" entity-id="@logId"></vc:user-log>
+        <div>
+        </div>
+
+    </div>
+
+    <div class="mt-5">
+        <vc:user-log view="@ViewTypeConst.Entity" controller-id="@ControllerNames.MaterialLog" entity-id="@logId"></vc:user-log>
+    </div>
 </div>
-
 
 <input id="statusId" type="hidden" value="@status" />
 <script src="~/js/MaterialLog_Details.js"></script>

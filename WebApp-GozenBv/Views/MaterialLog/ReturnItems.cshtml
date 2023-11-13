@@ -31,8 +31,7 @@
             <th>MaterialLogItems</th>
         </tr>
         <tr>
-            <th>@Html.DisplayNameFor(model => model.MaterialLogItem.MaterialId)</th>
-            <th>@Html.DisplayNameFor(model => model.MaterialLogItem)</th>
+            <th>Material</th>
             <th>@Html.DisplayNameFor(model => model.MaterialLogItem.MaterialAmount)</th>
             <th>Damaged?</th>
             <th id="damagedTitle" style="opacity: 0.6">@Html.DisplayNameFor(model => model.MaterialLogItem.DamagedAmount)</th>
@@ -42,8 +41,7 @@
         @foreach (var item in Model.Items)
         {
             <tr class="materialLogItemRow">
-                <td><p class="labelMaterialId">@item.MaterialId</p></td>
-                @*<td><p>@item.ProductNameCode</p></td>*@
+                <td><p>@item.ProductNameCode</p></td>
                 <td><p>@item.MaterialAmount</p></td>
                 <td><input class="chkDamaged" type="checkbox" onclick="ChangeDamaged(this)" /></td>
                 <td>

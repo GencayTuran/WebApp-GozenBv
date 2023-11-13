@@ -13,12 +13,14 @@ using System.Linq;
 using Microsoft.EntityFrameworkCore;
 using System.Security.Cryptography;
 using WebApp_GozenBv.DTOs;
+using WebApp_GozenBv.Mappers.Interfaces;
 
 namespace WebApp_GozenBv.Services
 {
     public class MaterialLogService : IMaterialLogService
     {
         private readonly IMaterialLogManager _logManager;
+        private readonly IMaterialLogMapper _logMapper;
         private readonly IMaterialManager _materialManager;
         private readonly IEmployeeManager _employeeManager;
         private readonly IMaterialHelper _materialHelper;
@@ -31,7 +33,8 @@ namespace WebApp_GozenBv.Services
             IEqualityHelper equalityHelper,
             IEmployeeManager employeeManager,
             IMaterialHelper materialHelper,
-            IRepairTicketManager repairManager)
+            IRepairTicketManager repairManager,
+            IMaterialLogMapper logMapper)
         {
             _logManager = logManager;
             _materialManager = materialManager;
@@ -39,6 +42,7 @@ namespace WebApp_GozenBv.Services
             _materialHelper = materialHelper;
             _employeeManager = employeeManager;
             _repairManager = repairManager;
+            _logMapper = logMapper;
         }
         public async Task<string> HandleCreate(MaterialLogCreateViewModel incomingViewModel)
         {
@@ -53,7 +57,7 @@ namespace WebApp_GozenBv.Services
                 throw new ArgumentNullException("No items in created log.");
             }
 
-            var mappedItems = _logManager.MapSelectedItems(selectedItems);
+            var mappedItems = _logMapper.MapSelectedItems(selectedItems);
             var incomingItems = await ValidateItems(mappedItems);
 
             string logId = Guid.NewGuid().ToString();
@@ -68,7 +72,7 @@ namespace WebApp_GozenBv.Services
             };
             await _logManager.ManageMaterialLogAsync(newLog, EntityOperation.Create);
 
-            var newItems = _logManager.MapNewItems(incomingItems, logId);
+            var newItems = _logMapper.MapNewItems(incomingItems, logId);
             await _logManager.ManageMaterialLogItemsAsync(newItems, EntityOperation.Create);
 
             return logId;
@@ -82,7 +86,7 @@ namespace WebApp_GozenBv.Services
             var originalItems = originalLogDetails.MaterialLogItems;
             string statusName;
 
-            var incomingDTO = _logManager.MapViewModelToDTO(incomingEdit);
+            var incomingDTO = _logMapper.MapViewModelToDTO(incomingEdit);
 
             switch (originalLog.Status)
             {
@@ -105,12 +109,12 @@ namespace WebApp_GozenBv.Services
                     if (LogModified(originalLog, incomingDTO.MaterialLog))
                     {
                         //map original to history
-                        var mappedHistory = await _logManager.MapLogHistoryAsync(originalLog);
+                        var mappedHistory = await _logMapper.MapLogHistoryAsync(originalLog);
                         //create record for history
                         await _logManager.ManageMaterialLogHistoryAsync(mappedHistory);
 
                         //map the update
-                        var updatedLog = _logManager.MapUpdatedMaterialLog(originalLog, incomingDTO.MaterialLog);
+                        var updatedLog = _logMapper.MapUpdatedMaterialLog(originalLog, incomingDTO.MaterialLog);
                         //update the log
                         await _logManager.ManageMaterialLogAsync(updatedLog, EntityOperation.Update);
                     }
@@ -118,7 +122,7 @@ namespace WebApp_GozenBv.Services
                     if (LogItemsModified(originalItems, incomingItems, originalLog.Status))
                     {
                         //map original items to history
-                        var mappedHistory = await _logManager.MapLogItemsHistoryAsync(originalItems);
+                        var mappedHistory = await _logMapper.MapLogItemsHistoryAsync(originalItems);
                         //create records for history
                         await _logManager.ManageMaterialLogItemsHistoryAsync(mappedHistory);
 
@@ -147,12 +151,12 @@ namespace WebApp_GozenBv.Services
                     if (LogItemsModified(originalItems, incomingDTO.MaterialLogItems, originalLog.Status))
                     {
                         //map original items to history
-                        var mappedHistory = await _logManager.MapLogItemsHistoryAsync(originalItems);
+                        var mappedHistory = await _logMapper.MapLogItemsHistoryAsync(originalItems);
                         //create records for history
                         await _logManager.ManageMaterialLogItemsHistoryAsync(mappedHistory);
 
                         //map the update
-                        var updatedItems = _logManager.MapUpdatedItems_StatusReturned(originalItems, incomingDTO.MaterialLogItems);
+                        var updatedItems = _logMapper.MapUpdatedItems_StatusReturned(originalItems, incomingDTO.MaterialLogItems);
                         //update items
                         await _logManager.ManageMaterialLogItemsAsync(updatedItems, EntityOperation.Update);
                     }
@@ -211,9 +215,9 @@ namespace WebApp_GozenBv.Services
                     }
                     modifiedItems.Add(item);
                 }
+                await _logManager.ManageMaterialLogItemsAsync(modifiedItems, EntityOperation.Update);
             }
 
-            await _logManager.ManageMaterialLogItemsAsync(modifiedItems, EntityOperation.Update);
             await _logManager.ManageMaterialLogAsync(log, EntityOperation.Update);
         }
 

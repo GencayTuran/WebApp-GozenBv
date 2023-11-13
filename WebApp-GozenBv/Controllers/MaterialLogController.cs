@@ -22,6 +22,7 @@ using WebApp_GozenBv.Models;
 using WebApp_GozenBv.Services.Interfaces;
 using WebApp_GozenBv.ViewModels;
 using WebApp_GozenBv.ViewData;
+using WebApp_GozenBv.Mappers.Interfaces;
 
 namespace WebApp_GozenBv.Controllers
 {
@@ -29,6 +30,7 @@ namespace WebApp_GozenBv.Controllers
     public class MaterialLogController : Controller
     {
         private readonly IMaterialLogManager _logManager;
+        private readonly IMaterialLogMapper _logMapper;
         private readonly IEmployeeManager _employeeManager;
         private readonly IMaterialManager _materialManager;
 
@@ -42,7 +44,8 @@ namespace WebApp_GozenBv.Controllers
             IMaterialManager materialManager,
             ILogSearchHelper searchHelper,
             IUserLogService userLogService,
-            IMaterialLogService logService)
+            IMaterialLogService logService,
+            IMaterialLogMapper logMapper)
         {
             _logManager = logManager;
             _employeeManager = employeeManager;
@@ -50,6 +53,7 @@ namespace WebApp_GozenBv.Controllers
             _searchHelper = searchHelper;
             _userLogService = userLogService;
             _logService = logService;
+            _logMapper = logMapper;
         }
 
         [HttpGet]
@@ -79,7 +83,7 @@ namespace WebApp_GozenBv.Controllers
                 return PartialView("_EntityNotFound");
             }
 
-            return View(await _logManager.MapMaterialLogDetailViewModel(logId));
+            return View(await _logMapper.MapMaterialLogDetailViewModel(logId));
         }
 
         [HttpGet]
@@ -124,21 +128,23 @@ namespace WebApp_GozenBv.Controllers
                 return NotFound();
             }
             var logId = id;
-            var log = await _logManager.GetMaterialLogAsync(logId);
-            var items = await _logManager.GetMaterialLogItemsAsync(logId);
-
-            if (log == null)
+            var logDTO = await _logManager.GetMaterialLogDTO(logId);
+            
+            if (logDTO == null)
             {
                 return NotFound();
             }
 
+            if (logDTO.MaterialLog.Approved)
+            {
+                throw new Exception("Log cannot be edited after it is approved.");
+            }
+
+            var viewModel = _logMapper.MapLogAndItemsToViewModel(logDTO);
+
             ViewData["Employees"] = new SelectList(await GetEmployeesViewData(), "EmployeeId", "EmployeeFullName");
             ViewData["Materials"] = new SelectList(await GetMaterialsViewData(), "MaterialId", "ProductNameCode");
-            return View(new MaterialLogEditViewModel()
-            {
-                MaterialLog = log,
-                Items = items
-            });
+            return View(viewModel);
         }
 
         [HttpPost]
@@ -149,7 +155,7 @@ namespace WebApp_GozenBv.Controllers
             {
                 try
                 {
-                    incomingEdit = _logManager.MapLogEditViewModelAsync(incomingEdit, itemsCreatedEdit, itemsReturnedEdit);
+                    incomingEdit = _logMapper.MapLogEditToViewModel(incomingEdit, itemsCreatedEdit, itemsReturnedEdit);
 
                     await _logService.HandleEdit(incomingEdit);
                     await _userLogService.StoreLogAsync(ControllerNames.MaterialLog, ActionConst.Edit, incomingEdit.MaterialLog.LogId);
@@ -184,7 +190,7 @@ namespace WebApp_GozenBv.Controllers
                 return NotFound();
             }
 
-            var logDetails = await _logManager.MapMaterialLogDetailViewModel(logId);
+            var logDetails = await _logMapper.MapMaterialLogDetailViewModel(logId);
 
             if (logDetails == null)
             {
@@ -195,20 +201,20 @@ namespace WebApp_GozenBv.Controllers
         }
 
         [HttpPost]
-        public IActionResult ReturnItems(MaterialLogDetailViewModel incomingReturn)
+        public async Task<IActionResult> ReturnItems(MaterialLogDetailViewModel incomingReturn)
         {
             var logId = incomingReturn.MaterialLog.LogId;
             try
             {
                 //TODO: try to return the full model with entities from view back to here. (employee gives null)
-                _logService.HandleReturn(incomingReturn);
+                await _logService.HandleReturn(incomingReturn);
             }
             catch (NullReferenceException e)
             {
                 return NotFound(e.Message);
             }
 
-            _userLogService.StoreLogAsync(ControllerNames.MaterialLog, ActionConst.ReturnItems, logId);
+            await _userLogService.StoreLogAsync(ControllerNames.MaterialLog, ActionConst.ReturnItems, logId);
 
             //TODO: more readable routevalue?
             return RedirectToAction("Details", new RouteValueDictionary(
@@ -224,7 +230,7 @@ namespace WebApp_GozenBv.Controllers
                 return NotFound();
             }
 
-            return View(await _logManager.MapMaterialLogDetailViewModel(logId));
+            return View(await _logMapper.MapMaterialLogDetailViewModel(logId));
         }
         
         [HttpPost, ActionName("Delete")]

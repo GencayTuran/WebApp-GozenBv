@@ -14,6 +14,8 @@ using WebApp_GozenBv.Helpers;
 using WebApp_GozenBv.Helpers.Interfaces;
 using WebApp_GozenBv.Managers;
 using WebApp_GozenBv.Managers.Interfaces;
+using WebApp_GozenBv.Mappers;
+using WebApp_GozenBv.Mappers.Interfaces;
 using WebApp_GozenBv.Services;
 using WebApp_GozenBv.Services.Interfaces;
 
@@ -62,6 +64,7 @@ namespace WebApp_GozenBv
             services.AddTransient<IMaterialDataHandler, MaterialDataHandler>();
 
             services.AddTransient<IMaterialLogService, MaterialLogService>();
+            services.AddTransient<IMaterialLogMapper, MaterialLogMapper>();
             services.AddTransient<IMaterialLogManager, MaterialLogManager>();
             services.AddTransient<IMaterialLogDataHandler, MaterialLogDataHandler>();
             services.AddTransient<IMaterialLogItemDataHandler, MaterialLogItemDataHandler>();

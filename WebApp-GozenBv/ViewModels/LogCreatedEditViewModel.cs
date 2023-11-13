@@ -9,6 +9,9 @@ namespace WebApp_GozenBv.ViewModels
     public class LogItemsCreatedEditViewModel
     {
         [Required]
-        public List<MaterialLogItem> Items { get; set; }
+        public MaterialLogViewModel MaterialLog { get; set; }
+
+        [Required]
+        public List<MaterialLogItemViewModel> Items { get; set; }
     }
 }

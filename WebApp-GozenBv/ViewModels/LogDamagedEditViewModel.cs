@@ -6,6 +6,7 @@ namespace WebApp_GozenBv.ViewModels
 {
     public class LogItemsReturnedEditViewModel
     {
-        public List<MaterialLogItem> Items { get; set; }
+        public MaterialLogViewModel MaterialLog { get; set; }
+        public List<MaterialLogItemViewModel> Items { get; set; }
     }
 }
