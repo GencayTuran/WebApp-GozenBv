@@ -1,0 +1,36 @@
+﻿@using Microsoft.AspNetCore.Html;
+@using WebApp_GozenBv.ViewModels;
+@model List<RepairTicketCardViewModel>
+
+<h2>Repair Tickets</h2>
+
+<div class="card-deck">
+    @if (Model != null && Model.Count > 0)
+    {
+        @foreach (var ticket in Model)
+        {
+            <div class="card">
+                <div class="card-header">
+                    <h5 class="card-title">@ticket.MaterialName</h5>
+                </div>
+                <div class="card-body">
+                    <p class="card-text">
+                        @Html.RenderPartialAsync("_TicketPartialView", ticket)
+                    </p>
+                </div>
+                <div class="card-footer">
+                    <button class="btn btn-primary" asp-action="RepairTicketPartial">
+                        <i class="fa fa-wrench"></i> Repair
+                    </button>
+                    <button class="btn btn-danger" asp-action="DeleteTicketPartial">
+                        <i class="fa fa-trash"></i> Delete
+                    </button>
+                </div>
+            </div>
+        }
+    }
+    else
+    {
+        <p>No repair tickets available.</p>
+    }
+</div>

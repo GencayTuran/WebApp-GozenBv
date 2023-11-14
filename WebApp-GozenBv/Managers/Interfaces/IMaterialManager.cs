@@ -12,7 +12,7 @@ namespace WebApp_GozenBv.Managers.Interfaces
         Task<List<Material>> GetMaterialsAsync();
         Task<Material> GetMaterialAsync(int? id);
         Material GetMaterial(int? id);
-        Task ManageMaterial(Material material, EntityOperation operation);
+        Task ManageMaterialAsync(Material material, EntityOperation operation);
         Task ManageMaterialsAsync(List<Material> materials, EntityOperation operation);
         void ManageMaterials(List<Material> materials, EntityOperation operation);
         Task<List<MaterialAlertViewModel>> GetMaterialAlerts();

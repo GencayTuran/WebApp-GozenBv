@@ -78,7 +78,7 @@ namespace WebApp_GozenBv.Services
             return logId;
         }
 
-        public async Task HandleEdit(MaterialLogEditViewModel incomingEdit)
+        public async Task HandleEdit(MaterialLogAndItemsViewModel incomingEdit)
         {
             //get original model
             var originalLogDetails = await _logManager.GetMaterialLogDTO(incomingEdit.MaterialLog.LogId);
@@ -165,7 +165,7 @@ namespace WebApp_GozenBv.Services
                     throw new Exception("No edit possible at other than Created or Returned state.");
             }
         }
-        public async Task HandleReturn(MaterialLogDetailViewModel incomingReturn)
+        public async Task HandleReturn(MaterialLogAndItemsViewModel incomingReturn)
         {
             //incoming
             string logId = incomingReturn.MaterialLog.LogId;
@@ -194,11 +194,7 @@ namespace WebApp_GozenBv.Services
 
             if (damaged)
             {
-                var damagedMaterials = JsonSerializer.Deserialize<List<ReturnItemsDamagedViewModel>>(incomingReturn.DamagedMaterial,
-                    new JsonSerializerOptions
-                    {
-                        PropertyNameCaseInsensitive = true
-                    });
+                var damagedMaterials = incomingReturn.MaterialLogItems.Where(x => x.IsDamaged).ToList();
 
                 log.Damaged = damaged;
 
@@ -212,8 +208,8 @@ namespace WebApp_GozenBv.Services
                         item.RepairAmount = damagedItem.RepairAmount;
                         item.DeleteAmount = damagedItem.DeleteAmount;
                         item.IsDamaged = true;
+                        modifiedItems.Add(item);
                     }
-                    modifiedItems.Add(item);
                 }
                 await _logManager.ManageMaterialLogItemsAsync(modifiedItems, EntityOperation.Update);
             }

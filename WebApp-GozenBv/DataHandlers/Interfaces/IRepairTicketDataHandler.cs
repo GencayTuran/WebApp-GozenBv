@@ -14,8 +14,9 @@ namespace WebApp_GozenBv.DataHandlers.Interfaces
         Task UpdateTicketsAsync(List<RepairTicket> tickets);
         Task DeleteTicketsAsync(List<RepairTicket> tickets);
 
-        Task<RepairTicket> GetTicketAsync(int ticketId);
-        Task<List<RepairTicket>> GetTicketsByLogIdAsync(string logId);
+        Task<RepairTicket> QueryTicketAsync(int? ticketId);
+        Task<List<RepairTicket>> QueryTicketsAsync();
+        Task<List<RepairTicket>> QueryTicketsByLogIdAsync(string logId);
 
     }
 }

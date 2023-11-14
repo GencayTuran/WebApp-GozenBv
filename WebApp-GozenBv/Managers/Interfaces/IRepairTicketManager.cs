@@ -10,7 +10,8 @@ namespace WebApp_GozenBv.Managers.Interfaces
         Task ManageTicketAsync(RepairTicket ticket, EntityOperation operation);
         Task ManageTicketsAsync(List<RepairTicket> tickets, EntityOperation operation);
 
-        Task<RepairTicket> GetTicketAsync(int ticketId);
+        Task<List<RepairTicket>> GetTicketsAsync();
+        Task<RepairTicket> GetTicketAsync(int? ticketId);
         Task<List<RepairTicket>> GetTicketsByLogIdAsync(string logId);
     }
 }

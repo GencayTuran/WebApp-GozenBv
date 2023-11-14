@@ -17,7 +17,7 @@ namespace WebApp_GozenBv.Managers
             _materialData = materialData;
         }
 
-        public async Task ManageMaterial(Material material, EntityOperation operation)
+        public async Task ManageMaterialAsync(Material material, EntityOperation operation)
         {
             switch (operation)
             {

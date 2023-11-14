@@ -1,4 +1,5 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections.Generic;
 using System.Net.Sockets;
 using System.Threading.Tasks;
 using WebApp_GozenBv.Constants;
@@ -50,15 +51,19 @@ namespace WebApp_GozenBv.Managers
                     break;
             }
         }
-
-        public async Task<RepairTicket> GetTicketAsync(int ticketId)
+        public async Task<List<RepairTicket>> GetTicketsAsync()
         {
-            return await _ticketData.GetTicketAsync(ticketId);
+            return await _ticketData.QueryTicketsAsync();
+        }
+
+        public async Task<RepairTicket> GetTicketAsync(int? ticketId)
+        {
+            return await _ticketData.QueryTicketAsync(ticketId);
         }
 
         public async Task<List<RepairTicket>> GetTicketsByLogIdAsync(string logId)
         {
-            return await _ticketData.GetTicketsByLogIdAsync(logId);
+            return await _ticketData.QueryTicketsByLogIdAsync(logId);
         }
     }
 }

@@ -4,9 +4,10 @@ using WebApp_GozenBv.Models;
 
 namespace WebApp_GozenBv.ViewModels
 {
-    public class MaterialLogEditViewModel
+    public class MaterialLogAndItemsViewModel
     {
         public MaterialLogViewModel MaterialLog { get; set; }
-        public List<MaterialLogItemViewModel> Items { get; set; }
+        public MaterialLogItemViewModel MaterialLogItem { get; set; }
+        public List<MaterialLogItemViewModel> MaterialLogItems { get; set; }
     }
 }

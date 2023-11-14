@@ -15,8 +15,8 @@ namespace WebApp_GozenBv.Mappers.Interfaces
         List<MaterialLogItem> MapUpdatedItems_StatusReturned(List<MaterialLogItem> originalLogItems, List<MaterialLogItem> incomingLogItems);
         List<MaterialLogItem> MapSelectedItems(List<MaterialLogSelectedItemViewModel> selectedItems);
         List<MaterialLogItem> MapNewItems(List<MaterialLogItem> incomingItems, string logId);
-        MaterialLogDTO MapViewModelToDTO(MaterialLogEditViewModel viewModel);
-        MaterialLogEditViewModel MapLogEditToViewModel(MaterialLogEditViewModel incomingEdit, LogItemsCreatedEditViewModel itemsCreatedEdit, LogItemsReturnedEditViewModel itemsReturnedEdit);
-        MaterialLogEditViewModel MapLogAndItemsToViewModel(MaterialLogDTO dto);
+        MaterialLogDTO MapViewModelToDTO(MaterialLogAndItemsViewModel viewModel);
+        MaterialLogAndItemsViewModel MapLogEditToViewModel(MaterialLogAndItemsViewModel incomingEdit, LogItemsCreatedEditViewModel itemsCreatedEdit, LogItemsReturnedEditViewModel itemsReturnedEdit);
+        MaterialLogAndItemsViewModel MapLogAndItemsToViewModel(MaterialLogDTO dto);
     }
 }

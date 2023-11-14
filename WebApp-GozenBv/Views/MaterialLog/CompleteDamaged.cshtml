@@ -37,14 +37,15 @@
         </tr>
     </thead>
     <tbody>
-        @foreach (var item in Model.Items)
-        {
+        <form asp-action="ReturnItems">
+            @foreach (var item in Model.Items)
+            {
             <tr>
                 <td>
                     <p class="materialId">@item.MaterialId</p>
                 </td>
 
-                @*<td>@item.ProductNameCode</td>*@
+                    @*<td>@item.ProductNameCode</td>*@
                 <td>@item.MaterialAmount</td>
                 <td><p class="damagedAmount">@item.DamagedAmount</p></td>
                 <td>
@@ -54,14 +55,12 @@
                     <input class="inputDeleted" min="0" max="@item.DamagedAmount" type="number" />
                 </td>
             </tr>
-        }
+            }
+        <input type="hidden" asp-for="MaterialLog.LogId" />
+        <input id="btnSubmit" type="submit" value="Complete" class="btn btn-primary" /> |
+        <a asp-action="Index">Back to List</a>
+        </form>
     </tbody>
 </table>
-<form asp-action="CompleteDamaged" onsubmit="FillData(event)">
-    <input type="hidden" asp-for="MaterialLog.LogId" />
-    <input id="completeDamagedResult" type="hidden" asp-for="DamagedMaterial" />
-    <input id="btnSubmit" type="submit" value="Complete" class="btn btn-primary" /> |
-    <a asp-action="Index">Back to List</a>
-</form>
 
 <script src="~/js/MaterialLog_CompleteDamaged.js"></script>

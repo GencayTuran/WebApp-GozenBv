@@ -1,5 +1,5 @@
 ﻿@using WebApp_GozenBv.Constants;
-@model WebApp_GozenBv.ViewModels.MaterialLogEditViewModel
+@model WebApp_GozenBv.ViewModels.MaterialLogAndItemsViewModel
 
 @{
     ViewData["Title"] = "Edit";
@@ -32,10 +32,10 @@
     @switch (status)
     {
         case MaterialLogStatusConst.Created:
-            <vc:log-created-edit log="@Model.MaterialLog" items="@Model.Items"></vc:log-created-edit>
+            <vc:log-created-edit log="@Model.MaterialLog" items="@Model.MaterialLogItems"></vc:log-created-edit>
             break;
         case MaterialLogStatusConst.Returned:
-            <vc:log-returned-edit log="@Model.MaterialLog" items="@Model.Items"></vc:log-returned-edit>
+            <vc:log-returned-edit log="@Model.MaterialLog" items="@Model.MaterialLogItems"></vc:log-returned-edit>
             break;
     }
 </form>

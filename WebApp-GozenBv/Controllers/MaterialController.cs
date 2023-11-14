@@ -103,7 +103,7 @@ namespace WebApp_GozenBv.Controllers
                     material.Cost = null;
                 }
 
-                await _manager.ManageMaterial(material, EntityOperation.Create);
+                await _manager.ManageMaterialAsync(material, EntityOperation.Create);
 
                 await _userLogService.StoreLogAsync(ControllerNames.Material, ActionConst.Create, material.Id.ToString());
 
@@ -137,7 +137,7 @@ namespace WebApp_GozenBv.Controllers
 
             if (ModelState.IsValid)
             {
-                await _manager.ManageMaterial(material, EntityOperation.Update);
+                await _manager.ManageMaterialAsync(material, EntityOperation.Update);
 
                 await _userLogService.StoreLogAsync(ControllerNames.Material, ActionConst.Edit, material.Id.ToString());
                 
@@ -170,7 +170,7 @@ namespace WebApp_GozenBv.Controllers
         public async Task<IActionResult> DeleteConfirmed(int id)
         {
             var material = await _manager.GetMaterialAsync(id);
-            await _manager.ManageMaterial(material, EntityOperation.Delete);
+            await _manager.ManageMaterialAsync(material, EntityOperation.Delete);
 
             await _userLogService.StoreLogAsync(ControllerNames.Material, ActionConst.Delete, material.Id.ToString());
 

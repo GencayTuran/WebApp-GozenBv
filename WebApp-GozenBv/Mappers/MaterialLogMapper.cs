@@ -226,7 +226,7 @@ namespace WebApp_GozenBv.Mappers
             return newItems;
         }
 
-        public MaterialLogDTO MapViewModelToDTO(MaterialLogEditViewModel viewModel)
+        public MaterialLogDTO MapViewModelToDTO(MaterialLogAndItemsViewModel viewModel)
         {
             var log = new MaterialLog()
             {
@@ -242,7 +242,7 @@ namespace WebApp_GozenBv.Mappers
             };
 
             var items = new List<MaterialLogItem>();
-            foreach (var item in viewModel.Items)
+            foreach (var item in viewModel.MaterialLogItems)
             {
                 items.Add(new MaterialLogItem()
                 {
@@ -265,30 +265,30 @@ namespace WebApp_GozenBv.Mappers
             };
         }
 
-        public MaterialLogEditViewModel MapLogEditToViewModel(MaterialLogEditViewModel incomingEdit, LogItemsCreatedEditViewModel itemsCreatedEdit, LogItemsReturnedEditViewModel itemsReturnedEdit)
+        public MaterialLogAndItemsViewModel MapLogEditToViewModel(MaterialLogAndItemsViewModel incomingEdit, LogItemsCreatedEditViewModel itemsCreatedEdit, LogItemsReturnedEditViewModel itemsReturnedEdit)
         {
             var status = incomingEdit.MaterialLog.Status;
 
             switch (status)
             {
                 case MaterialLogStatusConst.Created:
-                    return new MaterialLogEditViewModel()
+                    return new MaterialLogAndItemsViewModel()
                     {
                         MaterialLog = incomingEdit.MaterialLog,
-                        Items = itemsCreatedEdit.Items,
+                        MaterialLogItems = itemsCreatedEdit.Items,
                     };
                 case MaterialLogStatusConst.Returned:
-                    return new MaterialLogEditViewModel()
+                    return new MaterialLogAndItemsViewModel()
                     {
                         MaterialLog = incomingEdit.MaterialLog,
-                        Items = itemsReturnedEdit.Items,
+                        MaterialLogItems = itemsReturnedEdit.Items,
                     };
                 default:
                     throw new ArgumentNullException("Status was null.");
             }
         }
 
-        public MaterialLogEditViewModel MapLogAndItemsToViewModel(MaterialLogDTO dto)
+        public MaterialLogAndItemsViewModel MapLogAndItemsToViewModel(MaterialLogDTO dto)
         {
             var log = dto.MaterialLog;
             MaterialLogViewModel logViewModel = new MaterialLogViewModel()
@@ -325,10 +325,10 @@ namespace WebApp_GozenBv.Mappers
                 });
             }
 
-            return new MaterialLogEditViewModel()
+            return new MaterialLogAndItemsViewModel()
             {
                 MaterialLog = logViewModel,
-                Items = itemsViewModel
+                MaterialLogItems = itemsViewModel
             };
         }
     }

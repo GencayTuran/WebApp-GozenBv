@@ -44,16 +44,17 @@ namespace WebApp_GozenBv.Helpers
             return material;
         }
 
-        public Material FinishRepair(Material material, int qty, bool deleted)
+        public Material FinishRepair(Material material, bool isDeleted)
         {
-            //TODO: qty is always 1 here beacause every ticket is per qtyAmount?
-            if (!deleted)
+            if (!isDeleted)
             {
-                material.InRepairQty -= qty;
+                material.InRepairQty--;
+                material.InDepotAmount++;
             }
             else
             {
-                material.DeletedQty += qty;
+                material.InRepairQty--;
+                material.DeletedQty++;
             }
 
             return material;

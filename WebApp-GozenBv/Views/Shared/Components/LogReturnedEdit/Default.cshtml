@@ -48,7 +48,7 @@
                         <input asp-for="Items[i].ProductNameCode" disabled class="form-control"/>
                     </div>
                     <div class="col-md-2 form-group">
-                        <input asp-for="Items[i].MaterialAmount" max="@Model.Items[i].MaterialAmount" min="0" class="form-control col-md-6" />
+                        <input asp-for="Items[i].MaterialAmount" disabled class="form-control col-md-6" />
                         <span asp-validation-for="Items[i].MaterialAmount" class="text-danger"></span>
                     </div>
                     <div class="col-md-1 form-check d-flex justify-content-center">

@@ -38,6 +38,8 @@ namespace WebApp_GozenBv.Controllers
 
         private readonly IMaterialLogService _logService;
         private readonly IUserLogService _userLogService;
+
+        private readonly IRepairTicketService _repairService;
         public MaterialLogController(
             IMaterialLogManager logManager,
             IEmployeeManager employeeManager,
@@ -45,7 +47,8 @@ namespace WebApp_GozenBv.Controllers
             ILogSearchHelper searchHelper,
             IUserLogService userLogService,
             IMaterialLogService logService,
-            IMaterialLogMapper logMapper)
+            IMaterialLogMapper logMapper,
+            IRepairTicketService repairService)
         {
             _logManager = logManager;
             _employeeManager = employeeManager;
@@ -54,6 +57,7 @@ namespace WebApp_GozenBv.Controllers
             _userLogService = userLogService;
             _logService = logService;
             _logMapper = logMapper;
+            _repairService = repairService;
         }
 
         [HttpGet]
@@ -149,7 +153,7 @@ namespace WebApp_GozenBv.Controllers
 
         [HttpPost]
         [ValidateAntiForgeryToken]
-        public async Task<IActionResult> Edit([FromBody] MaterialLogEditViewModel incomingEdit, LogItemsCreatedEditViewModel itemsCreatedEdit, LogItemsReturnedEditViewModel itemsReturnedEdit)
+        public async Task<IActionResult> Edit([FromBody] MaterialLogAndItemsViewModel incomingEdit, LogItemsCreatedEditViewModel itemsCreatedEdit, LogItemsReturnedEditViewModel itemsReturnedEdit)
         { 
             if (ModelState.IsValid)
             {
@@ -189,19 +193,19 @@ namespace WebApp_GozenBv.Controllers
             {
                 return NotFound();
             }
-
-            var logDetails = await _logMapper.MapMaterialLogDetailViewModel(logId);
-
-            if (logDetails == null)
+            var logDTO = await _logManager.GetMaterialLogDTO(logId);
+            if (logDTO == null)
             {
                 return NotFound();
             }
 
-            return View(logDetails);
+            var mappedLog = _logMapper.MapLogAndItemsToViewModel(logDTO);
+
+            return View(mappedLog);
         }
 
         [HttpPost]
-        public async Task<IActionResult> ReturnItems(MaterialLogDetailViewModel incomingReturn)
+        public async Task<IActionResult> ReturnItems(MaterialLogAndItemsViewModel incomingReturn)
         {
             var logId = incomingReturn.MaterialLog.LogId;
             try
@@ -243,6 +247,16 @@ namespace WebApp_GozenBv.Controllers
             await _userLogService.StoreLogAsync(ControllerNames.MaterialLog, ActionConst.Delete, logId);
 
             return RedirectToAction(nameof(Index));
+        }
+
+        public async Task<IActionResult> RepairTicketPartial(int? id)
+        {
+            return PartialView("_TicketsPartialView", await _repairService.HandleTicket(id, RepairTicketAction.Repair));
+        }
+
+        public async Task<IActionResult> DeleteTicketPartial(int? id)
+        {
+            return PartialView("_TicketsPartialView", await _repairService.HandleTicket(id, RepairTicketAction.Delete));
         }
 
         private async Task<List<EmployeeViewData>> GetEmployeesViewData()

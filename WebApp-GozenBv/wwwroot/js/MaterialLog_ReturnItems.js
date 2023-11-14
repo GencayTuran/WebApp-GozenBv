@@ -1,47 +1,48 @@
-﻿    
-function ChangeDamaged(obj) {
-    let materialAmount = obj.parentNode.parentNode.querySelector(".inputMaterialAmount");
-    let inputDamaged = obj.parentNode.parentNode.querySelector(".inputDamagedAmount");
-    let damagedTitle = document.getElementById("damagedTitle");
-    let damaged = obj.checked;
-    if (damaged) {
-        inputDamaged.disabled = false;
-        damagedTitle.style.opacity = 1;
-        inputDamaged.value = materialAmount.value;
+﻿document.addEventListener("DOMContentLoaded", function () {
+    // Function to disable and clear inputs based on the state of the "Damaged" checkbox
+    function handleDamagedCheckboxChange() {
+        var checkboxes = document.querySelectorAll('.chkDamaged');
+        checkboxes.forEach(function (checkbox) {
+            var row = checkbox.closest('tr');
+            var damagedAmountInput = row.querySelector('.inputDamagedAmount');
+            var repairAmountInput = row.querySelector('.inputRepairAmount');
+            var deleteAmountInput = row.querySelector('.inputDeleteAmount');
+
+            if (!checkbox.checked) {
+                damagedAmountInput.value = '';
+                repairAmountInput.value = '';
+                deleteAmountInput.value = '';
+                damagedAmountInput.disabled = true;
+                repairAmountInput.disabled = true;
+                deleteAmountInput.disabled = true;
+            } else {
+                damagedAmountInput.disabled = false;
+                repairAmountInput.disabled = false;
+                deleteAmountInput.disabled = false;
+            }
+        });
     }
-    else {
-        inputDamaged.value = "";
-        inputDamaged.disabled = true;
-        damagedTitle.style.opacity = 0.6;
-    }
 
-}
+    // Check the state of the "Damaged" checkbox on page load
+    handleDamagedCheckboxChange();
 
-let result = document.getElementById("damagedMaterialResult");
-function PassDamagedItems() {
-
-    let inputReturnDamaged = document.querySelector("#isDamaged");
-    let returnDamaged = false;
-
-    let damagedMaterial = [];
-    let rows = document.querySelectorAll(".materialLogItemRow")
-
-    rows.forEach(row => {
-        let itemDamaged = row.querySelector(".chkDamaged").checked;
-        let materialLogItem = new Object();
-
-        if (itemDamaged) {
-            returnDamaged = true;
-            let materialId = row.querySelector(".labelMaterialId").innerHTML;
-            let damagedAmount = row.querySelector(".inputDamagedAmount").value;
-
-            materialLogItem.materialId = +materialId;
-            materialLogItem.damagedAmount = +damagedAmount;
-
-            damagedMaterial.push(materialLogItem);
-        }
+    // Bind the function to the change event of the "Damaged" checkboxes
+    var checkboxes = document.querySelectorAll('.chkDamaged');
+    checkboxes.forEach(function (checkbox) {
+        checkbox.addEventListener('change', handleDamagedCheckboxChange);
     });
-    let jsonDamagedMaterial = JSON.stringify(damagedMaterial);
-    result.value = jsonDamagedMaterial;
-    inputReturnDamaged.checked = returnDamaged;
-}
+
+    // Function to set "isDamaged" to true if any "Damaged" checkbox is checked
+    function setDamaged() {
+        var isDamagedCheckbox = document.getElementById('isDamaged');
+        isDamagedCheckbox.checked = Array.from(checkboxes).some(function (checkbox) {
+            return checkbox.checked;
+        });
+    }
+
+    // Bind the function to the form submission
+    var form = document.querySelector('form');
+    form.addEventListener('submit', function () {
+        setDamaged();
+    });
+});

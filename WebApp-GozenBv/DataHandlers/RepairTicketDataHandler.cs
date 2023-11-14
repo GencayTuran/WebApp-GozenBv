@@ -18,9 +18,19 @@ namespace WebApp_GozenBv.DataHandlers
             _context = context;
         }
 
-        public async Task<List<RepairTicket>> GetTicketsByLogIdAsync(string logId)
+        public async Task<List<RepairTicket>> QueryTicketsAsync()
         {
-            return await _context.RepairTickets.Where(x => x.LogId == logId).ToListAsync();
+            return await _context.RepairTickets.Include(x => x.Material).ToListAsync();
+        }
+
+        public async Task<List<RepairTicket>> QueryTicketsByLogIdAsync(string logId)
+        {
+            return await _context.RepairTickets.Where(x => x.LogId == logId).Include(x => x.Material).ToListAsync();
+        }
+
+        public async Task<RepairTicket> QueryTicketAsync(int? ticketId)
+        {
+            return await _context.RepairTickets.Where(x => x.Id == ticketId).Include(x => x.Material).FirstOrDefaultAsync();
         }
 
         public async Task CreateTicketAsync(RepairTicket ticket)
@@ -28,6 +38,7 @@ namespace WebApp_GozenBv.DataHandlers
             await _context.RepairTickets.AddAsync(ticket);
             await _context.SaveChangesAsync();
         }
+
         public async Task UpdateTicketAsync(RepairTicket ticket)
         {
             _context.RepairTickets.Update(ticket);
@@ -38,11 +49,6 @@ namespace WebApp_GozenBv.DataHandlers
         {
             _context.RepairTickets.Remove(ticket);
             await _context.SaveChangesAsync();
-        }
-
-        public async Task<RepairTicket> GetTicketAsync(int ticketId)
-        {
-            return await _context.RepairTickets.FindAsync(ticketId);
         }
 
         public async Task CreateTicketsAsync(List<RepairTicket> tickets)
