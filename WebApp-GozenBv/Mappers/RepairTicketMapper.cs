@@ -33,6 +33,17 @@ namespace WebApp_GozenBv.Mappers
             return ticketsViewModel;
         }
 
+        public RepairTicketCardViewModel MapTicketToCardViewModel(RepairTicket ticket)
+        {
+                return new RepairTicketCardViewModel()
+                {
+                    Id = ticket.Id,
+                    Status = ticket.Status,
+                    MaterialName = ticket.Material.Name + " " + ticket.Material.Brand,
+                    HasInfo = !(ticket.RepairInfo).IsNullOrEmpty()
+                };
+        }
+
         public RepairTicketViewModel MapTicketToViewModel(RepairTicket ticket)
         {
             return new RepairTicketViewModel()

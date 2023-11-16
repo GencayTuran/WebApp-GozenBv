@@ -78,10 +78,10 @@ namespace WebApp_GozenBv.Services
             return logId;
         }
 
-        public async Task HandleEdit(MaterialLogAndItemsViewModel incomingEdit)
+        public async Task HandleEdit(string logId, MaterialLogAndItemsViewModel incomingEdit)
         {
             //get original model
-            var originalLogDetails = await _logManager.GetMaterialLogDTO(incomingEdit.MaterialLog.LogId);
+            var originalLogDetails = await _logManager.GetMaterialLogDTO(logId);
             var originalLog = originalLogDetails.MaterialLog;
             var originalItems = originalLogDetails.MaterialLogItems;
             string statusName;

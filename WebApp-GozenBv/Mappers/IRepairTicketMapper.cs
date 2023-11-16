@@ -10,5 +10,6 @@ namespace WebApp_GozenBv.Mappers
     {
         List<RepairTicketCardViewModel> MapTicketsToCardViewModel(List<RepairTicket> tickets);
         RepairTicketViewModel MapTicketToViewModel(RepairTicket repairTicket);
+        RepairTicketCardViewModel MapTicketToCardViewModel(RepairTicket ticket);
     }
 }

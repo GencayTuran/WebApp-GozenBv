@@ -8,7 +8,7 @@ namespace WebApp_GozenBv.Services.Interfaces
     public interface IMaterialLogService
     {
         Task<string> HandleCreate(MaterialLogCreateViewModel incomingViewModel);
-        Task HandleEdit(MaterialLogAndItemsViewModel incomingEdit);
+        Task HandleEdit(string logId, MaterialLogAndItemsViewModel incomingEdit);
         Task HandleReturn(MaterialLogAndItemsViewModel incomingReturn);
 
         Task HandleDelete(string logId);

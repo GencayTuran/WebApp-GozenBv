@@ -113,8 +113,13 @@ namespace WebApp_GozenBv.Mappers
 
         public async Task<LogEditHistory> MapLogHistoryAsync(MaterialLog log)
         {
-            //TODO: does this return null or 0? if 0, just add ++ to map, else go do a check.
-            var latestVersion = await _historyData.QueryLatestLogVersion(log.LogId);
+            var latest = await _historyData.QueryLatestLog(log.LogId);
+            var version = 1;
+
+            if (latest != null)
+            {
+                version = latest.Version;
+            }
 
             return new LogEditHistory()
             {
@@ -124,14 +129,19 @@ namespace WebApp_GozenBv.Mappers
                 EmployeeId = log.EmployeeId,
                 Damaged = log.Damaged,
                 EditTimestamp = DateTime.Now,
-                Version = latestVersion++
+                Version = version++
             };
         }
 
         public async Task<List<ItemEditHistory>> MapLogItemsHistoryAsync(List<MaterialLogItem> items)
         {
-            //TODO: does this return null or 0? if 0, just add ++ to map, else go do a check.
-            var latestVersion = await _historyData.QueryLatestLogItemsVersion(items[0]?.LogId);
+            var latest = await _historyData.QueryLatestLogItem(items[0]?.LogId);
+            var version = 1;
+
+            if (latest != null)
+            {
+                version = latest.Version;
+            }
 
             var mappedItems = new List<ItemEditHistory>();
             foreach (var item in items)
@@ -149,7 +159,7 @@ namespace WebApp_GozenBv.Mappers
                     RepairAmount = item.RepairAmount,
                     DeleteAmount = item.DeleteAmount,
                     EditTimestamp = DateTime.Now,
-                    Version = latestVersion++
+                    Version = version++
                 });
             }
 
@@ -265,29 +275,6 @@ namespace WebApp_GozenBv.Mappers
             };
         }
 
-        public MaterialLogAndItemsViewModel MapLogEditToViewModel(MaterialLogAndItemsViewModel incomingEdit, LogItemsCreatedEditViewModel itemsCreatedEdit, LogItemsReturnedEditViewModel itemsReturnedEdit)
-        {
-            var status = incomingEdit.MaterialLog.Status;
-
-            switch (status)
-            {
-                case MaterialLogStatusConst.Created:
-                    return new MaterialLogAndItemsViewModel()
-                    {
-                        MaterialLog = incomingEdit.MaterialLog,
-                        MaterialLogItems = itemsCreatedEdit.Items,
-                    };
-                case MaterialLogStatusConst.Returned:
-                    return new MaterialLogAndItemsViewModel()
-                    {
-                        MaterialLog = incomingEdit.MaterialLog,
-                        MaterialLogItems = itemsReturnedEdit.Items,
-                    };
-                default:
-                    throw new ArgumentNullException("Status was null.");
-            }
-        }
-
         public MaterialLogAndItemsViewModel MapLogAndItemsToViewModel(MaterialLogDTO dto)
         {
             var log = dto.MaterialLog;
@@ -329,6 +316,79 @@ namespace WebApp_GozenBv.Mappers
             {
                 MaterialLog = logViewModel,
                 MaterialLogItems = itemsViewModel
+            };
+        }
+
+        public MaterialLogHistoryIndexViewModel MapHistoryToIndexViewModel(List<LogEditHistory> logHistory)
+        {
+            List<LogEditHistoryViewModel> viewModel = new();
+            foreach (var item in logHistory)
+            {
+                viewModel.Add(new LogEditHistoryViewModel()
+                {
+                    Id = item.Id,
+                    LogId = item.LogId,
+                    Version = item.Version,
+                    EditTimestamp = item.EditTimestamp,
+                    LogDate = item.LogDate,
+                    EmployeeId = item.EmployeeId,
+                    Employee = item.Employee,
+                    ReturnDate = item.ReturnDate,
+                    Damaged = item.Damaged,
+                    EmployeeName = item.Employee.Name + " " + item.Employee.Surname
+                });
+            }
+
+            return new MaterialLogHistoryIndexViewModel()
+            {
+                LogEditHistory = viewModel
+            };
+        }
+
+        public MaterialLogHistoryDetailViewModel MapHistoryToDetailViewModel(MaterialLogHistoryDTO logHistoryDTO)
+        {
+            var logH = logHistoryDTO.LogEditHistory;
+            LogEditHistoryViewModel logViewModel = new()
+            {
+                Id = logH.Id,
+                LogId = logH.LogId,
+                Version = logH.Version,
+                EditTimestamp = logH.EditTimestamp,
+                LogDate = logH.LogDate,
+                EmployeeId = logH.EmployeeId,
+                Employee = logH.Employee,
+                ReturnDate = logH.ReturnDate,
+                Damaged = logH.Damaged,
+                EmployeeName = logH.Employee.Name + " " + logH.Employee.Surname
+            };
+
+            var logItemsH = logHistoryDTO.ItemsEditHistory;
+            List<ItemEditHistoryViewModel> itemsViewModel = new();
+            foreach (var item in logItemsH)
+            {
+                itemsViewModel.Add(new ItemEditHistoryViewModel()
+                {
+                    Id = item.Id,
+                    MaterialLogItemId = item.MaterialLogItemId,
+                    LogId = item.LogId,
+                    Version = item.Version,
+                    EditTimestamp = item.EditTimestamp,
+                    MaterialId = item.MaterialId,
+                    Material = item.Material,
+                    MaterialAmount = item.MaterialAmount,
+                    Used = item.Used,
+                    IsDamaged = item.IsDamaged,
+                    DamagedAmount = item.DamagedAmount,
+                    RepairAmount = item.RepairAmount,
+                    DeleteAmount = item.DeleteAmount,
+                    MaterialName = item.Material.Name + " " + item.Material.Brand
+                });
+            }
+
+            return new MaterialLogHistoryDetailViewModel()
+            {
+                LogEditHistory = logViewModel,
+                ItemsEditHistory = itemsViewModel
             };
         }
     }

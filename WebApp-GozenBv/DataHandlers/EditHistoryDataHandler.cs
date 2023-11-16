@@ -29,35 +29,44 @@ namespace WebApp_GozenBv.DataHandlers
             await _context.SaveChangesAsync();
         }
 
-        public async Task<int> QueryLatestLogItemsVersion(string logId)
-        {
-            return (await _context.MaterialLogItemsHistory
-                .Where(x => x.LogId == logId)
-                .OrderByDescending(x => x.Version)
-                .FirstOrDefaultAsync()).Version;
-        }
-
-        public async Task<int> QueryLatestLogVersion(string logId)
-        {
-            return (await _context.MaterialLogHistory
-                 .Where(x => x.LogId == logId)
-                 .OrderByDescending(x => x.Version)
-                 .FirstOrDefaultAsync()).Version;
-        }
-
-        public async Task<List<ItemEditHistory>> QueryMaterialLogItemsHistoryAsync(string logId)
+        public async Task<ItemEditHistory> QueryLatestLogItem(string logId)
         {
             return await _context.MaterialLogItemsHistory
                 .Where(x => x.LogId == logId)
-                .OrderBy(x => x.Version)
-                .ToListAsync();
+                .OrderByDescending(x => x.Version)
+                .FirstOrDefaultAsync();
+        }
+
+        public async Task<LogEditHistory> QueryLatestLog(string logId)
+        {
+            return await _context.MaterialLogHistory
+                 .Where(x => x.LogId == logId)
+                 .OrderByDescending(x => x.Version)
+                 .FirstOrDefaultAsync();
         }
 
         public async Task<List<LogEditHistory>> QueryMaterialLogsHistoryAsync(string logId)
         {
             return await _context.MaterialLogHistory
                 .Where(x => x.LogId == logId)
+                .Include(x => x.Employee)
                 .OrderBy(x => x.Version)
+                .ToListAsync();
+        }
+
+        public async Task<LogEditHistory> QueryLogHistoryByVersion(string logId, int version)
+        {
+            return await _context.MaterialLogHistory
+               .Where(x => x.LogId == logId && x.Version == version)
+               .Include(x => x.Employee)
+               .FirstOrDefaultAsync();
+        }
+
+        public async Task<List<ItemEditHistory>> QueryLogItemsHistoryByVersion(string logId, int version)
+        {
+            return await _context.MaterialLogItemsHistory
+                .Where(x => x.LogId == logId && x.Version == version)
+                .Include(x => x.Material)
                 .ToListAsync();
         }
     }

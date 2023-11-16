@@ -24,9 +24,8 @@ namespace WebApp_GozenBv.Managers.Interfaces
         void ManageMaterialLogItems(List<MaterialLogItem> items, EntityOperation operation);
         Task ManageMaterialLogHistoryAsync(LogEditHistory entity);
         Task ManageMaterialLogItemsHistoryAsync(List<ItemEditHistory> collection);
-
-        Task<int> GetLatestLogVersion(string logId);
-        Task<int> GetLatestLogItemsVersion(string logId);
+        Task<List<LogEditHistory>> GetLogHistoryByLogId(string logId);
+        Task<MaterialLogHistoryDTO> GetHistoryDetails(string logId, int version);
     }
 }
 

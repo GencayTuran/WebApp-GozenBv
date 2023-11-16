@@ -23,6 +23,9 @@ using WebApp_GozenBv.Services.Interfaces;
 using WebApp_GozenBv.ViewModels;
 using WebApp_GozenBv.ViewData;
 using WebApp_GozenBv.Mappers.Interfaces;
+using WebApp_GozenBv.Mappers;
+using System.Security.Cryptography;
+using WebApp_GozenBv.DTOs;
 
 namespace WebApp_GozenBv.Controllers
 {
@@ -40,6 +43,7 @@ namespace WebApp_GozenBv.Controllers
         private readonly IUserLogService _userLogService;
 
         private readonly IRepairTicketService _repairService;
+        private readonly IRepairTicketMapper _repairMapper;
         public MaterialLogController(
             IMaterialLogManager logManager,
             IEmployeeManager employeeManager,
@@ -48,7 +52,8 @@ namespace WebApp_GozenBv.Controllers
             IUserLogService userLogService,
             IMaterialLogService logService,
             IMaterialLogMapper logMapper,
-            IRepairTicketService repairService)
+            IRepairTicketService repairService,
+            IRepairTicketMapper repairMapper)
         {
             _logManager = logManager;
             _employeeManager = employeeManager;
@@ -58,6 +63,7 @@ namespace WebApp_GozenBv.Controllers
             _logService = logService;
             _logMapper = logMapper;
             _repairService = repairService;
+            _repairMapper = repairMapper;
         }
 
         [HttpGet]
@@ -153,17 +159,15 @@ namespace WebApp_GozenBv.Controllers
 
         [HttpPost]
         [ValidateAntiForgeryToken]
-        public async Task<IActionResult> Edit([FromBody] MaterialLogAndItemsViewModel incomingEdit, LogItemsCreatedEditViewModel itemsCreatedEdit, LogItemsReturnedEditViewModel itemsReturnedEdit)
+        public async Task<IActionResult> Edit(string logId, MaterialLogAndItemsViewModel incomingEdit)
         { 
             if (ModelState.IsValid)
             {
                 try
                 {
-                    incomingEdit = _logMapper.MapLogEditToViewModel(incomingEdit, itemsCreatedEdit, itemsReturnedEdit);
-
-                    await _logService.HandleEdit(incomingEdit);
-                    await _userLogService.StoreLogAsync(ControllerNames.MaterialLog, ActionConst.Edit, incomingEdit.MaterialLog.LogId);
-                    return RedirectToAction(nameof(Index));
+                    await _logService.HandleEdit(logId, incomingEdit);
+                    await _userLogService.StoreLogAsync(ControllerNames.MaterialLog, ActionConst.Edit, logId);
+                    return RedirectToDetails(logId);
                 }
                 catch (Exception e)
                 {
@@ -249,14 +253,42 @@ namespace WebApp_GozenBv.Controllers
             return RedirectToAction(nameof(Index));
         }
 
-        public async Task<IActionResult> RepairTicketPartial(int? id)
+        public async Task<IActionResult> RepairTicket(int? id)
         {
-            return PartialView("_TicketsPartialView", await _repairService.HandleTicket(id, RepairTicketAction.Repair));
+            var updatedTicket = await _repairService.HandleTicket(id, RepairTicketAction.Repair);
+            return RedirectToAction("Details", new RouteValueDictionary(
+                new { ControllerContext = "MaterialLog", Action = "Details", Id = updatedTicket.LogId }));
         }
 
-        public async Task<IActionResult> DeleteTicketPartial(int? id)
+        public async Task<IActionResult> DeleteTicket(int? id)
         {
-            return PartialView("_TicketsPartialView", await _repairService.HandleTicket(id, RepairTicketAction.Delete));
+            var updatedTicket = await _repairService.HandleTicket(id, RepairTicketAction.Delete);
+            return RedirectToAction("Details", new RouteValueDictionary(
+                new { ControllerContext = "MaterialLog", Action = "Details", Id = updatedTicket.LogId }));
+        }
+
+        public async Task<IActionResult> HistoryIndex(string id)
+        {
+            var logId = id;
+            var logHistory = await _logManager.GetLogHistoryByLogId(logId);
+            
+            //TODO: exception Handling
+
+            var mappedHistory = _logMapper.MapHistoryToIndexViewModel(logHistory);
+
+            return View(mappedHistory);
+        }
+
+        public async Task<IActionResult> HistoryDetails(string id, int version)
+        {
+            var logId = id;
+            var logHistoryDTO = await _logManager.GetHistoryDetails(logId, version);
+            
+            //TODO: exception Handling
+
+            var mappedDetail = _logMapper.MapHistoryToDetailViewModel(logHistoryDTO);
+
+            return View(mappedDetail);
         }
 
         private async Task<List<EmployeeViewData>> GetEmployeesViewData()
@@ -346,5 +378,11 @@ namespace WebApp_GozenBv.Controllers
         private bool IsOrderFiltered(int sortOrder) => sortOrder != 0;
         private bool IsNotFiltered(string searchString, int sortStatus, int sortOrder)
             => !IsOrderFiltered(sortOrder) && !IsStatusFiltered(sortStatus) && !IsStringFiltered(searchString);
+
+        private RedirectToActionResult RedirectToDetails(string logId)
+        {
+            return RedirectToAction("Details", new RouteValueDictionary(
+            new { ControllerContext = "MaterialLog", Action = "Details", Id = logId }));
+        }
     }
 }

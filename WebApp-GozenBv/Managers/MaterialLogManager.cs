@@ -1,4 +1,5 @@
 ﻿using Humanizer;
+using Microsoft.AspNetCore.JsonPatch.Internal;
 using Microsoft.AspNetCore.Routing;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Graph;
@@ -153,14 +154,21 @@ namespace WebApp_GozenBv.Managers
             await _historyData.CreateMaterialLogItemsHistoryAsync(collection);
         }
 
-        public async Task<int> GetLatestLogVersion(string logId)
+        public async Task<List<LogEditHistory>> GetLogHistoryByLogId(string logId)
         {
-            return await _historyData.QueryLatestLogVersion(logId);
+            return await _historyData.QueryMaterialLogsHistoryAsync(logId);
         }
 
-        public async Task<int> GetLatestLogItemsVersion(string logId)
+        public async Task<MaterialLogHistoryDTO> GetHistoryDetails(string logId, int version)
         {
-            return await _historyData.QueryLatestLogItemsVersion(logId);
+            var logHistory = await _historyData.QueryLogHistoryByVersion(logId, version);
+            var itemsHistory = await _historyData.QueryLogItemsHistoryByVersion(logId, version);
+
+            return new MaterialLogHistoryDTO()
+            {
+                LogEditHistory = logHistory,
+                ItemsEditHistory = itemsHistory
+            };
         }
     }
 }
