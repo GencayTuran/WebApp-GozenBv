@@ -14,13 +14,13 @@ namespace WebApp_GozenBv.TagHelpers
 
             switch (Status)
             {
-                case MaterialLogStatusConst.Returned:
+                case MaterialLogStatus.Returned:
                     //bgColor = "bg-info";
                     break;
-                case MaterialLogStatusConst.Created:
+                case MaterialLogStatus.Created:
                     //bgColor = "bg-success";
                     break;
-                case MaterialLogStatusConst.DamagedAwaitingAction:
+                case MaterialLogStatus.DamagedAwaitingAction:
                     //bgColor = "bg-warning";
                     break;
                 default:

@@ -20,20 +20,20 @@ namespace WebApp_GozenBv.Helpers
             {
                 new SortViewModel
                 {
-                    Id = MaterialLogStatusConst.Created,
-                    Name = MaterialLogStatusConst.CreatedName
+                    Id = MaterialLogStatus.Created,
+                    Name = MaterialLogStatus.CreatedName
                 },
 
                 new SortViewModel
                 {
-                    Id = MaterialLogStatusConst.Returned,
-                    Name = MaterialLogStatusConst.ReturnedName
+                    Id = MaterialLogStatus.Returned,
+                    Name = MaterialLogStatus.ReturnedName
                 },
 
                 new SortViewModel
                 {
-                    Id = MaterialLogStatusConst.DamagedAwaitingAction,
-                    Name = MaterialLogStatusConst.DamagedAwaitingActionName
+                    Id = MaterialLogStatus.DamagedAwaitingAction,
+                    Name = MaterialLogStatus.DamagedAwaitingActionName
                 }
             };
 
@@ -104,14 +104,14 @@ namespace WebApp_GozenBv.Helpers
 
             switch (sortStatus)
             {
-                case MaterialLogStatusConst.Created:
-                    filteredLogs = logs.Where(s => s.Status == MaterialLogStatusConst.Created).ToList();
+                case MaterialLogStatus.Created:
+                    filteredLogs = logs.Where(s => s.Status == MaterialLogStatus.Created).ToList();
                     break;
-                case MaterialLogStatusConst.Returned:
-                    filteredLogs = logs.Where(s => s.Status == MaterialLogStatusConst.Returned).ToList();
+                case MaterialLogStatus.Returned:
+                    filteredLogs = logs.Where(s => s.Status == MaterialLogStatus.Returned).ToList();
                     break;
-                case MaterialLogStatusConst.DamagedAwaitingAction:
-                    filteredLogs = logs.Where(s => s.Status == MaterialLogStatusConst.DamagedAwaitingAction).ToList();
+                case MaterialLogStatus.DamagedAwaitingAction:
+                    filteredLogs = logs.Where(s => s.Status == MaterialLogStatus.DamagedAwaitingAction).ToList();
                     break;
             }
 

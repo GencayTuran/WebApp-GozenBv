@@ -17,7 +17,7 @@ namespace WebApp_GozenBv.Migrations
         {
 #pragma warning disable 612, 618
             modelBuilder
-                .HasAnnotation("ProductVersion", "6.0.0")
+                .HasAnnotation("ProductVersion", "6.0.23")
                 .HasAnnotation("Relational:MaxIdentifierLength", 128);
 
             SqlServerModelBuilderExtensions.UseIdentityColumns(modelBuilder, 1L, 1);
@@ -265,7 +265,7 @@ namespace WebApp_GozenBv.Migrations
                     b.Property<string>("LogId")
                         .HasColumnType("nvarchar(max)");
 
-                    b.Property<DateTime?>("ReturnDate")
+                    b.Property<DateTime>("ReturnDate")
                         .HasColumnType("datetime2");
 
                     b.Property<int>("Status")

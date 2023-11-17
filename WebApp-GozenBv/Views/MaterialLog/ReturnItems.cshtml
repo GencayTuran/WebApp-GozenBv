@@ -44,7 +44,7 @@
             {
             <tr class="materialLogItemRow">
                 <input type="hidden" asp-for="@Model.MaterialLogItems[i].MaterialId"/>
-                <td><input disabled asp-for="@Model.MaterialLogItems[i].ProductNameCode" class="form-control" /></td>
+                <td><input disabled asp-for="@Model.MaterialLogItems[i].MaterialFullName" class="form-control" /></td>
                 <td><input disabled asp-for="@Model.MaterialLogItems[i].MaterialAmount" class="form-control" /></td>
                 <td><input asp-for="@Model.MaterialLogItems[i].IsDamaged" class="chkDamaged form-check" type="checkbox" /></td>
                 <td>

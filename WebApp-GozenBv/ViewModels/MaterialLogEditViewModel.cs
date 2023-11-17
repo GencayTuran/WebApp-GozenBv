@@ -1,13 +1,10 @@
-﻿using Microsoft.Graph;
-using System.Collections.Generic;
-using WebApp_GozenBv.Models;
-
-namespace WebApp_GozenBv.ViewModels
+﻿namespace WebApp_GozenBv.ViewModels
 {
-    public class MaterialLogAndItemsViewModel
+    public class MaterialLogEditViewModel
     {
-        public MaterialLogViewModel MaterialLog { get; set; }
-        public MaterialLogItemViewModel MaterialLogItem { get; set; }
-        public List<MaterialLogItemViewModel> MaterialLogItems { get; set; }
+        public string LogId { get; set; }
+        public int Status { get; set; }
+        public MaterialLogCreatedEditViewModel CreatedEditViewModel { get; set; }
+        public MaterialLogReturnedEditViewModel ReturnedEditViewModel { get; set; }
     }
 }

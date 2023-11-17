@@ -27,7 +27,7 @@
                                     <th class="col-2" scope="col">@Html.DisplayNameFor(model => model.MaterialLog.LogDate)</th>
                                     <th scope="col">@Html.DisplayNameFor(model => model.MaterialLog.Employee)</th>
                                     <th scope="col">@Html.DisplayNameFor(model => model.MaterialLog.Status)</th>
-                                    @if (status == MaterialLogStatusConst.Returned)
+                                    @if (status == MaterialLogStatus.Returned)
                                     {
                                         <th scope="col">@Html.DisplayNameFor(model => model.MaterialLog.ReturnDate)</th>
                                     }
@@ -40,7 +40,7 @@
                                     <td>
                                         <vc:status-icon status="@status" is-damaged="@Model.MaterialLog.Damaged" is-approved="@approved"></vc:status-icon>
                                     </td>
-                                    @if (status == MaterialLogStatusConst.Returned)
+                                    @if (status == MaterialLogStatus.Returned)
                                     {
                                         <td>@Html.DisplayFor(model => model.MaterialLog.ReturnDate)</td>
                                     }
@@ -65,7 +65,7 @@
                                     @foreach (var item in Model.Items)
                                     {
                                         <tr>
-                                            <td>@item.ProductNameCode</td>
+                                            <td>@item.MaterialFullName</td>
                                             <td>@item.MaterialAmount</td>
                                             <td>@item.IsUsed</td>
                                         </tr>
@@ -98,7 +98,7 @@
                                     @foreach (var item in Model.ItemsDamaged)
                                     {
                                         <tr>
-                                            <td>@item.ProductNameCode</td>
+                                            <td>@item.MaterialFullName</td>
                                             <td>@item.MaterialAmount</td>
                                             <td>@item.Cost</td>
                                             <td>@item.IsUsed</td>
@@ -134,7 +134,7 @@
 
                         @switch (status)
                         {
-                            case MaterialLogStatusConst.Created:
+                            case MaterialLogStatus.Created:
                                 <a asp-action="Delete" asp-route-id="@logId" class="btn btn-danger mb-2">Delete</a>
 
                                 @if (!approved)
@@ -147,7 +147,7 @@
                                 }
                                 break;
 
-                            case MaterialLogStatusConst.Returned:
+                            case MaterialLogStatus.Returned:
                                 @if (!approved)
                                 {
                                     <a asp-action="ApproveLog" asp-route-id="@logId" class="btn btn-info mb-2">Approve Return</a>

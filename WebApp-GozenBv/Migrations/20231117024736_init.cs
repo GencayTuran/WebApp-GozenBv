@@ -131,7 +131,7 @@ namespace WebApp_GozenBv.Migrations
                     LogDate = table.Column<DateTime>(type: "datetime2", nullable: false),
                     EmployeeId = table.Column<int>(type: "int", nullable: false),
                     LogId = table.Column<string>(type: "nvarchar(max)", nullable: true),
-                    ReturnDate = table.Column<DateTime>(type: "datetime2", nullable: true),
+                    ReturnDate = table.Column<DateTime>(type: "datetime2", nullable: false),
                     Damaged = table.Column<bool>(type: "bit", nullable: false),
                     Status = table.Column<int>(type: "int", nullable: false),
                     Approved = table.Column<bool>(type: "bit", nullable: false)

@@ -1,6 +1,6 @@
 ﻿namespace WebApp_GozenBv.Constants
 {
-    public static class MaterialLogStatusConst
+    public static class MaterialLogStatus
     {
         public const int Created = 1;
         public const int Returned = 2;

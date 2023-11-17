@@ -101,7 +101,7 @@ namespace WebApp_GozenBv.Controllers
         {
             ViewData["DateToday"] = DateTime.Today.ToString("yyyy-MM-dd");
             ViewData["Employees"] = new SelectList(await GetEmployeesViewData(), "EmployeeId", "EmployeeFullName");
-            ViewData["Materials"] = new SelectList(await GetMaterialsViewData(), "MaterialId", "ProductNameCode");
+            ViewData["Materials"] = new SelectList(await GetMaterialsViewData(), "MaterialId", "MaterialFullName");
 
             return View();
         }
@@ -150,24 +150,24 @@ namespace WebApp_GozenBv.Controllers
                 throw new Exception("Log cannot be edited after it is approved.");
             }
 
-            var viewModel = _logMapper.MapLogAndItemsToViewModel(logDTO);
+            var viewModel = _logMapper.MapMaterialLogEditViewModel(logDTO);
 
             ViewData["Employees"] = new SelectList(await GetEmployeesViewData(), "EmployeeId", "EmployeeFullName");
-            ViewData["Materials"] = new SelectList(await GetMaterialsViewData(), "MaterialId", "ProductNameCode");
+            ViewData["Materials"] = new SelectList(await GetMaterialsViewData(), "MaterialId", "MaterialFullName");
             return View(viewModel);
         }
 
         [HttpPost]
         [ValidateAntiForgeryToken]
-        public async Task<IActionResult> Edit(string logId, MaterialLogAndItemsViewModel incomingEdit)
+        public async Task<IActionResult> Edit(MaterialLogEditViewModel incomingEdit)
         { 
             if (ModelState.IsValid)
             {
                 try
                 {
-                    await _logService.HandleEdit(logId, incomingEdit);
-                    await _userLogService.StoreLogAsync(ControllerNames.MaterialLog, ActionConst.Edit, logId);
-                    return RedirectToDetails(logId);
+                    await _logService.HandleEdit(incomingEdit);
+                    await _userLogService.StoreLogAsync(ControllerNames.MaterialLog, ActionConst.Edit, incomingEdit.LogId);
+                    return RedirectToDetails(incomingEdit.LogId);
                 }
                 catch (Exception e)
                 {
@@ -175,7 +175,8 @@ namespace WebApp_GozenBv.Controllers
                     
                 }
             }
-            ViewData["Employees"] = new SelectList(await _employeeManager.GetEmployeesAsync(), "Id", "Id", incomingEdit.MaterialLog.EmployeeId);
+            ViewData["Employees"] = new SelectList(await GetEmployeesViewData(), "EmployeeId", "EmployeeFullName");
+            ViewData["Materials"] = new SelectList(await GetMaterialsViewData(), "MaterialId", "MaterialFullName");
             return View(incomingEdit);
         }
 
@@ -320,7 +321,7 @@ namespace WebApp_GozenBv.Controllers
                     MaterialId = material.Id,
                     QuantityNew = material.NewQty,
                     QuantityUsed = material.UsedQty,
-                    ProductNameCode = material.Name + " - " + material.Brand
+                    MaterialFullName = material.Name + " - " + material.Brand
                 });
             }
 

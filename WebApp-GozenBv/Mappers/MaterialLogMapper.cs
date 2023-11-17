@@ -10,6 +10,7 @@ using WebApp_GozenBv.Managers.Interfaces;
 using WebApp_GozenBv.Mappers.Interfaces;
 using WebApp_GozenBv.Models;
 using WebApp_GozenBv.ViewModels;
+using System.ComponentModel.DataAnnotations;
 
 namespace WebApp_GozenBv.Mappers
 {
@@ -98,7 +99,7 @@ namespace WebApp_GozenBv.Mappers
                     LogId = item.LogId,
                     MaterialId = item.MaterialId,
                     MaterialAmount = item.MaterialAmount,
-                    ProductNameCode = (item.Material.Name + " " + item.Material.Brand).ToUpper(),
+                    MaterialFullName = (item.Material.Name + " " + item.Material.Brand).ToUpper(),
                     NoReturn = item.Material.NoReturn,
                     Cost = item.Material.Cost,
                     IsUsed = item.Used,
@@ -166,39 +167,64 @@ namespace WebApp_GozenBv.Mappers
             return mappedItems;
         }
 
-        public MaterialLog MapUpdatedMaterialLog(MaterialLog original, MaterialLog incoming)
+        public MaterialLog MapUpdatedMaterialLog(MaterialLog original, MaterialLogEditViewModel incoming)
         {
-            original.LogDate = incoming.LogDate;
-            original.ReturnDate = incoming.ReturnDate;
-            original.EmployeeId = incoming.EmployeeId;
+            var status = original.Status;
+            var createdVm = incoming.CreatedEditViewModel;
+            var returnedVm = incoming.ReturnedEditViewModel;
 
+            switch (status)
+            {
+                case MaterialLogStatus.Created:
+                    original.LogDate = createdVm.LogDate;
+                    original.EmployeeId = createdVm.EmployeeId;
+                    break;
+                case MaterialLogStatus.Returned:
+                    original.ReturnDate = returnedVm.ReturnDate;
+                    break;
+            }
             return original;
         }
 
-        public List<MaterialLogItem> MapUpdatedItems_StatusReturned(List<MaterialLogItem> originalLogItems, List<MaterialLogItem> incomingLogItems)
+        public List<MaterialLogItem> MapUpdatedItems_Created(string logId, List<MaterialLogItemCreatedEditViewModel> incoming)
         {
             var mappedItems = new List<MaterialLogItem>();
 
-            foreach (var item in originalLogItems)
+            foreach (var item in incoming)
             {
-                //find match
-                //TODO: is this a good expression?
-                var match = originalLogItems.FirstOrDefault(x => x.Id == item.Id && x.LogId == x.LogId);
+                mappedItems.Add(new MaterialLogItem()
+                {
+                    LogId = logId,
+                    MaterialId = item.MaterialId,
+                    Used = item.Used,
+                    MaterialAmount = item.MaterialAmount,
+                });
+            }
+
+            return mappedItems;
+        }
+
+        public List<MaterialLogItem> MapUpdatedItems_Returned(List<MaterialLogItem> original, List<MaterialLogItemReturnedEditViewModel> incoming)
+        {
+            var mappedItems = new List<MaterialLogItem>();
+
+            foreach (var item in original)
+            {
+                var match = incoming.FirstOrDefault(x => x.Id == item.Id);
 
                 if (match == null)
                 {
                     throw new ArgumentNullException("No matching item found. Fatal error.");
                 }
 
-                //TODO: dont forget in the view to set the amounts to null when item turns ot not damaged. Proper reset!
                 item.IsDamaged = match.IsDamaged;
                 item.DamagedAmount = match.DamagedAmount;
                 item.RepairAmount = match.RepairAmount;
                 item.DeleteAmount = match.DeleteAmount;
 
-                //add to updateList
                 mappedItems.Add(item);
             }
+
             return mappedItems;
         }
 
@@ -301,7 +327,7 @@ namespace WebApp_GozenBv.Mappers
                     LogId = item.LogId,
                     MaterialId = item.MaterialId,
                     MaterialAmount = item.MaterialAmount,
-                    ProductNameCode = (item.Material.Name + " " + item.Material.Brand).ToUpper(),
+                    MaterialFullName = (item.Material.Name + " " + item.Material.Brand).ToUpper(),
                     NoReturn = item.Material.NoReturn,
                     Cost = item.Material.Cost,
                     IsUsed = item.Used,
@@ -389,6 +415,62 @@ namespace WebApp_GozenBv.Mappers
             {
                 LogEditHistory = logViewModel,
                 ItemsEditHistory = itemsViewModel
+            };
+        }
+
+        public MaterialLogEditViewModel MapMaterialLogEditViewModel(MaterialLogDTO logDTO)
+        {
+            var itemsCreated = new List<MaterialLogItemCreatedEditViewModel>();
+            foreach (var item in logDTO.MaterialLogItems)
+            {
+                itemsCreated.Add(new MaterialLogItemCreatedEditViewModel()
+                {
+                    MaterialId = item.MaterialId,
+                    MaterialAmount = item.MaterialAmount,
+                    MaterialFullName = item.Material.Name + " " + item.Material.Brand,
+                    Used = item.Used
+                });
+            }
+
+            var itemsReturned = new List<MaterialLogItemReturnedEditViewModel>();
+            foreach (var item in logDTO.MaterialLogItems)
+            {
+                itemsReturned.Add(new MaterialLogItemReturnedEditViewModel()
+                {
+                    Id = item.Id,
+                    MaterialId = item.MaterialId,
+                    MaterialFullName = item.Material.Name + " " + item.Material.Brand,
+                    MaterialAmount = item.MaterialAmount,
+                    IsDamaged = item.IsDamaged,
+                    DamagedAmount = item.DamagedAmount,
+                    RepairAmount = item.RepairAmount,
+                    DeleteAmount = item.DeleteAmount,
+                    Used = item.Used
+                });
+            }
+
+            var createdVm = new MaterialLogCreatedEditViewModel()
+            {
+                LogDate = logDTO.MaterialLog.LogDate,
+                EmployeeId = logDTO.MaterialLog.EmployeeId,
+                ItemsCreatedEditViewModel = itemsCreated
+            };
+
+            var returnedVm = new MaterialLogReturnedEditViewModel()
+            {
+                LogDate = logDTO.MaterialLog.LogDate,
+                ReturnDate = logDTO.MaterialLog.ReturnDate,
+                EmployeeFullName = logDTO.MaterialLog.Employee.Name + " " + logDTO.MaterialLog.Employee.Surname,
+                EmployeeId = logDTO.MaterialLog.EmployeeId,
+                ItemsReturnedEditViewModel = itemsReturned
+            };
+
+            return new MaterialLogEditViewModel()
+            {
+                LogId = logDTO.MaterialLog.LogId,
+                Status = logDTO.MaterialLog.Status,
+                CreatedEditViewModel = createdVm,
+                ReturnedEditViewModel = returnedVm
             };
         }
     }

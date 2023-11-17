@@ -69,7 +69,7 @@ namespace WebApp_GozenBv.Helpers
 
             switch (status)
             {
-                case MaterialLogStatusConst.Created:
+                case MaterialLogStatus.Created:
                     for (int i = 0; i < original.Count; i++)
                     {
                         if (original[i].MaterialId != incoming[i]?.MaterialId
@@ -80,7 +80,7 @@ namespace WebApp_GozenBv.Helpers
                         }
                     }
                     break;
-                case MaterialLogStatusConst.Returned:
+                case MaterialLogStatus.Returned:
                     for (int i = 0; i < original.Count; i++)
                     {
                         if (original[i].MaterialId != incoming[i]?.MaterialId
