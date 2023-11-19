@@ -58,7 +58,7 @@ namespace WebApp_GozenBv.Services
             }
 
             var mappedItems = _logMapper.MapSelectedItems(selectedItems);
-            var incomingItems = await ValidateItems(mappedItems);
+            var incomingItems = await HandleItems(mappedItems);
 
             string logId = Guid.NewGuid().ToString();
 
@@ -94,7 +94,8 @@ namespace WebApp_GozenBv.Services
                 case MaterialLogStatus.Created:
                     statusName = MaterialLogStatus.CreatedName;
 
-                    //TODO: var incomingItems = await ValidateItems(incomingDTO.MaterialLogItems);
+                    var mappedItemsCreated = _logMapper.MapUpdatedItems_Created(logId, incomingEdit.CreatedEditViewModel.ItemsCreatedEditViewModel);
+                    var incomingItems = await HandleItems(mappedItemsCreated);
 
                     if (originalLog.Approved)
                     {
@@ -117,18 +118,15 @@ namespace WebApp_GozenBv.Services
                     var mappedItemHistory = await _logMapper.MapLogItemsHistoryAsync(originalItems);
                     //create records for history
                     await _logManager.ManageMaterialLogItemsHistoryAsync(mappedItemHistory);
-                    
+
                     //map the log
                     var updatedLog = _logMapper.MapUpdatedMaterialLog(originalLog, incomingEdit);
                     //update the log
                     await _logManager.ManageMaterialLogAsync(updatedLog, EntityOperation.Update);
-                        
-                    //map the updated items
-                    var updatedItemsCreated = _logMapper.MapUpdatedItems_Created(logId, incomingEdit.CreatedEditViewModel.ItemsCreatedEditViewModel);
-                        
+
                     //replace items
                     await _logManager.ManageMaterialLogItemsAsync(originalItems, EntityOperation.Delete);
-                    await _logManager.ManageMaterialLogItemsAsync(updatedItemsCreated, EntityOperation.Create);
+                    await _logManager.ManageMaterialLogItemsAsync(incomingItems, EntityOperation.Create);
                     break;
 
                 case MaterialLogStatus.Returned:
@@ -151,9 +149,9 @@ namespace WebApp_GozenBv.Services
                     await _logManager.ManageMaterialLogItemsHistoryAsync(mappedHistory);
 
                     //map the update
-                    var updatedItemsReturned = _logMapper.MapUpdatedItems_Returned(originalItems, incomingEdit.ReturnedEditViewModel.ItemsReturnedEditViewModel);
+                    var mappedItemsReturned = _logMapper.MapUpdatedItems_Returned(originalItems, incomingEdit.ReturnedEditViewModel.ItemsReturnedEditViewModel);
                     //update items
-                    await _logManager.ManageMaterialLogItemsAsync(updatedItemsReturned, EntityOperation.Update);
+                    await _logManager.ManageMaterialLogItemsAsync(mappedItemsReturned, EntityOperation.Update);
                     break;
 
                 default:
@@ -323,14 +321,9 @@ namespace WebApp_GozenBv.Services
                 throw new Exception("Cannot delete log after approved creation.");
             }
 
-            await DeleteCreate(logDTO);
-        }
-
-        public async Task DeleteCreate(MaterialLogDTO materialLogDTO)
-        {
             //remove log and its materiallogitems
-            await _logManager.ManageMaterialLogAsync(materialLogDTO.MaterialLog, EntityOperation.Delete);
-            await _logManager.ManageMaterialLogItemsAsync(materialLogDTO.MaterialLogItems, EntityOperation.Delete);
+            await _logManager.ManageMaterialLogAsync(logDTO.MaterialLog, EntityOperation.Delete);
+            await _logManager.ManageMaterialLogItemsAsync(logDTO.MaterialLogItems, EntityOperation.Delete);
         }
 
         private bool IsModified(MaterialLogDTO original, MaterialLogEditViewModel incoming)
@@ -407,39 +400,11 @@ namespace WebApp_GozenBv.Services
             return isModified;
         }
 
-        private bool LogModified(MaterialLog original, MaterialLog incoming)
+        private async Task<List<MaterialLogItem>> HandleItems(List<MaterialLogItem> selectedItems)
         {
-            //only editable fields
-            return original.LogDate != incoming.LogDate
-                || original.ReturnDate != incoming.ReturnDate
-                || original.EmployeeId != incoming.EmployeeId;
-        }
-        private bool LogItemsModified(List<MaterialLogItem> original, List<MaterialLogItem> incoming, int status)
-            => !_equalityHelper.AreEditableFieldsEqual(original, incoming, status);
-        private bool MaterialAmountModified(MaterialLogItem original, MaterialLogItem incoming)
-            =>
-            original.MaterialAmount != incoming.MaterialAmount ||
-            original.DamagedAmount != incoming.DamagedAmount ||
-            original.RepairAmount != incoming.RepairAmount ||
-            original.DeleteAmount != incoming.DeleteAmount;
-
-        private async Task<List<MaterialLogItem>> ValidateItems(List<MaterialLogItem> selectedItems)
-        {
-            var mergedItems = MergeItems(selectedItems);
-
-            foreach (var item in mergedItems)
-            {
-                var material = await _materialManager.GetMaterialAsync(item.MaterialId);
-                _materialHelper.ValidateQuantity(material, item.MaterialAmount, item.Used);
-            }
-
-            return mergedItems;
-        }
-
-        //TODO: check if this works correctly and if necessary (you can restrict user from view maybe)
-        private List<MaterialLogItem> MergeItems(List<MaterialLogItem> selectedItems)
-        {
-            return selectedItems
+            //TODO: check if this works correctly and if necessary (you can restrict user from view maybe)
+            //merge items
+            var mergedItems = selectedItems
                 .GroupBy(x => new { x.MaterialId, x.Used })
                 .Select(group => new MaterialLogItem
                 {
@@ -447,6 +412,15 @@ namespace WebApp_GozenBv.Services
                     MaterialAmount = group.Sum(x => x.MaterialAmount),
                     Used = group.Key.Used
                 }).ToList();
+
+            //validate qty items
+            foreach (var item in mergedItems)
+            {
+                var material = await _materialManager.GetMaterialAsync(item.MaterialId);
+                _materialHelper.ValidateQuantity(material, item.MaterialAmount, item.Used);
+            }
+
+            return mergedItems;
         }
     }
 }

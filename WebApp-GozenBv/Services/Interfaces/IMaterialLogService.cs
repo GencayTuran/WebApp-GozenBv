@@ -10,9 +10,7 @@ namespace WebApp_GozenBv.Services.Interfaces
         Task<string> HandleCreate(MaterialLogCreateViewModel incomingViewModel);
         Task HandleEdit(MaterialLogEditViewModel incomingEdit);
         Task HandleReturn(MaterialLogAndItemsViewModel incomingReturn);
-
         Task HandleDelete(string logId);
-        Task DeleteCreate(MaterialLogDTO materialLogDTO);
 
         Task HandleApprove(string logId);
         Task ApproveCreate(MaterialLogDTO materialLogDTO);

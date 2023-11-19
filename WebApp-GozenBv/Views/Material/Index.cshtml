@@ -32,7 +32,19 @@
                 @Html.DisplayNameFor(model => model.TotalQty)
             </th>
             <th>
+                @Html.DisplayNameFor(model => model.InUseAmount)
+            </th>
+            <th>
+                @Html.DisplayNameFor(model => model.InDepotAmount)
+            </th>
+            <th>
                 @Html.DisplayNameFor(model => model.MinQty)
+            </th>
+            <th>
+                @Html.DisplayNameFor(model => model.InRepairQty)
+            </th>
+            <th>
+                @Html.DisplayNameFor(model => model.DeletedQty)
             </th>
             <th>
                 @Html.DisplayNameFor(model => model.NoReturn)
@@ -66,7 +78,19 @@
                     @Html.DisplayFor(modelItem => item.TotalQty)
                 </td>
                 <td>
+                    @Html.DisplayFor(modelItem => item.InUseAmount)
+                </td>
+                <td>
+                    @Html.DisplayFor(modelItem => item.InDepotAmount)
+                </td>
+                <td>
                     @Html.DisplayFor(modelItem => item.MinQty)
+                </td>
+                <td>
+                    @Html.DisplayFor(modelItem => item.InRepairQty)
+                </td>
+                <td>
+                    @Html.DisplayFor(modelItem => item.DeletedQty)
                 </td>
                 <td>
                     @Html.CheckBoxFor(modelItem => item.NoReturn, new { @disabled = "disabled" })
