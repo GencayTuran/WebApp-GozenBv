@@ -8,6 +8,7 @@
     var logId = Model.MaterialLog.LogId;
     var log = Model.MaterialLog;
     var approved = Model.MaterialLog.Approved;
+    var showRepairTickets = log.Damaged && log.Approved && log.Status == MaterialLogStatus.Returned;
 }
 
 <div class="container-fluid">
@@ -156,7 +157,7 @@
                         }
                     </div>
                 </div>
-                @if (log.Damaged)
+                @if (showRepairTickets)
                 {
                     <div class="container bg-dark p-3 rounded">
                         <vc:repair-ticket-cards log-id="@Model.MaterialLog.LogId"></vc:repair-ticket-cards>
