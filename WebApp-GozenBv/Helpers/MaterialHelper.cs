@@ -85,7 +85,7 @@ namespace WebApp_GozenBv.Helpers
             //TODO: catch exc higher
             if (materialQty < askedQty)
             {
-                throw new Exception($"The asked quantity is higher than current quantity for id {material.Id}.");
+                throw new Exception($"The asked quantity is higher than current quantity for id {material.Id} ({material.Name} - {material.Brand}).");
             }
         }
 

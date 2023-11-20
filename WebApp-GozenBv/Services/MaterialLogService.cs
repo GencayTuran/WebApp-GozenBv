@@ -22,25 +22,19 @@ namespace WebApp_GozenBv.Services
         private readonly IMaterialLogManager _logManager;
         private readonly IMaterialLogMapper _logMapper;
         private readonly IMaterialManager _materialManager;
-        private readonly IEmployeeManager _employeeManager;
         private readonly IMaterialHelper _materialHelper;
-        private readonly IEqualityHelper _equalityHelper;
         private readonly IRepairTicketManager _repairManager;
 
         public MaterialLogService(
             IMaterialLogManager logManager,
             IMaterialManager materialManager,
-            IEqualityHelper equalityHelper,
-            IEmployeeManager employeeManager,
             IMaterialHelper materialHelper,
             IRepairTicketManager repairManager,
             IMaterialLogMapper logMapper)
         {
             _logManager = logManager;
             _materialManager = materialManager;
-            _equalityHelper = equalityHelper;
             _materialHelper = materialHelper;
-            _employeeManager = employeeManager;
             _repairManager = repairManager;
             _logMapper = logMapper;
         }
@@ -57,23 +51,36 @@ namespace WebApp_GozenBv.Services
                 throw new ArgumentNullException("No items in created log.");
             }
 
-            var mappedItems = _logMapper.MapSelectedItems(selectedItems);
-            var incomingItems = await HandleItems(mappedItems);
-
-            string logId = Guid.NewGuid().ToString();
-
-            //new Log
-            var newLog = new MaterialLog()
+            try
             {
-                LogId = logId,
-                Status = MaterialLogStatus.Created,
-                LogDate = incomingViewModel.MaterialLogDate,
-                EmployeeId = incomingViewModel.EmployeeId
-            };
-            await _logManager.ManageMaterialLogAsync(newLog, EntityOperation.Create);
+                string logId = Guid.NewGuid().ToString();
 
-            var newItems = _logMapper.MapNewItems(incomingItems, logId);
-            await _logManager.ManageMaterialLogItemsAsync(newItems, EntityOperation.Create);
+                //new items
+                var mappedItems = _logMapper.MapSelectedItems(selectedItems);
+                var validatedItems = await ValidateSelectedItems(mappedItems);
+                var newItems = _logMapper.MapNewItems(validatedItems, logId);
+
+                await _logManager.ManageMaterialLogItemsAsync(newItems, EntityOperation.Create);
+
+                //new log
+                var newLog = new MaterialLog()
+                {
+                    LogId = logId,
+                    Status = MaterialLogStatus.Created,
+                    LogDate = incomingViewModel.MaterialLogDate,
+                    EmployeeId = incomingViewModel.EmployeeId
+                };
+                await _logManager.ManageMaterialLogAsync(newLog, EntityOperation.Create);
+            }
+            catch (Exception e)
+            {
+                //TODO: return exception to view (user)
+                
+            }
+
+
+
+
 
             return logId;
         }
@@ -95,7 +102,7 @@ namespace WebApp_GozenBv.Services
                     statusName = MaterialLogStatus.CreatedName;
 
                     var mappedItemsCreated = _logMapper.MapUpdatedItems_Created(logId, incomingEdit.CreatedEditViewModel.ItemsCreatedEditViewModel);
-                    var incomingItems = await HandleItems(mappedItemsCreated);
+                    var incomingItems = await ValidateSelectedItems(mappedItemsCreated);
 
                     if (originalLog.Approved)
                     {
@@ -400,10 +407,9 @@ namespace WebApp_GozenBv.Services
             return isModified;
         }
 
-        private async Task<List<MaterialLogItem>> HandleItems(List<MaterialLogItem> selectedItems)
+        private async Task<List<MaterialLogItem>> ValidateSelectedItems(List<MaterialLogItem> selectedItems)
         {
-            //TODO: check if this works correctly and if necessary (you can restrict user from view maybe)
-            //merge items
+            //merge same items
             var mergedItems = selectedItems
                 .GroupBy(x => new { x.MaterialId, x.Used })
                 .Select(group => new MaterialLogItem
