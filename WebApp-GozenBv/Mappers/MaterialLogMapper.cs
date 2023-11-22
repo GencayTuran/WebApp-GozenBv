@@ -228,7 +228,7 @@ namespace WebApp_GozenBv.Mappers
             return mappedItems;
         }
 
-        public List<MaterialLogItem> MapSelectedItems(List<MaterialLogSelectedItemViewModel> selectedItems)
+        public List<MaterialLogItem> MapSelectedItems(List<MaterialLogSelectedItemViewModel> selectedItems, string logId)
         {
             var mappedItems = new List<MaterialLogItem>();
             foreach (var item in selectedItems)
@@ -237,29 +237,11 @@ namespace WebApp_GozenBv.Mappers
                 {
                     MaterialId = item.MaterialId,
                     MaterialAmount = item.Amount,
-                    Used = item.Used
+                    Used = item.Used,
+                    LogId = logId
                 });
             }
             return mappedItems;
-        }
-
-        public List<MaterialLogItem> MapNewItems(List<MaterialLogItem> incomingItems, string logId)
-        {
-            List<MaterialLogItem> newItems = new();
-            foreach (var item in incomingItems)
-            {
-                //new Item
-                MaterialLogItem newItem = new();
-
-                newItem.MaterialId = item.MaterialId;
-                newItem.MaterialAmount = item.MaterialAmount;
-                newItem.Used = item.Used;
-                newItem.LogId = logId;
-
-                newItems.Add(newItem);
-            }
-
-            return newItems;
         }
 
         public MaterialLogDTO MapViewModelToDTO(MaterialLogAndItemsViewModel viewModel)

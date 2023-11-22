@@ -12,8 +12,7 @@ namespace WebApp_GozenBv.Mappers.Interfaces
         Task<List<ItemEditHistory>> MapLogItemsHistoryAsync(List<MaterialLogItem> items);
         Task<MaterialLogDetailViewModel> MapMaterialLogDetailViewModel(string logId);
         MaterialLog MapUpdatedMaterialLog(MaterialLog original, MaterialLogEditViewModel incoming);
-        List<MaterialLogItem> MapSelectedItems(List<MaterialLogSelectedItemViewModel> selectedItems);
-        List<MaterialLogItem> MapNewItems(List<MaterialLogItem> incomingItems, string logId);
+        List<MaterialLogItem> MapSelectedItems(List<MaterialLogSelectedItemViewModel> selectedItems, string logId);
         MaterialLogDTO MapViewModelToDTO(MaterialLogAndItemsViewModel viewModel);
         MaterialLogAndItemsViewModel MapLogAndItemsToViewModel(MaterialLogDTO dto);
         MaterialLogHistoryIndexViewModel MapHistoryToIndexViewModel(List<LogEditHistory> logHistory);

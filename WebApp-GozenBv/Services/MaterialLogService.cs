@@ -51,16 +51,14 @@ namespace WebApp_GozenBv.Services
                 throw new ArgumentNullException("No items in created log.");
             }
 
+            string logId = Guid.NewGuid().ToString();
             try
             {
-                string logId = Guid.NewGuid().ToString();
-
                 //new items
-                var mappedItems = _logMapper.MapSelectedItems(selectedItems);
+                var mappedItems = _logMapper.MapSelectedItems(selectedItems, logId);
                 var validatedItems = await ValidateSelectedItems(mappedItems);
-                var newItems = _logMapper.MapNewItems(validatedItems, logId);
 
-                await _logManager.ManageMaterialLogItemsAsync(newItems, EntityOperation.Create);
+                await _logManager.ManageMaterialLogItemsAsync(validatedItems, EntityOperation.Create);
 
                 //new log
                 var newLog = new MaterialLog()
@@ -77,10 +75,6 @@ namespace WebApp_GozenBv.Services
                 //TODO: return exception to view (user)
                 
             }
-
-
-
-
 
             return logId;
         }
@@ -411,9 +405,10 @@ namespace WebApp_GozenBv.Services
         {
             //merge same items
             var mergedItems = selectedItems
-                .GroupBy(x => new { x.MaterialId, x.Used })
+                .GroupBy(x => new { x.LogId, x.MaterialId, x.Used })
                 .Select(group => new MaterialLogItem
                 {
+                    LogId = group.Key.LogId,
                     MaterialId = group.Key.MaterialId,
                     MaterialAmount = group.Sum(x => x.MaterialAmount),
                     Used = group.Key.Used
