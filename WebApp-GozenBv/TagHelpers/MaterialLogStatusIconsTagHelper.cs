@@ -20,9 +20,6 @@ namespace WebApp_GozenBv.TagHelpers
                 case MaterialLogStatus.Created:
                     //bgColor = "bg-success";
                     break;
-                case MaterialLogStatus.DamagedAwaitingAction:
-                    //bgColor = "bg-warning";
-                    break;
                 default:
                     //notfound
                     break;
