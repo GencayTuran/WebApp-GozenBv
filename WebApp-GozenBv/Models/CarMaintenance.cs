@@ -7,7 +7,9 @@ namespace WebApp_GozenBv.Models
     {
         public int Id { get; set; }
 
-        public int CarId { get; set; } 
+        [Required]
+        public int MaintenanceType { get; set; }
+        public int CarId { get; set; }
         public int? MaintenanceKm { get; set; }
         [DataType(DataType.Date)]
         public DateTime? MaintenanceDate { get; set; }

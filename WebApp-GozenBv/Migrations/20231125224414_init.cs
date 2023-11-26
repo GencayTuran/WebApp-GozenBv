@@ -15,6 +15,7 @@ namespace WebApp_GozenBv.Migrations
                 {
                     Id = table.Column<int>(type: "int", nullable: false)
                         .Annotation("SqlServer:Identity", "1, 1"),
+                    MaintenanceType = table.Column<int>(type: "int", nullable: false),
                     CarId = table.Column<int>(type: "int", nullable: false),
                     MaintenanceKm = table.Column<int>(type: "int", nullable: true),
                     MaintenanceDate = table.Column<DateTime>(type: "datetime2", nullable: true),
@@ -61,7 +62,7 @@ namespace WebApp_GozenBv.Migrations
                 });
 
             migrationBuilder.CreateTable(
-                name: "Material",
+                name: "Materials",
                 columns: table => new
                 {
                     Id = table.Column<int>(type: "int", nullable: false)
@@ -80,7 +81,7 @@ namespace WebApp_GozenBv.Migrations
                 },
                 constraints: table =>
                 {
-                    table.PrimaryKey("PK_Material", x => x.Id);
+                    table.PrimaryKey("PK_Materials", x => x.Id);
                 });
 
             migrationBuilder.CreateTable(
@@ -166,9 +167,9 @@ namespace WebApp_GozenBv.Migrations
                 {
                     table.PrimaryKey("PK_MaterialLogItems", x => x.Id);
                     table.ForeignKey(
-                        name: "FK_MaterialLogItems_Material_MaterialId",
+                        name: "FK_MaterialLogItems_Materials_MaterialId",
                         column: x => x.MaterialId,
-                        principalTable: "Material",
+                        principalTable: "Materials",
                         principalColumn: "Id",
                         onDelete: ReferentialAction.Cascade);
                 });
@@ -195,9 +196,9 @@ namespace WebApp_GozenBv.Migrations
                 {
                     table.PrimaryKey("PK_MaterialLogItemsHistory", x => x.Id);
                     table.ForeignKey(
-                        name: "FK_MaterialLogItemsHistory_Material_MaterialId",
+                        name: "FK_MaterialLogItemsHistory_Materials_MaterialId",
                         column: x => x.MaterialId,
-                        principalTable: "Material",
+                        principalTable: "Materials",
                         principalColumn: "Id",
                         onDelete: ReferentialAction.Cascade);
                 });
@@ -217,9 +218,9 @@ namespace WebApp_GozenBv.Migrations
                 {
                     table.PrimaryKey("PK_RepairTickets", x => x.Id);
                     table.ForeignKey(
-                        name: "FK_RepairTickets_Material_MaterialId",
+                        name: "FK_RepairTickets_Materials_MaterialId",
                         column: x => x.MaterialId,
-                        principalTable: "Material",
+                        principalTable: "Materials",
                         principalColumn: "Id",
                         onDelete: ReferentialAction.Cascade);
                 });
@@ -308,7 +309,7 @@ namespace WebApp_GozenBv.Migrations
                 name: "Employees");
 
             migrationBuilder.DropTable(
-                name: "Material");
+                name: "Materials");
 
             migrationBuilder.DropTable(
                 name: "Users");

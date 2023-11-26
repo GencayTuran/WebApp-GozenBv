@@ -65,5 +65,21 @@ namespace WebApp_GozenBv.Managers
         {
             return await _ticketData.QueryTicketsByLogIdAsync(logId);
         }
+
+        public void ManageTickets(List<RepairTicket> tickets, EntityOperation operation)
+        {
+            switch (operation)
+            {
+                case EntityOperation.Create:
+                    _ticketData.CreateTicketsAsync(tickets);
+                    break;
+                case EntityOperation.Update:
+                    _ticketData.UpdateTicketsAsync(tickets);
+                    break;
+                case EntityOperation.Delete:
+                    _ticketData.DeleteTicketsAsync(tickets);
+                    break;
+            }
+        }
     }
 }

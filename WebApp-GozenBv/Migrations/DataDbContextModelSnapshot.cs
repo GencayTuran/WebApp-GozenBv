@@ -45,6 +45,9 @@ namespace WebApp_GozenBv.Migrations
                     b.Property<int?>("MaintenanceKm")
                         .HasColumnType("int");
 
+                    b.Property<int>("MaintenanceType")
+                        .HasColumnType("int");
+
                     b.HasKey("Id");
 
                     b.ToTable("CarMaintenances");
@@ -239,7 +242,7 @@ namespace WebApp_GozenBv.Migrations
 
                     b.HasKey("Id");
 
-                    b.ToTable("Material");
+                    b.ToTable("Materials");
                 });
 
             modelBuilder.Entity("WebApp_GozenBv.Models.MaterialLog", b =>

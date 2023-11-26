@@ -41,17 +41,17 @@ namespace WebApp_GozenBv.DataHandlers
 
         public async Task<List<Material>> QueryAllMaterialsAsync()
         {
-            return await _context.Material.ToListAsync();
+            return await _context.Materials.ToListAsync();
         }
 
         public async Task<Material> QueryMaterialByIdAsync(int? id)
         {
-            return await _context.Material.FindAsync(id);
+            return await _context.Materials.FindAsync(id);
         }
 
         public Material QueryMaterialById(int? id)
         {
-            return _context.Material.Find(id);
+            return _context.Materials.Find(id);
         }
 
         public async Task CreateMaterialsAsync(List<Material> materials)

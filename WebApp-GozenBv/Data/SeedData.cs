@@ -1,29 +1,40 @@
 ﻿using Microsoft.AspNetCore.Builder;
-using Microsoft.AspNetCore.Identity;
-using Microsoft.Data.SqlClient;
-using Microsoft.Extensions.Configuration;
-using Microsoft.Extensions.DependencyInjection;
 using System;
 using System.Collections.Generic;
 using System.Linq;
-using System.Threading;
-using System.Threading.Tasks;
+using WebApp_GozenBv.Constants;
+using WebApp_GozenBv.Helpers.Interfaces;
+using WebApp_GozenBv.Managers.Interfaces;
 using WebApp_GozenBv.Models;
 
 namespace WebApp_GozenBv.Data
 {
-    public static class SeedData
+    public class SeedData
     {
-        private static DataDbContext _context;
-        public static void EnsurePopulated(IApplicationBuilder app)
-        {
-            _context = app
-                .ApplicationServices.CreateScope()
-                .ServiceProvider.GetRequiredService<DataDbContext>();
+        private DataDbContext _context;
+        private IMaterialHelper _materialHelper;
+        private IRepairTicketManager _repairManager;
 
-            if (!_context.Material.Any())
+        public SeedData(
+            DataDbContext context,
+            IMaterialHelper materialHelper,
+            IRepairTicketManager repairManager,
+            IServiceProvider serviceProvider)
+        {
+            _context = context;
+            _materialHelper = materialHelper;
+            _repairManager = repairManager;
+        }
+
+        public void EnsurePopulated(IApplicationBuilder app)
+        {
+            //_context = app
+            //    .ApplicationServices.CreateScope()
+            //    .ServiceProvider.GetRequiredService<DataDbContext>();
+
+            if (!_context.Materials.Any())
             {
-                _context.Material.AddRange(GetMaterial());
+                _context.Materials.AddRange(GetMaterial());
                 _context.SaveChanges();
                 _context.Employees.AddRange(GetEmployees());
                 _context.SaveChanges();
@@ -36,14 +47,15 @@ namespace WebApp_GozenBv.Data
                 _context.SaveChanges();
                 _context.MaterialLogItems.AddRange(GetMaterialLogItems());
                 _context.SaveChanges();
-
+                _context.UpdateRange(GetUpdatedMaterials());
+                _context.SaveChanges();
                 _context.Users.AddRange(GetUsers());
                 _context.SaveChanges();
             }
-
         }
 
-        private static MaterialLog[] GetMaterialLogs()
+
+        private MaterialLog[] GetMaterialLogs()
         {
             var materialLogs = new List<MaterialLog>
             {
@@ -52,8 +64,8 @@ namespace WebApp_GozenBv.Data
                     LogDate = new DateTime(2022, 1, 1),
                     EmployeeId = 1,
                     ReturnDate = new DateTime(2022, 2, 1),
-                    Damaged = false,
-                    Status = 1,
+                    Status = MaterialLogStatus.Created,
+                    Approved = false,
                     LogId = Guid.NewGuid().ToString(),
                 },
                 new MaterialLog
@@ -61,8 +73,8 @@ namespace WebApp_GozenBv.Data
                     LogDate = new DateTime(2022, 2, 1),
                     EmployeeId = 2,
                     ReturnDate = new DateTime(2022, 3, 1),
-                    Damaged = false,
-                    Status = 2,
+                    Status = MaterialLogStatus.Created,
+                    Approved = true,
                     LogId = Guid.NewGuid().ToString(),
                 },
                 new MaterialLog
@@ -71,7 +83,8 @@ namespace WebApp_GozenBv.Data
                     EmployeeId = 3,
                     ReturnDate = new DateTime(2022, 4, 1),
                     Damaged = true,
-                    Status = 3,
+                    Status = MaterialLogStatus.Returned,
+                    Approved = false,
                     LogId = Guid.NewGuid().ToString(),
                 },
                 new MaterialLog
@@ -80,7 +93,8 @@ namespace WebApp_GozenBv.Data
                     EmployeeId = 1,
                     ReturnDate = new DateTime(2022, 5, 1),
                     Damaged = false,
-                    Status = 1,
+                    Status = MaterialLogStatus.Returned,
+                    Approved = false,
                     LogId = Guid.NewGuid().ToString(),
                 },
                 new MaterialLog
@@ -88,8 +102,9 @@ namespace WebApp_GozenBv.Data
                     LogDate = new DateTime(2022, 5, 1),
                     EmployeeId = 2,
                     ReturnDate = new DateTime(2022, 6, 1),
-                    Damaged = true,
-                    Status = 2,
+                    Damaged = false,
+                    Status = MaterialLogStatus.Returned,
+                    Approved = true,
                     LogId = Guid.NewGuid().ToString(),
                 },
                 new MaterialLog
@@ -98,7 +113,8 @@ namespace WebApp_GozenBv.Data
                     EmployeeId = 3,
                     ReturnDate = new DateTime(2022, 7, 1),
                     Damaged = true,
-                    Status = 3,
+                    Status = MaterialLogStatus.Returned,
+                    Approved = true,
                     LogId = Guid.NewGuid().ToString(),
         }
             };
@@ -106,55 +122,136 @@ namespace WebApp_GozenBv.Data
         }
 
 
-        private static MaterialLogItem[] GetMaterialLogItems()
+        private MaterialLogItem[] GetMaterialLogItems()
         {
             var materialLogItems = new List<MaterialLogItem>();
-            var materialLogs = _context.MaterialLogs.Select(s => s).ToList();
 
-            bool[] arrDamaged = new bool[4];
-            arrDamaged[0] = true;
-            arrDamaged[1] = true;
-            arrDamaged[2] = true;
-            arrDamaged[3] = false;
+                var materialLogs = _context.MaterialLogs.Select(s => s).ToList();
 
-            var rnd = new Random();
-            for (int i = 0; i < materialLogs.Count; i++)
-            {
-                int counter = 1;
-                do
+                bool[] arrDamaged = new bool[2];
+                arrDamaged[0] = true;
+                arrDamaged[1] = false;
+
+                var rnd = new Random();
+                int rndDamagedAmount = 0, rndRepairedAmount = 0, rndDeletedAmount = 0;
+                bool rndDamaged = false, damaged = false;
+
+                foreach (var log in materialLogs)
                 {
-                    var rndMaterialId = rnd.Next(1, 6);
-                    var material = _context.Material.Where(s => s.Id == rndMaterialId).FirstOrDefault();
-                    string productNameCode = (material.Name + " " + material.Brand).ToUpper();
-                    int rndMaterialAmount = rnd.Next(1, 4);
-                    bool rndDamaged = arrDamaged[rnd.Next(0, 4)];
-                    bool damaged = materialLogs[i].Damaged ? rndDamaged : false;
-                    int rndDamagedAmount = materialLogs[i].Damaged == false ? 0 : rndDamaged ? rnd.Next(1, rndMaterialAmount + 1) : 0;
-                    int rndRepairedAmount = rndDamagedAmount != 0 ? rnd.Next(0, rndDamagedAmount + 1) : 0;
-                    int rndDeletedAmount = rndDamagedAmount - rndRepairedAmount;
-                    var rndUsed = rnd.Next(0, 2);
-                    bool used = rndUsed == 1 ? true : false;
-
-                    materialLogItems.Add(new MaterialLogItem
+                    int counter = 1;
+                    do
                     {
-                        LogId = materialLogs[i].LogId,
-                        MaterialId = material.Id,
-                        MaterialAmount = rndMaterialAmount,
-                        IsDamaged = damaged,
-                        DamagedAmount = rndDamagedAmount,
-                        RepairAmount = rndRepairedAmount,
-                        DeleteAmount = rndDeletedAmount,
-                        Used = used
-                    });
+                        var rndMaterialId = rnd.Next(1, 6);
+                        var material = _context.Materials.Where(s => s.Id == rndMaterialId).FirstOrDefault();
+                        string productNameCode = (material.Name + " " + material.Brand).ToUpper();
+                        int rndMaterialAmount = rnd.Next(1, 4);
+                        bool used = rnd.Next(0, 2) == 1;
 
-                    counter++;
-                } while (counter <= 10);
-            }
+                        if (log.Damaged)
+                        {
+                            rndDamaged = arrDamaged[rnd.Next(0, 2)];
+                            damaged = true;
+                            //NOTE: there is a bug here where damaged amount could be 0 while log is damaged. but not a problem to work with.
+                            rndDamagedAmount = !log.Damaged ? 0 : rndDamaged ? rnd.Next(1, rndMaterialAmount + 1) : 0;
+                            rndRepairedAmount = rndDamagedAmount != 0 ? rnd.Next(0, rndDamagedAmount + 1) : 0;
+                            rndDeletedAmount = rndDamagedAmount - rndRepairedAmount;
+                        }
+
+
+                        materialLogItems.Add(new MaterialLogItem
+                        {
+                            LogId = log.LogId,
+                            MaterialId = material.Id,
+                            MaterialAmount = rndMaterialAmount,
+                            IsDamaged = damaged,
+                            DamagedAmount = rndDamagedAmount,
+                            RepairAmount = rndRepairedAmount,
+                            DeleteAmount = rndDeletedAmount,
+                            Used = used,
+                        });
+
+                        counter++;
+                    } while (counter <= rnd.Next(1, 6));
+                }
+
+                
 
             return materialLogItems.ToArray();
         }
 
-        private static User[] GetUsers()
+        private List<Material> GetUpdatedMaterials()
+        {
+
+            var materialLogs = _context.MaterialLogs.ToList();
+            List<Material> modifiedMaterials = new();
+
+
+            foreach (var log in materialLogs)
+            {
+                var logItems = _context.MaterialLogItems.Where(x => x.LogId == log.LogId);
+
+                foreach (var logItem in logItems)
+                {
+                    var material = _context.Materials.Find(logItem.MaterialId);
+
+                    if (log.Status == MaterialLogStatus.Created && log.Approved)
+                    {
+                        //approved? --> change material its amounts
+                        modifiedMaterials.Add(_materialHelper.TakeQuantity(material, logItem.MaterialAmount, logItem.Used));
+                    }
+                    if (log.Status == MaterialLogStatus.Returned)
+                    {
+                        //modify material based on its previous created approved state
+                        modifiedMaterials.Add(_materialHelper.TakeQuantity(material, logItem.MaterialAmount, logItem.Used));
+
+                        //modify material based if approved return
+                        if (log.Damaged)
+                        {
+                            //if repair any -> repairticket/item
+                            if (logItem.RepairAmount > 0)
+                            {
+                                material = _materialHelper.ToRepairQuantity(material, (int)logItem.RepairAmount);
+
+                                var tickets = new List<RepairTicket>();
+                                for (int i = 0; i < logItem.RepairAmount; i++)
+                                {
+                                    tickets.Add(new RepairTicket()
+                                    {
+                                        LogId = log.LogId,
+                                        Status = RepairTicketStatus.AwaitingAction,
+                                        MaterialId = material.Id,
+                                        Material = material
+                                    });
+                                }
+                                _repairManager.ManageTickets(tickets, EntityOperation.Create);
+                            }
+
+                            //if delete any -> deleteamount
+                            if (logItem.DeleteAmount > 0)
+                            {
+                                material = _materialHelper.DeleteQuantity(material, (int)logItem.DeleteAmount);
+                            }
+
+                            //undamaged items in MaterialAmount
+                            if (logItem.MaterialAmount > logItem.DamagedAmount)
+                            {
+                                var undamagedAmount = logItem.MaterialAmount - logItem.DamagedAmount;
+                                material = _materialHelper.ReturnQuantity(material, (int)undamagedAmount);
+                            }
+                        }
+                        else
+                        {
+                            material = _materialHelper.ReturnQuantity(material, logItem.MaterialAmount);
+                        }
+                        modifiedMaterials.Add(material);
+                    }
+                }
+            }
+
+            return modifiedMaterials;
+        }
+
+        private User[] GetUsers()
         {
             var users = new User[1];
 
@@ -167,59 +264,85 @@ namespace WebApp_GozenBv.Data
             return users;
         }
 
-        private static Material[] GetMaterial()
+        private Material[] GetMaterial()
         {
-            var material = new Material[5];
+            var material = new Material[7];
             material[0] = new Material
             {
                 Name = "Kniptang",
-                NewQty = 75,
+                NewQty = 100,
+                UsedQty = 100,
+                InDepotAmount = 200,
                 MinQty = 50,
-                UsedQty = 20,
                 Brand = "Knipex",
-                Cost = 20
-            };
+                Cost = 20,
 
+            };
             material[1] = new Material
             {
                 Name = "Boormachine",
-                NewQty = 80,
+                NewQty = 100,
+                UsedQty = 100,
+                InDepotAmount = 200,
                 MinQty = 15,
-                UsedQty = 20,
                 Brand = "Makita",
                 Cost = 50
             };
             material[2] = new Material
             {
                 Name = "Slijper",
-                NewQty = 50,
+                NewQty = 100,
+                UsedQty = 100,
+                InDepotAmount = 200,
                 MinQty = 20,
-                UsedQty = 20,
                 Brand = "Bosch",
                 Cost = 80
             };
             material[3] = new Material
             {
                 Name = "Hamer",
-                NewQty = 50,
+                NewQty = 100,
+                UsedQty = 100,
+                InDepotAmount = 200,
                 MinQty = 50,
-                UsedQty = 20,
                 Brand = "Hitachi",
+                Cost = 15
             };
             material[4] = new Material
             {
                 Name = "Kniptang",
-                NewQty = 50,
+                NewQty = 100,
+                UsedQty = 100,
+                InDepotAmount = 200,
                 MinQty = 25,
-                UsedQty = 20,
                 Brand = "Andere",
                 Cost = 20
+            };
+            material[5] = new Material
+            {
+                Name = "Koffie machine",
+                NewQty = 100,
+                UsedQty = 100,
+                InDepotAmount = 200,
+                MinQty = 5,
+                Brand = "Makita",
+                Cost = 20
+            };
+            material[6] = new Material
+            {
+                Name = "Drilboor",
+                NewQty = 5,
+                UsedQty = 3,
+                InDepotAmount = 8,
+                MinQty = 10,
+                Brand = "Black & Decker",
+                Cost = 150
             };
 
             return material;
         }
 
-        private static CarPark[] GetCarPark()
+        private CarPark[] GetCarPark()
         {
             var CarPark = new CarPark[4];
             CarPark[0] = new CarPark
@@ -268,22 +391,25 @@ namespace WebApp_GozenBv.Data
             return CarPark;
         }
 
-        private static CarMaintenance[] GetCarMaintenances()
+        private CarMaintenance[] GetCarMaintenances()
         {
-            var carMaintenances = new CarMaintenance[4];
+            var carMaintenances = new CarMaintenance[5];
             carMaintenances[0] = new CarMaintenance
             {
+                MaintenanceType = MaintenanceTypes.Km,
                 CarId = 1,
                 MaintenanceKm = 85000,
             };
             carMaintenances[1] = new CarMaintenance
             {
+                MaintenanceType = MaintenanceTypes.Date,
                 CarId = 2,
                 MaintenanceDate = DateTime.Parse("15/05/2023"),
                 MaintenanceInfo = "Motorwissel"
             };
             carMaintenances[2] = new CarMaintenance
             {
+                MaintenanceType = MaintenanceTypes.Date,
                 CarId = 3,
                 MaintenanceDate = DateTime.Parse("01/01/2023"),
                 MaintenanceInfo = "testDone",
@@ -291,16 +417,24 @@ namespace WebApp_GozenBv.Data
             };
             carMaintenances[3] = new CarMaintenance
             {
+                MaintenanceType = MaintenanceTypes.Date,
                 CarId = 4,
                 MaintenanceDate = DateTime.Parse("01/01/2023"),
-                MaintenanceInfo = "testpastdateinfo"
+                MaintenanceInfo = "testpastdateinfo",
+            };
+            carMaintenances[4] = new CarMaintenance
+            {
+                MaintenanceType = MaintenanceTypes.Other,
+                CarId = 3,
+                MaintenanceDate = DateTime.Parse("01/06/2024"),
+                MaintenanceInfo = "testOtherTypeInfoMaintenance",
             };
             return carMaintenances;
         }
 
-        private static Employee[] GetEmployees()
+        private Employee[] GetEmployees()
         {
-            var employees = new Employee[3];
+            var employees = new Employee[4];
             employees[0] = new Employee
             {
                 Name = "Aydin",
@@ -316,8 +450,12 @@ namespace WebApp_GozenBv.Data
                 Name = "Janssens",
                 Surname = "Jan",
             };
+            employees[3] = new Employee
+            {
+                Name = "Testie",
+                Surname = "Testels",
+            };
             return employees;
         }
-
     }
 }

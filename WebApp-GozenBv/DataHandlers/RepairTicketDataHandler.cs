@@ -1,4 +1,5 @@
-﻿using Microsoft.EntityFrameworkCore;
+﻿using AspNetCore;
+using Microsoft.EntityFrameworkCore;
 using System.Collections.Generic;
 using System.Linq;
 using System.Net.Sockets;
@@ -67,6 +68,24 @@ namespace WebApp_GozenBv.DataHandlers
         {
             _context.RepairTickets.RemoveRange(tickets);
             await _context.SaveChangesAsync();
+        }
+
+        public void CreateTickets(List<RepairTicket> tickets)
+        {
+            _context.RepairTickets.AddRange(tickets);
+            _context.SaveChanges();
+        }
+
+        public void UpdateTickets(List<RepairTicket> tickets)
+        {
+            _context.RepairTickets.UpdateRange(tickets);
+            _context.SaveChanges();
+        }
+
+        public void DeleteTickets(List<RepairTicket> tickets)
+        {
+            _context.RepairTickets.RemoveRange(tickets);
+            _context.SaveChanges();
         }
     }
 }

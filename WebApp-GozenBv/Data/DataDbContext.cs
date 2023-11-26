@@ -11,7 +11,7 @@ namespace WebApp_GozenBv.Data
     public class DataDbContext : DbContext
     {
         public DataDbContext(DbContextOptions<DataDbContext> options) : base(options) { }
-        public DbSet<Material> Material { get; set; }
+        public DbSet<Material> Materials { get; set; }
         public DbSet<MaterialLog> MaterialLogs { get; set; }
         public DbSet<Employee> Employees { get; set; }
         public DbSet<CarPark> CarPark { get; set; }

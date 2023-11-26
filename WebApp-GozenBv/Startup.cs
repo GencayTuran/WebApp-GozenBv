@@ -75,9 +75,12 @@ namespace WebApp_GozenBv
             services.AddTransient<IRepairTicketMapper, RepairTicketMapper>();
             services.AddTransient<IRepairTicketManager, RepairTicketManager>();
             services.AddTransient<IRepairTicketDataHandler, RepairTicketDataHandler>();
+
+            services.AddScoped<SeedData>();
+
         }
 
-        public void Configure(IApplicationBuilder app, IWebHostEnvironment env)
+        public void Configure(IApplicationBuilder app, IWebHostEnvironment env, SeedData seedData)
         {
             if (env.IsDevelopment())
             {
@@ -103,7 +106,7 @@ namespace WebApp_GozenBv
                     pattern: "{controller=Home}/{action=Index}/{id?}");
             });
 
-            SeedData.EnsurePopulated(app);
+            seedData.EnsurePopulated(app);
         }
     }
 }

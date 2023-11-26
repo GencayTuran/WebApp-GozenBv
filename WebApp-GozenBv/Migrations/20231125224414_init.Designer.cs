@@ -12,7 +12,7 @@ using WebApp_GozenBv.Data;
 namespace WebApp_GozenBv.Migrations
 {
     [DbContext(typeof(DataDbContext))]
-    [Migration("20231117024736_init")]
+    [Migration("20231125224414_init")]
     partial class init
     {
         protected override void BuildTargetModel(ModelBuilder modelBuilder)
@@ -45,6 +45,9 @@ namespace WebApp_GozenBv.Migrations
                         .HasColumnType("nvarchar(max)");
 
                     b.Property<int?>("MaintenanceKm")
+                        .HasColumnType("int");
+
+                    b.Property<int>("MaintenanceType")
                         .HasColumnType("int");
 
                     b.HasKey("Id");
@@ -241,7 +244,7 @@ namespace WebApp_GozenBv.Migrations
 
                     b.HasKey("Id");
 
-                    b.ToTable("Material");
+                    b.ToTable("Materials");
                 });
 
             modelBuilder.Entity("WebApp_GozenBv.Models.MaterialLog", b =>

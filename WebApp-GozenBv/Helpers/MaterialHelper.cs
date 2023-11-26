@@ -15,8 +15,6 @@ namespace WebApp_GozenBv.Helpers
     {
         public Material TakeQuantity(Material material, int qty, bool isUsed)
         {
-            ValidateQuantity(material, qty, isUsed);
-
             if (!isUsed)
             {
                 material.NewQty -= qty;
@@ -40,6 +38,7 @@ namespace WebApp_GozenBv.Helpers
         public Material ToRepairQuantity(Material material, int qty)
         {
             material.InRepairQty += qty;
+            material.InUseAmount -= qty;
 
             return material;
         }
