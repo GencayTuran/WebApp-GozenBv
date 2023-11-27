@@ -12,6 +12,7 @@ namespace WebApp_GozenBv.Managers.Interfaces
 	public interface IMaterialLogManager
 	{
         Task<List<MaterialLog>> GetMaterialLogs();
+        Task<List<MaterialLog>> GetMaterialLogsAsync();
         Task<MaterialLog> GetMaterialLogAsync(string logId);
         MaterialLog GetMaterialLog(string logId);
         Task<List<MaterialLogItem>> GetMaterialLogItemsAsync(string logId);

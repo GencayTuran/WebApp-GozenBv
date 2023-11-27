@@ -15,6 +15,6 @@ namespace WebApp_GozenBv.Services.Interfaces
         Task HandleApprove(string logId);
         Task ApproveCreate(MaterialLogDTO materialLogDTO);
         Task ApproveReturn(MaterialLogDTO materialLogDTO);
-        
+        Task ValidateAllLogsApproved();
     }
 }

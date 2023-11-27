@@ -83,6 +83,10 @@ namespace WebApp_GozenBv.Managers
         {
             return await _logData.QueryMaterialLogs();
         }
+        public async Task<List<MaterialLog>> GetMaterialLogsAsync()
+        {
+            return await _logData.QueryMaterialLogsAsync();
+        }
 
         public async Task<MaterialLogDTO> GetMaterialLogDTO(string logId)
         {

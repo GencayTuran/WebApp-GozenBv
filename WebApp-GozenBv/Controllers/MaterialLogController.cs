@@ -70,7 +70,7 @@ namespace WebApp_GozenBv.Controllers
         [HttpGet]
         public async Task<IActionResult> Index(string searchString, int sortStatus, int sortOrder)
         {
-            var logs = await _logManager.GetMaterialLogs();
+            var logs = await _logManager.GetMaterialLogsAsync();
             logs = HandleFilters(logs, searchString, sortStatus, sortOrder);
 
             return View(logs);
@@ -92,6 +92,17 @@ namespace WebApp_GozenBv.Controllers
         [HttpGet]
         public async Task<IActionResult> Create()
         {
+            try
+            {
+                await _logService.ValidateAllLogsApproved();
+            }
+            catch (Exception)
+            {
+                throw;
+                //TODO: handle exception
+                //return RedirectToAction(nameof(Index));
+            }
+
             ViewData["DateToday"] = DateTime.Today.ToString("yyyy-MM-dd");
             ViewData["Employees"] = new SelectList(await GetEmployeesViewData(), "EmployeeId", "EmployeeFullName");
             ViewData["Materials"] = new SelectList(await GetMaterialsViewData(), "MaterialId", "MaterialFullName");
@@ -126,6 +137,17 @@ namespace WebApp_GozenBv.Controllers
         [HttpGet]
         public async Task<IActionResult> Edit(string id)
         {
+            try
+            {
+                await _logService.ValidateAllLogsApproved();
+            }
+            catch (Exception)
+            {
+                throw;
+                //TODO: handle exception
+                //return RedirectToAction(nameof(Index));
+            }
+
             if (id.IsNullOrEmpty())
             {
                 return NotFound();

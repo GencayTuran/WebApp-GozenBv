@@ -423,5 +423,15 @@ namespace WebApp_GozenBv.Services
 
             return mergedItems;
         }
+
+        public async Task ValidateAllLogsApproved()
+        {
+            var logs = await _logManager.GetMaterialLogsAsync();
+            if (logs.Any(x => !x.Approved))
+            {
+                var exceptionMessage = "Not all logs are approved. Approve before create or edit logs";
+                throw new Exception(exceptionMessage);
+            }
+        }
     }
 }

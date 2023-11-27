@@ -10,8 +10,7 @@ namespace WebApp_GozenBv.DataHandlers
 	public interface IMaterialLogDataHandler
 	{
 		Task<List<MaterialLog>> QueryMaterialLogs();
-		Task<List<MaterialLog>> QueryMaterialLogsAsync(Expression<Func<MaterialLog, bool>> filter);
-		List<MaterialLog> QueryMaterialLogs(Expression<Func<MaterialLog, bool>> filter);
+		Task<List<MaterialLog>> QueryMaterialLogsAsync();
 		Task<MaterialLog> QueryMaterialLogByLogIdAsync(string logId);
 		MaterialLog QueryMaterialLogByLogId(string logId);
 

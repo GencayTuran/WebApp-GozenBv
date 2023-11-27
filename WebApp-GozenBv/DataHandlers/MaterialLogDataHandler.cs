@@ -27,9 +27,9 @@ namespace WebApp_GozenBv.DataHandlers
             return await _context.MaterialLogs.Where(log => log.LogId.Equals(logCode)).Include(log => log.Employee).FirstOrDefaultAsync();
         }
 
-        public async Task<List<MaterialLog>> QueryMaterialLogsAsync(Expression<Func<MaterialLog, bool>> filter)
+        public async Task<List<MaterialLog>> QueryMaterialLogsAsync()
         {
-            return await _context.MaterialLogs.Where(filter).ToListAsync();
+            return await _context.MaterialLogs.ToListAsync();
         }
 
         public async Task UpdateMaterialLogAsync(MaterialLog log)
