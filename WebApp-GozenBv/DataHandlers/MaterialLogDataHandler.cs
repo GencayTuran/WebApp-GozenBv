@@ -29,7 +29,7 @@ namespace WebApp_GozenBv.DataHandlers
 
         public async Task<List<MaterialLog>> QueryMaterialLogsAsync()
         {
-            return await _context.MaterialLogs.ToListAsync();
+            return await _context.MaterialLogs.Include(log => log.Employee).ToListAsync();
         }
 
         public async Task UpdateMaterialLogAsync(MaterialLog log)
