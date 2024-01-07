@@ -33,7 +33,7 @@ namespace WebApp_GozenBv.Migrations
                     b.Property<int>("CarId")
                         .HasColumnType("int");
 
-                    b.Property<bool>("Done")
+                    b.Property<bool>("IsFinished")
                         .HasColumnType("bit");
 
                     b.Property<DateTime?>("MaintenanceDate")

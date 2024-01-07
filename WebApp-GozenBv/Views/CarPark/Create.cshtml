@@ -1,16 +1,23 @@
 ﻿@model WebApp_GozenBv.ViewModels.CarCreateViewModel
-
 @{
-    ViewData["Title"] = "Create";
+    ViewData["Title"] = "Create Car";
 }
 
 <h1>Create</h1>
-
 <h4>CarPark</h4>
 <hr />
-<div class="row">
-    <div class="col-md-4">
-        <form asp-action="Create">
+
+<form asp-action="Create">
+    <input type="hidden" id="objCarMaintenances" asp-for="CarMaintenances" />
+    <div class="d-flex justify-content-end">
+        <div class="form-group col-2">
+            <input id="btnSubmit" type="submit" value="Save" class="btn btn-primary w-100" />
+            <a asp-action="Index" class="btn btn-dark w-100">Back to List</a>
+        </div>
+    </div>
+
+    <div class="row">
+        <div class="col-md-4">
             <div asp-validation-summary="ModelOnly" class="text-danger"></div>
             <div class="form-group">
                 <label asp-for="Car.LicencePlate" class="control-label"></label>
@@ -52,33 +59,56 @@
                 <input asp-for="Car.DriverName" class="form-control" />
                 <span asp-validation-for="Car.DriverName" class="text-danger"></span>
             </div>
-            <div class="form-group">
-                <label asp-for="CarMaintenance.MaintenanceKm" class="control-label"></label>
-                <input asp-for="CarMaintenance.MaintenanceKm" class="form-control" />
-            </div>
-            <div class="form-group">
-                <label asp-for="CarMaintenance.MaintenanceDate" class="control-label"></label>
-                <input asp-for="CarMaintenance.MaintenanceDate" class="form-control" />
-            </div>
-            <div class="form-group">
-                <label asp-for="CarMaintenance.MaintenanceInfo" class="control-label"></label>
-                <input asp-for="CarMaintenance.MaintenanceInfo" class="form-control" />
-            </div>
-            <div class="form-group">
-                <input type="submit" value="Create" class="btn btn-primary" />
-            </div>
-        </form>
+        </div>
     </div>
-</div>
+</form>
 
-<div>
-    <a asp-action="Index">Back to List</a>
-</div>
+<h5>Maintenances</h5>
+<button type="button" class="btn btn-primary mb-2" id="btnAddMaintenance">Add Maintenance</button>
+<table class="table table-bordered table-sm">
+    <thead class="thead-light">
+        <tr>
+            <th><label asp-for="CarMaintenance.MaintenanceType" class="control-label"></label></th>
+            <th><label asp-for="CarMaintenance.MaintenanceKm" class="control-label"></label></th>
+            <th><label asp-for="CarMaintenance.MaintenanceDate" class="control-label"></label></th>
+            <th><label asp-for="CarMaintenance.MaintenanceInfo" class="control-label"></label></th>
+            <th></th>
+        </tr>
+    </thead>
+    <tbody id="maintenancesContainer">
+        <tr class="maintenanceRow">
+            <td>
+                <select asp-for="CarMaintenance.MaintenanceType" id="selectType" class="maintenanceType form-control" asp-items="ViewBag.MaintenanceTypes">
+                    <option value="0">Select Type</option>
+                </select>
+                <span asp-validation-for="CarMaintenance.MaintenanceType" class="text-danger"></span>
+            </td>
+            <td>
+                <input asp-for="CarMaintenance.MaintenanceKm" class="maintenanceKm form-control" />
+                <span asp-validation-for="CarMaintenance.MaintenanceKm" class="text-danger"></span>
+            </td>
+            <td>
+                <input asp-for="CarMaintenance.MaintenanceDate" class="maintenanceDate form-control" />
+                <span asp-validation-for="CarMaintenance.MaintenanceDate" class="text-danger"></span>
+            </td>
+            <td>
+                <input asp-for="CarMaintenance.MaintenanceInfo" class="maintenanceInfo form-control" />
+                <span asp-validation-for="CarMaintenance.MaintenanceInfo" class="text-danger"></span>
+            </td>
+            <td width="50">
+                <button type="button" onclick="RemoveRow(this)" class="btn btn-danger rounded-circle">
+                    <img src="~/resources/icons/trashcan-svgrepo-com.svg" width="25" />
+                </button>
+            </td>
+        </tr>
+    </tbody>
+</table>
 
-<script src="/js/CarPark_KeuringDates.js"></script>
+<script src="/js/CarPark_Create_KeuringDates.js"></script>
+<script src="/js/CarPark_Create_AddMaintenance.js"></script>
 
-    @section Scripts {
-        @{
-            await Html.RenderPartialAsync("_ValidationScriptsPartial");
-        }
+@section Scripts {
+    @{
+        await Html.RenderPartialAsync("_ValidationScriptsPartial");
+    }
     }

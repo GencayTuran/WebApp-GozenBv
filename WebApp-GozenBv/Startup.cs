@@ -54,6 +54,7 @@ namespace WebApp_GozenBv
             services.AddTransient<IEqualityHelper, EqualityHelper>();
 
             services.AddTransient<ICarParkService, CarParkService>();
+            services.AddTransient<ICarParkMapper, CarParkMapper>();
             services.AddTransient<ICarParkManager, CarParkManager>();
             services.AddTransient<ICarParkDataHandler, CarParkDataHandler>();
             services.AddTransient<ICarMaintenanceDataHandler, CarMaintenanceDataHandler>();

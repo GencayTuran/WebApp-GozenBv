@@ -1,0 +1,147 @@
+﻿@model WebApp_GozenBv.ViewModels.CarMaintenancesEditViewModel
+
+@{
+    ViewData["Title"] = "Edit Maintenances";
+}
+
+<form asp-action="EditMaintenances">
+    <div class="d-flex justify-content-end">
+        <div class="form-group col-2">
+            <a asp-action="Index" class="btn btn-dark w-100 mb-2">Back to List</a>
+            <input id="btnSubmit" type="submit" value="Save" class="btn btn-primary w-100" />
+        </div>
+    </div>
+
+    <h1>Edit</h1>
+    <h4>Car Maintenances</h4>
+    <hr />
+
+    <div class="d-flex flex-column">
+        <div>
+            <table id="carDetails" class="table table-bordered table-sm">
+                <thead class="thead-dark">
+                <tr>
+                    <th>    
+                        <label asp-for="@Model.Car.LicencePlate" class="control-label"></label>
+                    </th>
+                    <th>
+                        <label asp-for="@Model.Car.ChassisNumber" class="control-label"></label>
+                    </th>
+                    <th>
+                        <label asp-for="@Model.Car.Brand" class="control-label"></label>
+                    </th>
+                    <th>
+                        <label asp-for="@Model.Car.Model" class="control-label"></label>
+                    </th>
+                    <th>
+                        <label asp-for="@Model.Car.Km" class="control-label"></label>
+                    </th>
+                    <th>
+                        <label asp-for="@Model.Car.KeuringDate" class="control-label"></label>
+                    </th>
+                    <th>
+                        <label asp-for="@Model.Car.DeadlineKeuringDate" class="control-label"></label>
+                    </th>
+                    <th>
+                        <label asp-for="@Model.Car.DriverName" class="control-label"></label>
+                    </th>
+                </tr>
+                </thead>
+                <tbody>
+                    <tr>
+                        <td>
+                            <p>@Model.Car.LicencePlate</p>
+                        </td>
+                        <td>
+                            <p>@Model.Car.ChassisNumber</p>
+                        </td>
+                        <td>
+                            <p>@Model.Car.Brand</p>
+                        </td>
+                        <td>
+                            <p>@Model.Car.Model</p>
+                        </td>
+                        <td>
+                            <p>@Model.Car.Km</p>
+                        </td>
+                        <td>
+                            <p>@Model.Car.KeuringDate</p>
+                        </td>
+                        <td>
+                            <p>@Model.Car.DeadlineKeuringDate</p>
+                        </td>
+                        <td>
+                            <p>@Model.Car.DriverName</p>
+                        </td>
+                    </tr>
+
+                </tbody>
+            </table>
+        </div>
+
+        <div>
+            <h5>Maintenances</h5>
+            <table class="table table-bordered table-sm">
+                <thead class="thead-light">
+                    <tr>
+                        <th>
+                            <label asp-for="@Model.CarMaintenance.MaintenanceType"></label>
+                        </th>
+                        <th>
+                            <label asp-for="@Model.CarMaintenance.MaintenanceDate"></label>
+                        </th>
+                        <th>
+                            <label asp-for="@Model.CarMaintenance.MaintenanceKm"></label>
+                        </th>
+                        <th>
+                            <label asp-for="@Model.CarMaintenance.MaintenanceInfo"></label>
+                        </th>
+                    </tr>
+                </thead>
+                <tbody>
+
+                    @for (int i = 0; i < Model.CarMaintenances.Count; i++)
+                    {
+                        <tr>
+                            <td>
+                                <select asp-for="@Model.CarMaintenances[i].MaintenanceType" asp-items="ViewBag.MaintenanceTypes" class="form-control">
+                                    <option value="0">Select Type</option>
+                                </select>
+                                <span asp-validation-for="@Model.CarMaintenances[i].MaintenanceType" class="text-danger"></span>
+                            </td>
+                            <td>
+                                <input asp-for="@Model.CarMaintenances[i].MaintenanceDate" class="form-control" />
+                                <span asp-validation-for="@Model.CarMaintenances[i].MaintenanceDate" class="text-danger"></span>
+                            </td>
+                            <td>
+                                <input asp-for="@Model.CarMaintenances[i].MaintenanceKm" class="form-control" />
+                                <span asp-validation-for="@Model.CarMaintenances[i].MaintenanceKm" class="text-danger"></span>
+                            </td>
+                            <td>
+                                <input asp-for="@Model.CarMaintenances[i].MaintenanceInfo" class="form-control" />
+                                <span asp-validation-for="@Model.CarMaintenances[i].MaintenanceInfo" class="text-danger"></span>
+                            </td>
+                        </tr>
+                    }
+                    @*TODO: add new maintenances logic here (copy Create logic)*@
+                    @*<tr></tr>*@
+                </tbody>
+            </table>
+        </div>
+    </div>
+</form>
+
+@*<script>
+    document.addEventListener('DOMContentLoaded', function () {
+        var inputs = document.querySelectorAll('#carDetails input');
+        inputs.forEach(input => {
+            input.readOnly = true;
+        });
+    });
+</script>*@
+
+@section Scripts {
+    @{
+        await Html.RenderPartialAsync("_ValidationScriptsPartial");
+    }
+}

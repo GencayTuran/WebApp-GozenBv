@@ -12,7 +12,7 @@ using WebApp_GozenBv.Data;
 namespace WebApp_GozenBv.Migrations
 {
     [DbContext(typeof(DataDbContext))]
-    [Migration("20231125224414_init")]
+    [Migration("20231128013311_init")]
     partial class init
     {
         protected override void BuildTargetModel(ModelBuilder modelBuilder)
@@ -35,7 +35,7 @@ namespace WebApp_GozenBv.Migrations
                     b.Property<int>("CarId")
                         .HasColumnType("int");
 
-                    b.Property<bool>("Done")
+                    b.Property<bool>("IsFinished")
                         .HasColumnType("bit");
 
                     b.Property<DateTime?>("MaintenanceDate")

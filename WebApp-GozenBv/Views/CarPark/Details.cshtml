@@ -8,6 +8,12 @@
 <h1>Details</h1>
 
 <div>
+    <a asp-action="EditCar" asp-route-id="@Model.Car.Id">Edit Car</a> |
+    <a asp-action="EditMaintenances" asp-route-id="@Model.Car.Id">Edit Maintenances</a> |
+    <a asp-action="Index">Back to List</a>
+</div>
+
+<div>
     <h4>CarPark</h4>
     <hr />
     <dl class="row">
@@ -105,9 +111,4 @@
 
 <div>
     <vc:user-log view="@ViewTypeConst.Entity" controller-id="@ControllerNames.CarPark" entity-id="@Model.Car.Id"></vc:user-log>
-</div>
-
-<div>
-    <a asp-action="Edit" asp-route-id="@Model.Car.Id">Edit</a> |
-    <a asp-action="Index">Back to List</a>
 </div>

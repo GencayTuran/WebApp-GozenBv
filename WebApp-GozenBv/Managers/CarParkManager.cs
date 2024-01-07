@@ -10,6 +10,7 @@ using System.Linq.Expressions;
 using WebApp_GozenBv.Managers.Interfaces;
 using WebApp_GozenBv.DataHandlers.Interfaces;
 using WebApp_GozenBv.Constants;
+using WebApp_GozenBv.DTOs;
 
 namespace WebApp_GozenBv.Managers
 {
@@ -32,7 +33,7 @@ namespace WebApp_GozenBv.Managers
 
             foreach (var car in cars)
             {
-                var carMaintenaces = (await _maintenanceData.QueryCarMaintenances(maintenance => maintenance.CarId == car.Id && !maintenance.Done)).ToList();
+                var carMaintenaces = (await _maintenanceData.QueryCarMaintenances(maintenance => maintenance.CarId == car.Id && !maintenance.IsFinished)).ToList();
                 carIndexViewModel.Add(new CarIndexViewModel
                 {
                     Car = car,
@@ -46,7 +47,7 @@ namespace WebApp_GozenBv.Managers
         public async Task<CarDetailsViewModel> GetCarAndAllMaintenances(int? id)
         {
             var car = await _carData.QueryCarById(id);
-            var maintenances = (await _maintenanceData.QueryCarMaintenances(c => c.CarId == id && !c.Done)).ToList();
+            var maintenances = (await _maintenanceData.QueryCarMaintenances(c => c.CarId == id)).ToList();
 
             CarDetailsViewModel carDetailsViewModel = new CarDetailsViewModel
             {
@@ -75,7 +76,7 @@ namespace WebApp_GozenBv.Managers
                 case EntityOperation.Delete:
                     await _carData.DeleteCar(car);
 
-                    //deleting all maintenances realted to this car
+                    //deleting all maintenances related to this car
                     var maintenances = await _maintenanceData.QueryCarMaintenances(m => m.CarId == car.Id);
                     foreach (var maintenance in maintenances)
                     {
@@ -123,6 +124,7 @@ namespace WebApp_GozenBv.Managers
             }
         }
 
+        //
         public async Task ManageCarMaintenances(List<CarMaintenance> carMaintenances, EntityOperation operation)
         {
             switch (operation)
@@ -173,6 +175,11 @@ namespace WebApp_GozenBv.Managers
         public async Task<CarMaintenance> GetCarMaintenance(int? id)
         {
             return await _maintenanceData.QueryCarMaintenanceById(id);
+        }
+
+        public async Task<int> GetLastCreatedCarId()
+        {
+            return (await _carData.QueryCars()).Last().Id;
         }
 
         #region alerts
@@ -240,6 +247,20 @@ namespace WebApp_GozenBv.Managers
             return carAlerts;
         }
         #endregion
+
+        public async Task<CarParkDTO> GetCarParkDTO(int id)
+        {
+            var car = await _carData.QueryCarById(id);
+            var maintenances = (await _maintenanceData.QueryCarMaintenances(c => c.CarId == id)).ToList();
+
+            CarParkDTO dto = new CarParkDTO
+            {
+                Car = car,
+                CarMaintenances = maintenances
+            };
+
+            return dto;
+        }
     }
 }
 

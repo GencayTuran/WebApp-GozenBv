@@ -15,12 +15,12 @@ namespace WebApp_GozenBv.Migrations
                 {
                     Id = table.Column<int>(type: "int", nullable: false)
                         .Annotation("SqlServer:Identity", "1, 1"),
-                    MaintenanceType = table.Column<int>(type: "int", nullable: false),
                     CarId = table.Column<int>(type: "int", nullable: false),
+                    MaintenanceType = table.Column<int>(type: "int", nullable: false),
                     MaintenanceKm = table.Column<int>(type: "int", nullable: true),
                     MaintenanceDate = table.Column<DateTime>(type: "datetime2", nullable: true),
                     MaintenanceInfo = table.Column<string>(type: "nvarchar(max)", nullable: true),
-                    Done = table.Column<bool>(type: "bit", nullable: false)
+                    IsFinished = table.Column<bool>(type: "bit", nullable: false)
                 },
                 constraints: table =>
                 {

@@ -413,7 +413,7 @@ namespace WebApp_GozenBv.Data
                 CarId = 3,
                 MaintenanceDate = DateTime.Parse("01/01/2023"),
                 MaintenanceInfo = "testDone",
-                Done = true
+                IsFinished = true
             };
             carMaintenances[3] = new CarMaintenance
             {

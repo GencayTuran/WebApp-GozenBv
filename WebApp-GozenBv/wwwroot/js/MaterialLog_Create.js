@@ -85,6 +85,7 @@ function PassProducts() {
 
 }
 
+//TODO: do you still need to check in the view for qty?
 function CheckQuantity()
 {
     GetElements();
