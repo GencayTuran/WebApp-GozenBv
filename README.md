@@ -1,11 +1,6 @@
 # WebApp-GozenBv
 WebApplication for stock and work management
 
-nugets
-    <PackageReference Include="Microsoft.AspNetCore.Identity.EntityFrameworkCore" Version="3.1.15" />
-    <PackageReference Include="Microsoft.EntityFrameworkCore.SqlServer" Version="3.1.30" />
-    <PackageReference Include="Microsoft.EntityFrameworkCore.Tools" Version="3.1.30">
-      <PrivateAssets>all</PrivateAssets>
-      <IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
-    </PackageReference>
-    <PackageReference Include="Microsoft.VisualStudio.Web.CodeGeneration.Design" Version="3.1.5" />
+demo
+https://github.com/GencayTuran/WebApp-GozenBv/assets/73703849/c9f701bb-dc97-41fa-b3dd-b13f3b4929e8
+
