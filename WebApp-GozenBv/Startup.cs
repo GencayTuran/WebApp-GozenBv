@@ -37,8 +37,8 @@ namespace WebApp_GozenBv
 
             services.AddDbContext<DataDbContext>(opts =>
             {
-                //opts.UseSqlServer(Configuration.GetConnectionString("AZURE_SQL_CONNECTIONSTRING"));
-                opts.UseSqlServer(Configuration.GetConnectionString("DbConnection"));
+                opts.UseSqlServer(Configuration.GetConnectionString("AZURE_SQL_CONNECTIONSTRING"));
+                //opts.UseSqlServer(Configuration.GetConnectionString("DbConnection"));
             });
 
             services.AddTransient<IUserLogService, UserLogService>();
