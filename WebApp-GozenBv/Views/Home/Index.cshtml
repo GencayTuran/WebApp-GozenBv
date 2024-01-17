@@ -5,16 +5,15 @@
 
 <div class="align-content-center">
     <div class="d-flex justify-content-center"><p class="display-3">Menu</p></div>
-    
+
     <div class="container d-flex flex-column justify-content-center p-5 w-75">
         <a class="btn" asp-area="" asp-controller="MaterialLog" asp-action="Create">Formulier</a>
         <a class="btn" asp-area="" asp-controller="MaterialLog" asp-action="Index">MaterialLog</a>
         <a class="btn" asp-area="" asp-controller="Material" asp-action="Index">Material</a>
         <a class="btn" asp-area="" asp-controller="CarPark" asp-action="Index">Carpark</a>
+        <div class="mt-4">
+            <vc:alerts></vc:alerts>
+            <vc:user-log view="@ViewTypeConst.Limit" controller-id="@ControllerNames.Home" entity-id=""></vc:user-log>
+        </div>
     </div>
-    <vc:alerts></vc:alerts>
-
-    @*<div>Api result</div>
-    <div>@ViewData["ApiResult"]</div>*@
-    <vc:user-log view="@ViewTypeConst.Limit" controller-id="@ControllerNames.Home" entity-id=""></vc:user-log>
 </div>
