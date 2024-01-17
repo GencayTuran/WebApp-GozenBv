@@ -9,11 +9,10 @@ namespace WebApp_GozenBv.DataHandlers
 {
 	public interface IMaterialLogDataHandler
 	{
-		Task<List<MaterialLog>> GetMaterialLogs();
-		Task<List<MaterialLog>> GetMaterialLogsAsync(Expression<Func<MaterialLog, bool>> filter);
-		List<MaterialLog> GetMaterialLogs(Expression<Func<MaterialLog, bool>> filter);
-		Task<MaterialLog> GetMaterialLogByLogIdAsync(string logId);
-		MaterialLog GetMaterialLogByLogId(string logId);
+		Task<List<MaterialLog>> QueryMaterialLogs();
+		Task<List<MaterialLog>> QueryMaterialLogsAsync();
+		Task<MaterialLog> QueryMaterialLogByLogIdAsync(string logId);
+		MaterialLog QueryMaterialLogByLogId(string logId);
 
         Task CreateMaterialLogAsync(MaterialLog log);
         void CreateMaterialLog(MaterialLog log);

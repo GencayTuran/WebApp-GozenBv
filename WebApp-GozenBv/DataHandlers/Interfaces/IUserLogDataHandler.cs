@@ -9,10 +9,10 @@ namespace WebApp_GozenBv.DataHandlers
     public interface IUserLogDataHandler
     {
         Task CreateUserLogAsync(UserLog userLog);
-        Task<List<UserLog>> GetLogsByControllerIdAsync(int controllerId);
-        Task<List<UserLog>> GetLogsByEntityIdAsync(string entityId, int controllerId);
-        Task<List<UserLog>> GetUserLogsAsync();
-        Task<List<UserLog>> GetUserLogsByIdAsync(int id);
+        Task<List<UserLog>> QueryLogsByControllerIdAsync(int controllerId);
+        Task<List<UserLog>> QueryLogsByEntityIdAsync(string entityId, int controllerId);
+        Task<List<UserLog>> QueryUserLogsAsync();
+        Task<List<UserLog>> QueryUserLogsByIdAsync(int id);
     }
 }
 

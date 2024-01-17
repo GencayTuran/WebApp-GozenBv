@@ -11,8 +11,10 @@ using WebApp_GozenBv.Constants;
 using WebApp_GozenBv.Data;
 using WebApp_GozenBv.DataHandlers;
 using WebApp_GozenBv.Managers.Interfaces;
+using WebApp_GozenBv.Mappers;
 using WebApp_GozenBv.Models;
 using WebApp_GozenBv.Services.Interfaces;
+using WebApp_GozenBv.ViewData;
 using WebApp_GozenBv.ViewModels;
 
 namespace WebApp_GozenBv.Controllers
@@ -20,19 +22,27 @@ namespace WebApp_GozenBv.Controllers
     //[Authorize]
     public class CarParkController : Controller
     {
-        private readonly IUserLogService _userLogService;
         private readonly ICarParkManager _manager;
+        private readonly ICarParkMapper _mapper;
+        private readonly ICarParkService _carService;
+        private readonly IUserLogService _userLogService;
 
-        public CarParkController(ICarParkManager manager, IUserLogService userLogService)
+        public CarParkController(
+            ICarParkManager manager,
+            ICarParkMapper mapper,
+            ICarParkService carService,
+            IUserLogService userLogService)
         {
             _manager = manager;
+            _mapper = mapper;
+            _carService = carService;
             _userLogService = userLogService;
         }
 
         [HttpGet]
         public async Task<IActionResult> Index()
         {
-            return View(await _manager.MapCarsAndFutureMaintenances());
+            return View(await _manager.GetCarsAndFutureMaintenances());
         }
 
         [HttpGet]
@@ -43,7 +53,7 @@ namespace WebApp_GozenBv.Controllers
                 return NotFound();
             }
 
-            var car = await _manager.MapCarAndAllMaintenances(id);
+            var car = await _manager.GetCarAndAllMaintenances(id);
 
             if (car == null)
             {
@@ -56,6 +66,7 @@ namespace WebApp_GozenBv.Controllers
         [HttpGet]
         public IActionResult Create()
         {
+            ViewData["MaintenanceTypes"] = new SelectList(SetCreateViewData(), "Id", "Name");
             return View();
         }
 
@@ -65,29 +76,24 @@ namespace WebApp_GozenBv.Controllers
         {
             if (ModelState.IsValid)
             {
-                await _manager.ManageCar(carCreate.Car, EntityOperation.Create);
-
-                if (carCreate.CarMaintenance != null)
-                {
-                    await _manager.ManageCarMaintenance(carCreate.CarMaintenance, EntityOperation.Create);
-                }
-
+                await _carService.HandleCreate(carCreate);
                 await _userLogService.StoreLogAsync(ControllerNames.CarPark, ActionConst.Create, carCreate.Car.Id.ToString());
 
-                return RedirectToAction(nameof(Index));
+                var carId = await _manager.GetLastCreatedCarId();
+                return RedirectToDetails(carId);
             }
             return View(carCreate);
         }
 
         [HttpGet]
-        public async Task<IActionResult> Edit(int? id)
+        public async Task<IActionResult> EditCar(int? id)
         {
             if (id == null)
             {
                 return NotFound();
             }
 
-            var carPark = await _manager.MapCarAndAllMaintenances(id);
+            var carPark = await _manager.GetCar(id);
 
             if (carPark == null)
             {
@@ -98,40 +104,64 @@ namespace WebApp_GozenBv.Controllers
         }
 
         [HttpPost]
-        public async Task<IActionResult> Edit(int id, CarDetailsViewModel carDetails)
+        public async Task<IActionResult> EditCar(CarPark car)
         {
-            if (id != carDetails.Car.Id)
-            {
-                return NotFound();
-            }
-
             if (ModelState.IsValid)
             {
                 try
                 {
-                    await _manager.ManageCar(carDetails.Car, EntityOperation.Update);
-
-                    if (carDetails.CarMaintenances != null)
-                    {
-                        await _manager.ManageCarMaintenances(carDetails.CarMaintenances, EntityOperation.Update);
-                    }
-
-                    await _userLogService.StoreLogAsync(ControllerNames.CarPark, ActionConst.Edit, carDetails.Car.Id.ToString());
+                    await _carService.HandleEdit(car);
                 }
-                catch (DbUpdateConcurrencyException)
+                catch (Exception)
                 {
-                    if (!CarParkExists(carDetails.Car.Id))
-                    {
-                        return NotFound();
-                    }
-                    else
-                    {
-                        throw;
-                    }
+                    //TODO: handle exception
+                    //add viewBag?
+                    return View(car);
                 }
-                return RedirectToAction(nameof(Index));
+
+                await _userLogService.StoreLogAsync(ControllerNames.CarPark, ActionConst.Edit, car.Id.ToString());
+                return RedirectToDetails(car.Id);
             }
-            return View(carDetails);
+            return View(car);
+        }
+
+        [HttpGet]
+        public async Task<IActionResult> EditMaintenances(int id)
+        {
+            var carParkDto = await _manager.GetCarParkDTO(id);
+            var viewModel = _mapper.MapEditMaintenances(carParkDto);
+
+            if (carParkDto == null)
+            {
+                return NotFound();
+            }
+
+            return View(viewModel);
+        }
+
+        [HttpPost]
+        public async Task<IActionResult> EditMaintenances(CarMaintenancesEditViewModel viewModel)
+        {
+            try
+            {
+                await _carService.HandleEdit(viewModel);
+            }
+            catch (Exception)
+            {
+                //TODO: handle exception
+                throw;
+            }
+            return RedirectToDetails(viewModel.Car.Id);
+        }
+
+        public async Task<IActionResult> CompleteAlert(int id)
+        {
+            var maintenance = await _manager.GetCarMaintenance(id);
+            maintenance.IsFinished = true;
+
+            await _manager.ManageCarMaintenance(maintenance, EntityOperation.Update);
+
+            return RedirectToDetails(id);
         }
 
         // GET: CarPark/Delete/5
@@ -142,7 +172,7 @@ namespace WebApp_GozenBv.Controllers
                 return NotFound();
             }
 
-            var car = await _manager.MapCar(id);
+            var car = await _manager.GetCar(id);
 
             if (car == null)
             {
@@ -157,33 +187,57 @@ namespace WebApp_GozenBv.Controllers
         [ValidateAntiForgeryToken]
         public async Task<IActionResult> DeleteConfirmed(int id)
         {
-            var car = await _manager.MapCar(id);
+            var car = await _manager.GetCar(id);
             if (car == null)
             {
                 return NotFound();
             }
 
-            await _manager.ManageCar(car, EntityOperation.Delete);
+            try
+            {
+                await _carService.HandleDelete(id);
+            }
+            catch (Exception)
+            {
+                //TODO: handle exception
+                throw;
+            }
 
             await _userLogService.StoreLogAsync(ControllerNames.CarPark, ActionConst.Delete, car.Id.ToString());
-
             return RedirectToAction(nameof(Index));
         }
 
-        public async Task<IActionResult> CompleteAlert(int id)
+        private List<MaintenanceTypeViewData> SetCreateViewData()
         {
-            var maintenance = await _manager.MapCarMaintenance(id);
-            maintenance.Done = true;
-
-            await _manager.ManageCarMaintenance(maintenance, EntityOperation.Update);
-
-            return RedirectToAction("Details", new RouteValueDictionary(
-                new { ControllerContext = "CarPark", Action = "Details", Id = maintenance.CarId }));
+            return new List<MaintenanceTypeViewData>()
+            {
+                new MaintenanceTypeViewData()
+                {
+                    Id = MaintenanceTypes.Date,
+                    Name = MaintenanceTypes.DateName
+                },
+                new MaintenanceTypeViewData()
+                {
+                    Id = MaintenanceTypes.Km,
+                    Name = MaintenanceTypes.KmName
+                },
+                new MaintenanceTypeViewData()
+                {
+                    Id = MaintenanceTypes.Other,
+                    Name = MaintenanceTypes.OtherName
+                },
+            };
         }
 
         private bool CarParkExists(int id)
         {
-            return _manager.MapCar(id) != null;
+            return _manager.GetCar(id) != null;
+        }
+
+        private RedirectToActionResult RedirectToDetails(int id)
+        {
+            return RedirectToAction("Details", new RouteValueDictionary(
+                new { ControllerContext = "CarPark", Action = "Details", Id = id }));
         }
     }
 }

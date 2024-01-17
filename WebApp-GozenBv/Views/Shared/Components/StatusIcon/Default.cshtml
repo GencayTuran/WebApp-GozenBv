@@ -2,22 +2,27 @@
 @model WebApp_GozenBv.ViewModels.StatusIconViewModel;
 
 <div class="d-flex flex-row justify-content-start">
-    @if (Model.Status == MaterialLogStatusConst.Created)
+    @if (Model.Status == MaterialLogStatus.Created)
     {
-        <img width="20" src="~/resources/icons/check-svgrepo-com.svg" />
+        <img width="20" title="@LogIconTitles.TakenMaterial" src="~/resources/icons/tool-svgrepo-com.svg" />
     }
 
-    @if (Model.Status == MaterialLogStatusConst.DamagedAwaitingAction)
+    @if (Model.Status == MaterialLogStatus.Returned)
     {
-        <img width="20" src="~/resources/icons/red-exclamation-mark-svgrepo-com.svg" />
-    }
-
-    @if (Model.Status == MaterialLogStatusConst.Returned)
-    {
-        <img width="20" src="~/resources/icons/return-svgrepo-com.svg" />
+        <img width="20" title="@LogIconTitles.Returned" src="~/resources/icons/return-svgrepo-com.svg" />
         if (Model.IsDamaged)
         {
-            <img width="20" src="~/resources/icons/close-bold-svgrepo-com.svg" />
+            <img width="20" title="Damaged" src="~/resources/icons/close-bold-svgrepo-com.svg" />
         }
+    }
+
+    @if (!Model.IsApproved)
+    {
+        <img width="20" title="@LogIconTitles.NotApproved" src="~/resources/icons/red-exclamation-mark-svgrepo-com.svg" />
+    }
+
+    @if (Model.IsApproved)
+    {
+        <img width="20" title="@LogIconTitles.Approved" src="~/resources/icons/check-svgrepo-com.svg" />
     }
 </div>

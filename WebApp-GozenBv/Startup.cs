@@ -14,6 +14,8 @@ using WebApp_GozenBv.Helpers;
 using WebApp_GozenBv.Helpers.Interfaces;
 using WebApp_GozenBv.Managers;
 using WebApp_GozenBv.Managers.Interfaces;
+using WebApp_GozenBv.Mappers;
+using WebApp_GozenBv.Mappers.Interfaces;
 using WebApp_GozenBv.Services;
 using WebApp_GozenBv.Services.Interfaces;
 
@@ -51,6 +53,8 @@ namespace WebApp_GozenBv
             services.AddTransient<IMaterialHelper, MaterialHelper>();
             services.AddTransient<IEqualityHelper, EqualityHelper>();
 
+            services.AddTransient<ICarParkService, CarParkService>();
+            services.AddTransient<ICarParkMapper, CarParkMapper>();
             services.AddTransient<ICarParkManager, CarParkManager>();
             services.AddTransient<ICarParkDataHandler, CarParkDataHandler>();
             services.AddTransient<ICarMaintenanceDataHandler, CarMaintenanceDataHandler>();
@@ -62,13 +66,23 @@ namespace WebApp_GozenBv
             services.AddTransient<IMaterialDataHandler, MaterialDataHandler>();
 
             services.AddTransient<IMaterialLogService, MaterialLogService>();
+            services.AddTransient<IMaterialLogMapper, MaterialLogMapper>();
             services.AddTransient<IMaterialLogManager, MaterialLogManager>();
             services.AddTransient<IMaterialLogDataHandler, MaterialLogDataHandler>();
             services.AddTransient<IMaterialLogItemDataHandler, MaterialLogItemDataHandler>();
 
+            services.AddTransient<IEditHistoryDataHandler, EditHistoryDataHandler>();
+
+            services.AddTransient<IRepairTicketService, RepairTicketService>();
+            services.AddTransient<IRepairTicketMapper, RepairTicketMapper>();
+            services.AddTransient<IRepairTicketManager, RepairTicketManager>();
+            services.AddTransient<IRepairTicketDataHandler, RepairTicketDataHandler>();
+
+            services.AddScoped<SeedData>();
+
         }
 
-        public void Configure(IApplicationBuilder app, IWebHostEnvironment env)
+        public void Configure(IApplicationBuilder app, IWebHostEnvironment env, SeedData seedData)
         {
             if (env.IsDevelopment())
             {
@@ -94,7 +108,7 @@ namespace WebApp_GozenBv
                     pattern: "{controller=Home}/{action=Index}/{id?}");
             });
 
-            SeedData.EnsurePopulated(app);
+            seedData.EnsurePopulated(app);
         }
     }
 }

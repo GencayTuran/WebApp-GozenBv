@@ -1,18 +1,15 @@
-﻿using Microsoft.AspNetCore.Mvc.Rendering;
-using System.Collections.Generic;
-using System.Threading.Tasks;
+﻿using System.Collections.Generic;
 using WebApp_GozenBv.Models;
-using WebApp_GozenBv.ViewModels;
+using WebApp_GozenBv.ViewData;
 
 namespace WebApp_GozenBv.Helpers.Interfaces
 {
     public interface ILogSearchHelper
     {
-        List<MaterialLog> SortListByOrder(List<MaterialLog> logs, int sortOrder);
-        List<MaterialLog> SortListByStatus(List<MaterialLog> logs, int sortStatus);
-        List<MaterialLog> FilterListByString(List<MaterialLog> materialLogs, string searchString);
-        List<SortViewModel> GetStatusSortList();
-        List<SortViewModel> GetSortOrderList();
+        SelectedFilterViewData SetFilters(List<MaterialLog> logs, string searchString, int sortStatus, int sortOrder);
         List<MaterialLog> SortListByDefault(List<MaterialLog> logs);
+        List<FilterOptionViewData> GetStatusOptions();
+        List<FilterOptionViewData> GetSortOrderOptions();
+        bool IsNotFiltered(string searchString, int sortStatus, int sortOrder);
     }
 }

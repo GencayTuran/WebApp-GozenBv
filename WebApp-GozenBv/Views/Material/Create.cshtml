@@ -13,36 +13,46 @@
         <form asp-action="Create" autocomplete="off">
             <div asp-validation-summary="ModelOnly" class="text-danger"></div>
             <div class="form-group">
-                <label asp-for="ProductName" class="control-label"></label>
-                <input asp-for="ProductName" class="form-control" />
-                <span asp-validation-for="ProductName" class="text-danger"></span>
+                <label asp-for="Name" class="control-label"></label>
+                <input asp-for="Name" class="form-control" />
+                <span asp-validation-for="Name" class="text-danger"></span>
             </div>
             <div class="form-group">
-                <label asp-for="ProductCode" class="control-label"></label>
-                <input asp-for="ProductCode" class="form-control" />
-                <span asp-validation-for="ProductCode" class="text-danger"></span>
+                <label asp-for="Brand" class="control-label"></label>
+                <input asp-for="Brand" class="form-control" />
+                <span asp-validation-for="Brand" class="text-danger"></span>
             </div>
             <div class="form-group">
-                <label asp-for="QuantityNew" class="control-label"></label>
-                <input asp-for="QuantityNew" class="form-control" />
-                <span asp-validation-for="QuantityNew" class="text-danger"></span>
+                <label asp-for="NewQty" class="control-label"></label>
+                <input asp-for="NewQty" class="form-control" />
+                <span asp-validation-for="NewQty" class="text-danger"></span>
             </div>
             <div class="form-group">
-                <label asp-for="MinQuantity" class="control-label"></label>
-                <input asp-for="MinQuantity" class="form-control" />
-                <span asp-validation-for="MinQuantity" class="text-danger"></span>
+                <label asp-for="UsedQty" class="control-label"></label>
+                <input asp-for="UsedQty" class="form-control" />
+                <span asp-validation-for="UsedQty" class="text-danger"></span>
             </div>
             <div class="form-group">
-                <label asp-for="QuantityUsed" class="control-label"></label>
-                <input asp-for="QuantityUsed" class="form-control" />
-                <span asp-validation-for="QuantityUsed" class="text-danger"></span>
+                <label asp-for="InUseAmount" class="control-label"></label>
+                <input asp-for="InUseAmount" class="form-control" />
+                <span asp-validation-for="InUseAmount" class="text-danger"></span>
             </div>
-            <div class="form-group d-flex flex-column">
+            <div class="form-group">
+                <label asp-for="InDepotAmount" class="control-label"></label>
+                <input asp-for="InDepotAmount" class="form-control" />
+                <span asp-validation-for="InDepotAmount" class="text-danger"></span>
+            </div>
+            <div class="form-group">
+                <label asp-for="MinQty" class="control-label"></label>
+                <input asp-for="MinQty" class="form-control" />
+                <span asp-validation-for="MinQty" class="text-danger"></span>
+            </div>
+            <div class="form-group">
                 <div>
-                    <label class="form-check-label">@Html.DisplayNameFor(model => model.NoReturn)</label>
+                    <label>@Html.DisplayNameFor(model => model.NoReturn)</label>
                 </div>
                 <div>
-                    <input class="form-check-input" asp-for="NoReturn" />
+                    <input class="form-check" asp-for="NoReturn" />
                 </div>
             </div>
             <div class="form-group">

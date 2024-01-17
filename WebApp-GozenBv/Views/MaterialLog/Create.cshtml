@@ -2,49 +2,51 @@
 
 @{
     ViewData["Title"] = "Create";
-
 }
 
 <h1>Formulier</h1>
 
 <h4>MaterialLog</h4>
+<div>
+    <a asp-action="Index">Back to List</a>
+</div>
 <hr />
-<div class="row">
-    <div class="col-md-4">
+<div class="column">
+    <div>
         <form asp-action="Create" onsubmit="ValidateForm(event)" autocomplete="off">
             <div>
                 <div asp-validation-summary="ModelOnly" class="text-danger"></div>
-                <div class="form-group">
-                    <label class="control-label">Datum</label>
-                    <input value="@ViewBag.DateToday" asp-for="MaterialLogDate" class="form-control" />
-                    <span asp-validation-for="MaterialLogDate" class="text-danger"></span>
-                </div>
-                <div class="form-group">
-                    <label class="control-label">Werknemer</label>
-
-                    <select id="selectEmployee" class="form-control" asp-for="EmployeeId" asp-items="ViewBag.Employees" allowClear>
-                        <option value="">Select Employee</option>
-                    </select>
-                    @*<select class="form-control" asp-for="EmployeeId" asp-items="ViewBag.Employees"></select>*@
-                    @*<input id="inputSelectedEmployee" type="search" placeholder="Select Employee" class="form-control" list="lstEmployees"></input>
-                    <datalist id="lstEmployees">
-                        @foreach (var emp in ViewBag.Employees)
-                        {
-                            <option data-value="@emp.EmployeeId" value="@emp.EmployeeFullName"></option>
-                        }
-                    </datalist>
-                    <input id="inputEmployeeId" type="hidden" asp-for="EmployeeId" />*@
-                </div>
-                <div class="form-group">
-                    <input type="submit" value="Create" class="btn btn-primary" />
+                <div class="row align-items-end justify-content-between">
+                    <div class="row col-md-6">
+                    <div class="col-md-6">
+                        <div class="form-group">
+                            <label class="control-label">Datum</label>
+                            <input value="@ViewBag.DateToday" asp-for="MaterialLogDate" class="form-control" />
+                            <span asp-validation-for="MaterialLogDate" class="text-danger"></span>
+                        </div>
+                    </div>
+                    <div class="col-md-6">
+                        <div class="form-group">
+                            <label class="control-label">Werknemer</label>
+                            <select id="selectEmployee" class="form-control" asp-for="EmployeeId" asp-items="ViewBag.Employees" allowClear>
+                                <option value="">Select Employee</option>
+                            </select>
+                        </div>
+                    </div>
+                    </div>
+                    <div class="col-md-2">
+                        <div class="form-group">
+                            <input type="submit" value="Create" class="btn btn-primary" />
+                        </div>
+                    </div>
                 </div>
                 <input id="productsResult" type="hidden" asp-for="SelectedProducts" />
             </div>
         </form>
     </div>
-    <div class="col-md-8">
+    <div>
         <div id="SelectedProducts">
-            <div class="d-flex flex-row justify-content-end bg-secondary">
+            <div style="height: 50px" class="d-flex flex-row justify-content-end alert-dark rounded mb-2 align-items-center">
                 <div class="col-6">Materiaal</div>
                 <div class="col-2">Aantal</div>
                 <div class="col-2">Used?</div>
@@ -54,24 +56,14 @@
             </div>
 
             <div id="rowCollection">
-                <div class="productRow">
+                <div class="productRow rounded">
                     <div class="form-group d-flex flex-row justify-content-between">
                         <div class="col-6">
-                            @*<select class="inputProduct form-control" asp-items="ViewBag.Materials">
-                            <option value="">Selecteer materiaal</option>
-                            </select>*@
-@*                            <input class="inputSelectedProduct form-control" placeholder="Select Material" type="search" list="lstMaterial" />
-                            <datalist id="lstMaterial">
-                                @foreach (var material in ViewBag.Materials)
-                                {
-                                    <option data-value="@material.MaterialId" value="@material.ProductNameCode"></option>
-                                }
-                            </datalist>*@
                             <select class="form-control selectMaterial" asp-items="ViewBag.Materials" allowClear>
                                 <option value="">Select Materiaal</option>
                             </select>
                         </div>
-                        <div class="col-2 d-flex flex-row">
+                        <div class="col-2 d-flex flex-row"> 
                             <input class="form-control inputAmount" type="number" min="1" placeholder="Aantal" />
                             <p class="labelAlert display-4" style="color: red;"></p>
                         </div>
@@ -90,17 +82,12 @@
     </div>
 </div>
 
-<div>
-    <a asp-action="Index">Back to List</a>
-</div>
-
-
 <script>
     var materialQtyAndNames = @Html.Raw(Json.Serialize(ViewBag.Materials));
     var employeeData = @Html.Raw(Json.Serialize(ViewBag.Employees));
 
-    $('#selectEmployee').select2({width: '100%'});
-    $('.selectMaterial').select2({ width: '100%' });
+    //$('#selectEmployee').select2({width: '100%'});
+    //$('.selectMaterial').select2({ width: '100%' });
 </script>
 <script src="~/js/MaterialLog_Create.js"></script>
 

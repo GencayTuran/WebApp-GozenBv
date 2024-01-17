@@ -30,7 +30,7 @@ namespace WebApp_GozenBv.Controllers
         // GET: Employee
         public async Task<IActionResult> Index()
         {
-            return View(await _manager.MapEmployeesAsync());
+            return View(await _manager.GetEmployeesAsync());
         }
 
         // GET: Employee/Details/5
@@ -41,7 +41,7 @@ namespace WebApp_GozenBv.Controllers
                 return NotFound();
             }
 
-            var employee = await _manager.MapEmployeeAsync(id);
+            var employee = await _manager.GetEmployeeAsync(id);
             if (employee == null)
             {
                 return PartialView("_EntityNotFound");
@@ -76,7 +76,7 @@ namespace WebApp_GozenBv.Controllers
                 return NotFound();
             }
 
-            var employee = await _manager.MapEmployeeAsync(id);
+            var employee = await _manager.GetEmployeeAsync(id);
 
             if (employee == null)
             {
@@ -111,7 +111,7 @@ namespace WebApp_GozenBv.Controllers
                 return NotFound();
             }
 
-            var employee = await _manager.MapEmployeeAsync(id);
+            var employee = await _manager.GetEmployeeAsync(id);
 
             if (employee == null)
             {
@@ -125,7 +125,7 @@ namespace WebApp_GozenBv.Controllers
         [HttpPost, ActionName("Delete")]
         public async Task<IActionResult> DeleteConfirmed(int id)
         {
-            var employee = await _manager.MapEmployeeAsync(id);
+            var employee = await _manager.GetEmployeeAsync(id);
             await _manager.ManageEmployee(employee, EntityOperation.Delete);
 
             await _userLogService.StoreLogAsync(ControllerNames.Employee, ActionConst.Delete, employee.Id.ToString());

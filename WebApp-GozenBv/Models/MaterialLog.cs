@@ -17,10 +17,10 @@ namespace WebApp_GozenBv.Models
         public string LogId { get; set; }
 
         [DataType(DataType.Date)]
-        public DateTime? ReturnDate { get; set; }
+        public DateTime ReturnDate { get; set; }
 
         public bool Damaged { get; set; }
         public int Status { get; set; }
-
+        public bool Approved { get; set; }
     }
 }

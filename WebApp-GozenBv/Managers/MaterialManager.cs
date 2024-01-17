@@ -17,7 +17,7 @@ namespace WebApp_GozenBv.Managers
             _materialData = materialData;
         }
 
-        public async Task ManageMaterial(Material material, EntityOperation operation)
+        public async Task ManageMaterialAsync(Material material, EntityOperation operation)
         {
             switch (operation)
             {
@@ -33,32 +33,32 @@ namespace WebApp_GozenBv.Managers
             }
         }
 
-        public async Task<Material> MapMaterialAsync(int? id)
+        public async Task<Material> GetMaterialAsync(int? id)
         {
-            return await _materialData.GetMaterialByIdAsync(id);
+            return await _materialData.QueryMaterialByIdAsync(id);
         }
 
-        public Material MapMaterial(int? id)
+        public Material GetMaterial(int? id)
         {
-            return _materialData.GetMaterialById(id);
+            return _materialData.QueryMaterialById(id);
         }
 
-        public Task<List<Material>> MapMaterialsAsync()
+        public Task<List<Material>> GetMaterialsAsync()
         {
-            return _materialData.GetAllMaterialsAsync();
+            return _materialData.QueryAllMaterialsAsync();
         }
 
-        public async Task<List<MaterialAlertViewModel>> MapMaterialAlerts()
+        public async Task<List<MaterialAlertViewModel>> GetMaterialAlerts()
         {
             List<MaterialAlertViewModel> materialAlerts = new();
 
-            var material = await _materialData.GetAllMaterialsAsync();
+            var material = await _materialData.QueryAllMaterialsAsync();
 
             foreach (var item in material)
             {
-                if (item.QuantityNew < item.MinQuantity)
+                if (item.NewQty < item.MinQty)
                 {
-                    if (item.QuantityNew != 0)
+                    if (item.NewQty != 0)
                     {
                         materialAlerts.Add(new MaterialAlertViewModel()
                         {

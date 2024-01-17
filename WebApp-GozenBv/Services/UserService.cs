@@ -51,16 +51,6 @@ namespace WebApp_GozenBv.Services
         //        return userId;
         //    }
 
-        public async Task<Models.User> ArrangeCurrentUserAsync()
-        {
-            var user = await _manager.MapCurrentUserAsync();
-            return user;
-        }
-
-        public async Task<int> ArrangeCurrentUserIdAsync(Models.User user)
-        {
-            return (await _manager.MapCurrentUserAsync()).Id;
-        }
     }
 }
 

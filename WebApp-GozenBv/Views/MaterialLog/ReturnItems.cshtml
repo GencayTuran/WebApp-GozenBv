@@ -1,4 +1,4 @@
-﻿@model WebApp_GozenBv.ViewModels.MaterialLogDetailViewModel
+﻿@model WebApp_GozenBv.ViewModels.MaterialLogAndItemsViewModel
 
 @{
     ViewData["Title"] = "Return items?";
@@ -6,10 +6,9 @@
     var logId = Model.MaterialLog.LogId;
 }
 
-<h1>Return</h1>
+<h1>Material Log</h1>
 
-@*<h3>Which products are damaged?</h3>*@
-<h4>Return items?</h4>
+<h4>Return items</h4>
 <hr />
 <table class="table">
     <thead>
@@ -22,7 +21,7 @@
     <tbody>
         <tr>
             <td>@Html.DisplayFor(model => model.MaterialLog.LogDate)</td>
-            <td>@Html.DisplayFor(model => model.EmployeeFullName)</td>
+            <td>@Html.DisplayFor(model => model.MaterialLog.EmployeeFullName)</td>
             <td>@Html.DisplayFor(model => logId)</td>
         </tr>
     </tbody>
@@ -31,37 +30,45 @@
             <th>MaterialLogItems</th>
         </tr>
         <tr>
-            <th>@Html.DisplayNameFor(model => model.MaterialLogItem.MaterialId)</th>
-            <th>@Html.DisplayNameFor(model => model.MaterialLogItem)</th>
+            <th>Material</th>
             <th>@Html.DisplayNameFor(model => model.MaterialLogItem.MaterialAmount)</th>
             <th>Damaged?</th>
-            <th id="damagedTitle" style="opacity: 0.6">@Html.DisplayNameFor(model => model.MaterialLogItem.DamagedAmount)</th>
+            <th id="damagedTitle">@Html.DisplayNameFor(model => model.MaterialLogItem.DamagedAmount)</th>
+            <th>@Html.DisplayNameFor(model => model.MaterialLogItem.RepairAmount)</th>
+            <th>@Html.DisplayNameFor(model => model.MaterialLogItem.DeleteAmount)</th>
         </tr>
     </thead>
     <tbody>
-        @foreach (var item in Model.ItemsUndamaged)
-        {
+        <form asp-action="ReturnItems">
+            @for (int i = 0; i < Model.MaterialLogItems.Count; i++)
+            {
             <tr class="materialLogItemRow">
-                <td><p class="labelMaterialId">@item.MaterialId</p></td>
-                <td><p>@item.ProductNameCode</p></td>
-                <td><p>@item.MaterialAmount</p></td>
-                <td><input class="chkDamaged" type="checkbox" onclick="ChangeDamaged(this)" /></td>
+                <input type="hidden" asp-for="@Model.MaterialLogItems[i].MaterialId"/>
+                <td><input disabled asp-for="@Model.MaterialLogItems[i].MaterialFullName" class="form-control" /></td>
+                <td><input disabled asp-for="@Model.MaterialLogItems[i].MaterialAmount" class="form-control" /></td>
+                <td><input asp-for="@Model.MaterialLogItems[i].IsDamaged" class="chkDamaged form-check" type="checkbox" /></td>
                 <td>
-                    <input class="inputDamagedAmount w-25" disabled type="number" max="@item.MaterialAmount" min="1"/>
+                    <input asp-for="@Model.MaterialLogItems[i].DamagedAmount" class="inputDamagedAmount form-control" />
+                    <span asp-validation-for="@Model.MaterialLogItems[i].DamagedAmount" class="text-danger"></span>
                 </td>
-                <input class="inputMaterialAmount" value="@item.MaterialAmount" type="hidden" />
+                <td>
+                    <input asp-for="@Model.MaterialLogItems[i].RepairAmount" class="inputRepairAmount form-control" />
+                    <span asp-validation-for="@Model.MaterialLogItems[i].RepairAmount" class="text-danger"></span>
+                </td>
+                <td>
+                    <input asp-for="@Model.MaterialLogItems[i].DeleteAmount" class="inputDeleteAmount form-control" />
+                    <span asp-validation-for="@Model.MaterialLogItems[i].DeleteAmount" class="text-danger"></span>
+                </td>
             </tr>
-        }
+            }
+
+        <input type="hidden" asp-for="MaterialLog.EmployeeId" />
+        <input type="hidden" asp-for="MaterialLog.LogId" />
+        <input id="isDamaged" hidden type="checkbox" asp-for="MaterialLog.Damaged" />
+        <input type="submit" onclick="SetDamaged()" value="Complete" class="btn btn-primary" /> 
+        </form>
     </tbody>
 </table>
 
-<form asp-action="ReturnItems">
-    <input type="hidden" asp-for="MaterialLog.EmployeeId" />
-    <input type="hidden" asp-for="MaterialLog.LogId" />
-    <input id="isDamaged" hidden type="checkbox" asp-for="MaterialLog.Damaged" />
-    <input id="damagedMaterialResult" type="hidden" asp-for="DamagedMaterial" />
-    <input id="btnSubmit" onclick="PassDamagedItems()" type="submit" value="Complete" class="btn btn-primary" /> |
-    <a asp-action="Index">Back to List</a>
-</form>
-
+<a asp-action="Index">Back to List</a>
 <script src="~/js/MaterialLog_ReturnItems.js"></script>

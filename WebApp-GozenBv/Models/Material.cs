@@ -11,15 +11,25 @@ namespace WebApp_GozenBv.Models
     {
         public int Id { get; set; }
         [Required]
-        public string ProductName { get; set; }
+        public string Name { get; set; }
         [Required]
-        public string ProductCode { get; set; }
+        public string Brand { get; set; }
         [Required]
-        public int QuantityNew { get; set; }
+        public int NewQty { get; set; }
         [Required]
-        public int MinQuantity { get; set; }
-        public int QuantityUsed { get; set; }
-        public bool NoReturn { get; set; }
+        public int UsedQty { get; set; }
+        [Required]
+        public int MinQty { get; set; }
+        [Required]
+        public int InUseAmount { get; set; }
+        [Required]
+        public int InDepotAmount { get; set; }
+        [Required]
+        public int InRepairQty { get; set; }
+
+        public int DeletedQty { get; set; }
+
         public double? Cost { get; set; }
+        public bool NoReturn { get; set; }
     }
 }

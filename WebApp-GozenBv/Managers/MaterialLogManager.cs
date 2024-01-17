@@ -1,12 +1,19 @@
-﻿using Microsoft.AspNetCore.Routing;
+﻿using Humanizer;
+using Microsoft.AspNetCore.JsonPatch.Internal;
+using Microsoft.AspNetCore.Routing;
 using Microsoft.EntityFrameworkCore;
+using Microsoft.Graph;
+using Microsoft.Graph.ExternalConnectors;
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Security.Cryptography;
 using System.Text.Json;
 using System.Threading.Tasks;
 using WebApp_GozenBv.Constants;
 using WebApp_GozenBv.DataHandlers;
+using WebApp_GozenBv.DataHandlers.Interfaces;
+using WebApp_GozenBv.DTOs;
 using WebApp_GozenBv.Helpers;
 using WebApp_GozenBv.Managers.Interfaces;
 using WebApp_GozenBv.Models;
@@ -14,18 +21,21 @@ using WebApp_GozenBv.ViewModels;
 
 namespace WebApp_GozenBv.Managers
 {
-	public class MaterialLogManager : IMaterialLogManager
-	{
+    public class MaterialLogManager : IMaterialLogManager
+    {
         private readonly IMaterialLogDataHandler _logData;
         private readonly IMaterialLogItemDataHandler _itemData;
+        private readonly IEditHistoryDataHandler _historyData;
 
         public MaterialLogManager(
             IMaterialLogDataHandler logData,
-            IMaterialLogItemDataHandler itemData)
-		{
+            IMaterialLogItemDataHandler itemData,
+            IEditHistoryDataHandler historyData)
+        {
             _logData = logData;
             _itemData = itemData;
-		}
+            _historyData = historyData;
+        }
 
         public async Task ManageMaterialLogAsync(MaterialLog log, EntityOperation operation)
         {
@@ -59,51 +69,40 @@ namespace WebApp_GozenBv.Managers
             }
         }
 
-        public async Task<MaterialLog> MapMaterialLogAsync(string logId)
+        public async Task<MaterialLog> GetMaterialLogAsync(string logId)
         {
-            return await _logData.GetMaterialLogByLogIdAsync(logId);
+            return await _logData.QueryMaterialLogByLogIdAsync(logId);
         }
 
-        public async Task<List<MaterialLogItem>> MapMaterialLogItemsAsync(string logId)
+        public async Task<List<MaterialLogItem>> GetMaterialLogItemsAsync(string logId)
         {
-            return await _itemData.GetItemsByLogIdAsync(logId);
+            return await _itemData.QueryItemsByLogIdAsync(logId);
         }
 
-        public async Task<List<MaterialLog>> MapMaterialLogs()
+        public async Task<List<MaterialLog>> GetMaterialLogs()
         {
-            return await _logData.GetMaterialLogs();
+            return await _logData.QueryMaterialLogs();
         }
-        public async Task<MaterialLogDetailViewModel> MapMaterialLogDetails(string logId)
+        public async Task<List<MaterialLog>> GetMaterialLogsAsync()
         {
-            var log = await _logData.GetMaterialLogByLogIdAsync(logId);
-            List<MaterialLogItem> undamagedItems, damagedItems = new();
+            return await _logData.QueryMaterialLogsAsync();
+        }
 
-            if (log.Damaged)
+        public async Task<MaterialLogDTO> GetMaterialLogDTO(string logId)
+        {
+            var log = await _logData.QueryMaterialLogByLogIdAsync(logId);
+
+            if (log == null)
             {
-                undamagedItems = await _itemData.GetUnDamagedItemsByLogId(logId);
-                damagedItems = await _itemData.GetDamagedItemsByLogId(logId);
+                throw new ArgumentNullException($"MaterialLog with logId {logId} does not exist.");
             }
-            else
-            {
-                undamagedItems = await _itemData.GetItemsByLogIdAsync(logId);
-            }
 
-            return new MaterialLogDetailViewModel
+            var items = await _itemData.QueryItemsByLogIdAsync(logId);
+
+            return new MaterialLogDTO
             {
-                MaterialLog = new MaterialLog
-                {
-                    Id = log.Id,
-                    LogId = log.LogId,
-                    LogDate = log.LogDate,
-                    Employee = log.Employee,
-                    EmployeeId = log.EmployeeId,
-                    ReturnDate = log.ReturnDate,
-                    Status = log.Status,
-                    Damaged = log.Damaged,
-                },
-                ItemsUndamaged = undamagedItems,
-                ItemsDamaged = damagedItems,
-                EmployeeFullName = (log.Employee.Name + " " + log.Employee.Surname).ToUpper(),
+                MaterialLog = log,
+                MaterialLogItems = items
             };
         }
 
@@ -139,14 +138,41 @@ namespace WebApp_GozenBv.Managers
             }
         }
 
-        public MaterialLog MapMaterialLog(string logId)
+        public MaterialLog GetMaterialLog(string logId)
         {
-            return _logData.GetMaterialLogByLogId(logId);
+            return _logData.QueryMaterialLogByLogId(logId);
         }
 
-        public List<MaterialLogItem> MapMaterialLogItems(string logId)
+        public List<MaterialLogItem> GetMaterialLogItems(string logId)
         {
-            return _itemData.GetItemsByLogId(logId);
+            return _itemData.QueryItemsByLogId(logId);
+        }
+
+        public async Task ManageMaterialLogHistoryAsync(LogEditHistory entity)
+        {
+            await _historyData.CreateMaterialLogHistoryAsync(entity);
+        }
+
+        public async Task ManageMaterialLogItemsHistoryAsync(List<ItemEditHistory> collection)
+        {
+            await _historyData.CreateMaterialLogItemsHistoryAsync(collection);
+        }
+
+        public async Task<List<LogEditHistory>> GetLogHistoryByLogId(string logId)
+        {
+            return await _historyData.QueryMaterialLogsHistoryAsync(logId);
+        }
+
+        public async Task<MaterialLogHistoryDTO> GetHistoryDetails(string logId, int version)
+        {
+            var logHistory = await _historyData.QueryLogHistoryByVersion(logId, version);
+            var itemsHistory = await _historyData.QueryLogItemsHistoryByVersion(logId, version);
+
+            return new MaterialLogHistoryDTO()
+            {
+                LogEditHistory = logHistory,
+                ItemsEditHistory = itemsHistory
+            };
         }
     }
 }

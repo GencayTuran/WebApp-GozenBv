@@ -30,7 +30,7 @@ namespace WebApp_GozenBv.Controllers
         [HttpGet]
         public async Task<IActionResult> Index()
         {
-            var materials = await _manager.MapMaterialsAsync();
+            var materials = await _manager.GetMaterialsAsync();
             List<MaterialViewModel> lstMaterialViewModel = new();
 
             foreach (var material in materials)
@@ -38,14 +38,18 @@ namespace WebApp_GozenBv.Controllers
                 lstMaterialViewModel.Add(new MaterialViewModel
                 {
                     Id = material.Id,
-                    ProductName = material.ProductName,
-                    ProductCode = material.ProductCode,
-                    QuantityNew = material.QuantityNew,
-                    MinQuantity = material.MinQuantity,
-                    QuantityUsed = material.QuantityUsed,
+                    Name = material.Name,
+                    Brand = material.Brand,
+                    NewQty = material.NewQty,
+                    InUseAmount = material.InUseAmount,
+                    InDepotAmount = material.InDepotAmount,
+                    MinQty = material.MinQty,
+                    InRepairQty = material.InRepairQty,
+                    DeletedQty = material.DeletedQty,
+                    UsedQty = material.UsedQty,
                     NoReturn = material.NoReturn,
                     Cost = material.Cost,
-                    TotalQty = material.QuantityNew + material.QuantityUsed
+                    TotalQty = material.NewQty + material.UsedQty
                 });
             }
 
@@ -60,19 +64,23 @@ namespace WebApp_GozenBv.Controllers
                 return NotFound();
             }
 
-            var material = await _manager.MapMaterialAsync(id);
+            var material = await _manager.GetMaterialAsync(id);
 
             MaterialViewModel materialViewModel = new()
             {
                 Id = material.Id,
-                ProductName = material.ProductName,
-                ProductCode = material.ProductCode,
-                QuantityNew = material.QuantityNew,
-                MinQuantity = material.MinQuantity,
-                QuantityUsed = material.QuantityUsed,
+                Name = material.Name,
+                Brand = material.Brand,
+                NewQty = material.NewQty,
+                InUseAmount = material.InUseAmount,
+                InDepotAmount = material.InDepotAmount,
+                MinQty = material.MinQty,
+                InRepairQty = material.InRepairQty,
+                DeletedQty = material.DeletedQty,
+                UsedQty = material.UsedQty,
                 NoReturn = material.NoReturn,
                 Cost = material.Cost,
-                TotalQty = material.QuantityNew + material.QuantityUsed
+                TotalQty = material.NewQty + material.UsedQty
             };
 
             if (material == null)
@@ -86,7 +94,7 @@ namespace WebApp_GozenBv.Controllers
         [HttpGet]
         public IActionResult Create()
         {
-            //var productBrands = _manager.MapProductBrands();
+            //var productBrands = _manager.GetProductBrands();
 
             //ViewData["ProductBrands"] = productBrands;
             return View();
@@ -103,7 +111,7 @@ namespace WebApp_GozenBv.Controllers
                     material.Cost = null;
                 }
 
-                await _manager.ManageMaterial(material, EntityOperation.Create);
+                await _manager.ManageMaterialAsync(material, EntityOperation.Create);
 
                 await _userLogService.StoreLogAsync(ControllerNames.Material, ActionConst.Create, material.Id.ToString());
 
@@ -119,7 +127,7 @@ namespace WebApp_GozenBv.Controllers
                 return NotFound();
             }
 
-            var material = await _manager.MapMaterialAsync(id);
+            var material = await _manager.GetMaterialAsync(id);
             if (material == null)
             {
                 return NotFound();
@@ -137,7 +145,7 @@ namespace WebApp_GozenBv.Controllers
 
             if (ModelState.IsValid)
             {
-                await _manager.ManageMaterial(material, EntityOperation.Update);
+                await _manager.ManageMaterialAsync(material, EntityOperation.Update);
 
                 await _userLogService.StoreLogAsync(ControllerNames.Material, ActionConst.Edit, material.Id.ToString());
                 
@@ -155,7 +163,7 @@ namespace WebApp_GozenBv.Controllers
                 return NotFound();
             }
 
-            var material = await _manager.MapMaterialAsync(id);
+            var material = await _manager.GetMaterialAsync(id);
 
             if (material == null)
             {
@@ -169,8 +177,8 @@ namespace WebApp_GozenBv.Controllers
         [ValidateAntiForgeryToken]
         public async Task<IActionResult> DeleteConfirmed(int id)
         {
-            var material = await _manager.MapMaterialAsync(id);
-            await _manager.ManageMaterial(material, EntityOperation.Delete);
+            var material = await _manager.GetMaterialAsync(id);
+            await _manager.ManageMaterialAsync(material, EntityOperation.Delete);
 
             await _userLogService.StoreLogAsync(ControllerNames.Material, ActionConst.Delete, material.Id.ToString());
 

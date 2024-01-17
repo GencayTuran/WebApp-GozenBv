@@ -21,9 +21,9 @@ namespace WebApp_GozenBv.DataHandlers
             _context = context;
         }
 
-        public async Task<List<CarPark>> GetCars() => await _context.CarPark.ToListAsync();
+        public async Task<List<CarPark>> QueryCars() => await _context.CarPark.ToListAsync();
 
-        public async Task<CarPark> GetCarById(int? id) => await _context.CarPark.FindAsync(id);
+        public async Task<CarPark> QueryCarById(int? id) => await _context.CarPark.FindAsync(id);
 
         public async Task CreateCar(CarPark car)
         {

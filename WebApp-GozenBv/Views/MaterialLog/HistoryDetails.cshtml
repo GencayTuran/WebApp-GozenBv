@@ -1,0 +1,81 @@
+﻿@using WebApp_GozenBv.ViewModels;
+@model MaterialLogHistoryDetailViewModel
+
+@{
+    ViewData["Title"] = "Material Log Detail";
+}
+
+<h2>Material Log Detail</h2>
+
+<h3>Log Edit History</h3>
+
+<table class="table">
+    <thead>
+        <tr>
+            <th>ID</th>
+            <th>Log ID</th>
+            <th>Version</th>
+            <th>Edit Timestamp</th>
+            <th>Log Date</th>
+            <th>Employee ID</th>
+            <th>Employee Name</th>
+            <th>Return Date</th>
+            <th>Damaged</th>
+        </tr>
+    </thead>
+    <tbody>
+        <tr>
+            <td>@Model.LogEditHistory.Id</td>
+            <td>@Model.LogEditHistory.LogId</td>
+            <td>@Model.LogEditHistory.Version</td>
+            <td>@Model.LogEditHistory.EditTimestamp.ToShortDateString()</td>
+            <td>@Model.LogEditHistory.LogDate.ToShortDateString()</td>
+            <td>@Model.LogEditHistory.EmployeeId</td>
+            <td>@Model.LogEditHistory.EmployeeName</td>
+            <td>@(Model.LogEditHistory.ReturnDate.HasValue ? Model.LogEditHistory.ReturnDate.Value.ToShortDateString() : "")</td>
+            <td>@Model.LogEditHistory.Damaged</td>
+        </tr>
+    </tbody>
+</table>
+
+<h3>Items Edit History</h3>
+
+<table class="table">
+    <thead>
+        <tr>
+            <th>ID</th>
+            <th>Material Log Item ID</th>
+            <th>Log ID</th>
+            <th>Version</th>
+            <th>Edit Timestamp</th>
+            <th>Material ID</th>
+            <th>Material Name</th>
+            <th>Material Amount</th>
+            <th>Used</th>
+            <th>Is Damaged</th>
+            <th>Damaged Amount</th>
+            <th>Repair Amount</th>
+            <th>Delete Amount</th>
+        </tr>
+    </thead>
+    <tbody>
+        @foreach (var item in Model.ItemsEditHistory)
+        {
+            <tr>
+                <td>@item.Id</td>
+                <td>@item.MaterialLogItemId</td>
+                <td>@item.LogId</td>
+                <td>@item.Version</td>
+                <td>@item.EditTimestamp.ToShortDateString()</td>
+                <td>@item.MaterialId</td>
+                <td>@item.MaterialName</td>
+                <td>@item.MaterialAmount</td>
+                <td>@item.Used</td>
+                <td>@item.IsDamaged</td>
+                <td>@item.DamagedAmount</td>
+                <td>@item.RepairAmount</td>
+                <td>@item.DeleteAmount</td>
+            </tr>
+        }
+    </tbody>
+</table>

@@ -17,22 +17,34 @@
                 @Html.DisplayNameFor(model => model.Id)
             </th>
             <th>
-                @Html.DisplayNameFor(model => model.ProductName)
+                @Html.DisplayNameFor(model => model.Name)
             </th>
             <th>
-                @Html.DisplayNameFor(model => model.ProductCode)
+                @Html.DisplayNameFor(model => model.Brand)
             </th>
             <th>
-                @Html.DisplayNameFor(model => model.QuantityNew)
+                @Html.DisplayNameFor(model => model.NewQty)
             </th>
             <th>
-                @Html.DisplayNameFor(model => model.QuantityUsed)
+                @Html.DisplayNameFor(model => model.UsedQty)
             </th>
             <th>
                 @Html.DisplayNameFor(model => model.TotalQty)
             </th>
             <th>
-                @Html.DisplayNameFor(model => model.MinQuantity)
+                @Html.DisplayNameFor(model => model.InUseAmount)
+            </th>
+            <th>
+                @Html.DisplayNameFor(model => model.InDepotAmount)
+            </th>
+            <th>
+                @Html.DisplayNameFor(model => model.MinQty)
+            </th>
+            <th>
+                @Html.DisplayNameFor(model => model.InRepairQty)
+            </th>
+            <th>
+                @Html.DisplayNameFor(model => model.DeletedQty)
             </th>
             <th>
                 @Html.DisplayNameFor(model => model.NoReturn)
@@ -51,22 +63,34 @@
                     @Html.DisplayFor(modelItem => item.Id)
                 </td>
                 <td>
-                    @Html.DisplayFor(modelItem => item.ProductName)
+                    @Html.DisplayFor(modelItem => item.Name)
                 </td>
                 <td>
-                    @Html.DisplayFor(modelItem => item.ProductCode)
+                    @Html.DisplayFor(modelItem => item.Brand)
                 </td>
                 <td>
-                    @Html.DisplayFor(modelItem => item.QuantityNew)
+                    @Html.DisplayFor(modelItem => item.NewQty)
                 </td>
                 <td>
-                    @Html.DisplayFor(modelItem => item.QuantityUsed)
+                    @Html.DisplayFor(modelItem => item.UsedQty)
                 </td>
                 <td>
                     @Html.DisplayFor(modelItem => item.TotalQty)
                 </td>
                 <td>
-                    @Html.DisplayFor(modelItem => item.MinQuantity)
+                    @Html.DisplayFor(modelItem => item.InUseAmount)
+                </td>
+                <td>
+                    @Html.DisplayFor(modelItem => item.InDepotAmount)
+                </td>
+                <td>
+                    @Html.DisplayFor(modelItem => item.MinQty)
+                </td>
+                <td>
+                    @Html.DisplayFor(modelItem => item.InRepairQty)
+                </td>
+                <td>
+                    @Html.DisplayFor(modelItem => item.DeletedQty)
                 </td>
                 <td>
                     @Html.CheckBoxFor(modelItem => item.NoReturn, new { @disabled = "disabled" })

@@ -3,26 +3,171 @@
 
 @{
     ViewData["Title"] = "Edit";
+    var status = Model.Status;
+    var logId = Model.LogId;
 }
 
-<h1>Edit</h1>
+<div class="flex-row d-flex justify-content-between">
+    <div class="col-md-8">
+        <h1 class="mb-0">Edit</h1>
+        <h4 class="text-muted">Material Log</h4>
+    </div>
 
-<h4>MaterialLog</h4>
-<hr />
-
-@switch (Model.Status)
-{
-    case MaterialLogStatusConst.Created:
-        <vc:log-created-edit log-id="@Model.LogId"></vc:log-created-edit>
-        break;
-    case MaterialLogStatusConst.DamagedAwaitingAction:
-        @*viewComponent of log-damaged-edit here*@
-        break;
-}
-
-<div>
-    <a asp-action="Index">Back to List</a>
+    <div class="d-flex flex-column col-2">
+        <a asp-action="Details" asp-route-id="@logId" class="btn btn-dark">Back to Details</a>
+    </div>
 </div>
+
+<form asp-action="Edit">
+    <div asp-validation-summary="ModelOnly" class="text-danger"></div>
+    <input type="hidden" asp-for="LogId" />
+
+    <div class="d-flex justify-content-end">
+        <div class="form-group col-2">
+            <input type="submit" value="Save" class="btn btn-primary w-100" />
+        </div>
+    </div>
+    <hr />
+
+    @switch (status)
+    {
+        case MaterialLogStatus.Created:
+        var itemsCreated = Model.CreatedEditViewModel.ItemsCreatedEditViewModel;
+            <table class="table table-bordered table-striped table-sm col-md-8">
+                <thead class="thead-dark">
+                    <tr>
+                        <th scope="col">Log Date</th>
+                        <th scope="col">Employee</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr>
+                        <td>
+                            <input asp-for="CreatedEditViewModel.LogDate" readonly class="form-control" />
+                            <span asp-validation-for="CreatedEditViewModel.LogDate" class="text-danger"></span>
+                        </td>
+                        <td>
+                            <select asp-for="CreatedEditViewModel.EmployeeId" asp-items="@ViewBag.Employees" class="form-control"></select>
+                            <span asp-validation-for="CreatedEditViewModel.EmployeeId" class="text-danger"></span>
+                        </td>
+                    </tr>
+                </tbody>
+            </table>
+
+            <h5>Items</h5>
+            <hr />
+            <div>
+                <div>
+                    <div class="flex-column d-flex">
+                        <div class="flex-row d-flex mb-2">
+                            <div class="col-md-3">Material</div>
+                            <div class="col-md-3">MaterialAmount</div>
+                            <div class="col-md-3">Used?</div>
+                        </div>
+
+                        @for (int i = 0; i < itemsCreated.Count; i++)
+                        {
+                            <div class="flex-row d-flex">
+                                <div class="col-md-3 form-group">
+                                    <select asp-for="CreatedEditViewModel.ItemsCreatedEditViewModel[i].MaterialId" asp-items="ViewBag.Materials" class="form-control"></select>
+                                    <span asp-validation-for="CreatedEditViewModel.ItemsCreatedEditViewModel[i].MaterialId" class="text-danger"></span>
+                                </div>
+                                <div class="col-md-3 form-group">
+                                    <input asp-for="CreatedEditViewModel.ItemsCreatedEditViewModel[i].MaterialAmount" class="form-control" />
+                                    <span asp-validation-for="CreatedEditViewModel.ItemsCreatedEditViewModel[i].MaterialAmount" class="text-danger"></span>
+                                </div>
+                                <div class="col-md-3 form-check">
+                                    <input class="form-check-input" type="checkbox" asp-for="CreatedEditViewModel.ItemsCreatedEditViewModel[i].Used" class="form-control" />
+                                </div>
+                            </div>
+                        }
+                    </div>
+                    @*add or remove rows here*@
+                </div>
+            </div>
+            break;
+
+        case MaterialLogStatus.Returned:
+            var itemsReturned = Model.ReturnedEditViewModel.ItemsReturnedEditViewModel;
+            <table class="table table-bordered table-striped table-sm col-md-8">
+                <thead class="thead-dark">
+                    <tr>
+                        <th scope="col">Log Date</th>
+                        <th scope="col">Return Date</th>
+                        <th scope="col">Employee</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr>
+                        <td>
+                            <input asp-for="ReturnedEditViewModel.LogDate" readonly class="form-control" />
+                            <span asp-validation-for="ReturnedEditViewModel.LogDate" class="text-danger"></span>
+                        </td>
+                        <td>
+                            <input asp-for="ReturnedEditViewModel.ReturnDate" class="form-control" />
+                            <span asp-validation-for="ReturnedEditViewModel.ReturnDate" class="text-danger"></span>
+                        </td>
+                        <td>
+                            <input asp-for="ReturnedEditViewModel.EmployeeFullName" disabled class="form-control" />
+                            <span asp-validation-for="ReturnedEditViewModel.EmployeeId" class="text-danger"></span>
+                        </td>
+                    </tr>
+                </tbody>
+            </table>
+
+            <h5>Items</h5>
+            <hr />
+            <div>
+                <div>
+                    <div class="flex-column d-flex">
+                        <div class="flex-row d-flex mb-2">
+                            <div class="col-md-3">Material</div>
+                            <div class="col-md-2">MaterialAmount</div>
+                            <div class="col-md-1 d-flex justify-content-center">Used?</div>
+                            <div class="col-md-1 d-flex justify-content-center">Damaged?</div>
+                            <div class="col-md-2">DamagedAmount</div>
+                            <div class="col-md-2">RepairAmount</div>
+                            <div class="col-md-2">DeleteAmount</div>
+                        </div>
+
+                        @for (int i = 0; i < itemsReturned.Count; i++)
+                        {
+                            <div class="flex-row d-flex">
+                                <div class="col-md-3 form-group">
+                                    <input asp-for="ReturnedEditViewModel.ItemsReturnedEditViewModel[i].MaterialFullName" disabled class="form-control" />
+                                </div>
+                                <div class="col-md-2 form-group">
+                                    <input asp-for="ReturnedEditViewModel.ItemsReturnedEditViewModel[i].MaterialAmount" disabled class="form-control col-md-6" />
+                                    <span asp-validation-for="ReturnedEditViewModel.ItemsReturnedEditViewModel[i].MaterialAmount" class="text-danger"></span>
+                                </div>
+                                <div class="col-md-1 form-check d-flex justify-content-center">
+                                    <input class="form-check-input" type="checkbox" readonly asp-for="ReturnedEditViewModel.ItemsReturnedEditViewModel[i].Used" class="form-control" />
+                                </div>
+                                <div class="col-md-1 form-check d-flex justify-content-center">
+                                    <input class="form-check-input" type="checkbox" asp-for="ReturnedEditViewModel.ItemsReturnedEditViewModel[i].IsDamaged" class="form-control" data-row-index="@i" />
+                                </div>
+                                <div class="col-md-2 form-group">
+                                    <input asp-for="ReturnedEditViewModel.ItemsReturnedEditViewModel[i].DamagedAmount" class="form-control col-md-6" />
+                                    <span asp-validation-for="ReturnedEditViewModel.ItemsReturnedEditViewModel[i].DamagedAmount" class="text-danger"></span>
+                                </div>
+                                <div class="col-md-2 form-group">
+                                    <input asp-for="ReturnedEditViewModel.ItemsReturnedEditViewModel[i].RepairAmount" class="form-control col-md-6" />
+                                    <span asp-validation-for="ReturnedEditViewModel.ItemsReturnedEditViewModel[i].RepairAmount" class="text-danger"></span>
+                                </div>
+                                <div class="col-md-2 form-group">
+                                    <input asp-for="ReturnedEditViewModel.ItemsReturnedEditViewModel[i].DeleteAmount" class="form-control col-md-6" />
+                                    <span asp-validation-for="ReturnedEditViewModel.ItemsReturnedEditViewModel[i].DeleteAmount" class="text-danger"></span>
+                                </div>
+                            </div>
+                        }
+                    </div>
+                </div>
+            </div>
+            break;
+    }
+</form>
+
+<script src="~/js/MaterialLog_Edit.js"></script>
 
 @section Scripts {
     @{

@@ -33,7 +33,7 @@ namespace WebApp_GozenBv.Services
             //var user = await _userManager.GetCurrentUser();
             //var userId = _userManager.GetCurrentUserId(user);
 
-            var user = await _userManager.MapCurrentUserAsync();
+            var user = await _userManager.GetCurrentUserAsync();
 
             var userLog = new UserLog
             {
@@ -45,114 +45,6 @@ namespace WebApp_GozenBv.Services
             };
 
             await _userLogManager.ManageUserLog(userLog);
-        }
-
-        public async Task<List<UserLogViewModel>> GetLogsByControllerAsync(int controllerId)
-        {
-            return SetViewModel(await _userLogManager.MapLogsByControllerAsync(controllerId));
-        }
-
-        public async Task<List<UserLogViewModel>> ArrangeLogsByEntityAsync(string entityId, int controllerId)
-        {
-            return SetViewModel(await _userLogManager.MapUserLogsByEntityAsync(entityId, controllerId));
-        }
-
-        public async Task<List<UserLogViewModel>> ArrangeLogsByUserAsync(int id)
-        {
-            return SetViewModel(await _userLogManager.MapUserLogsByUserAsync(id));
-        }
-
-        public async Task<List<UserLogViewModel>> ArrangeUserLogsAsync()
-        {
-            return SetViewModel(await _userLogManager.MapUserLogsAsync());
-        }
-
-        private List<UserLogViewModel> SetViewModel(List<UserLog> userLogs)
-        {
-            List<UserLogViewModel> userLogsViewModel = new();
-
-            if (userLogs.Any())
-            {
-                foreach (var log in userLogs)
-                {
-                    userLogsViewModel.Add(new UserLogViewModel
-                    {
-                        UserName = log.User.Name,
-                        Action = SetAction(log.Action),
-                        ControllerName = SetControllerName(log.ControllerId),
-                        EntityId = log.EntityId,
-                        LogDate = log.LogDate
-                    });
-                }
-                return userLogsViewModel;
-            }
-            return userLogsViewModel;
-        }
-
-        private string SetAction(int dataAction)
-        {
-            string action = "";
-
-            switch (dataAction)
-            {
-                case ActionConst.Create:
-                    action = "created";
-                    break;
-                case ActionConst.Delete:
-                    action = "deleted";
-                    break;
-                case ActionConst.CompleteDamaged:
-                    action = "completed damaged";
-                    break;
-                case ActionConst.ReturnItems:
-                    action = "returned items";
-                    break;
-                case ActionConst.Edit:
-                    action = "edited";
-                    break;
-                case ActionConst.Login:
-                    action = "logged in";
-                    break;
-                case ActionConst.Logout:
-                    action = "logged out";
-                    break;
-                case ActionConst.Undo:
-                    action = "did undo";
-                    break;
-                default:
-                    throw new ArgumentOutOfRangeException($"Action with Id: {dataAction} does not exist for user logging.");
-            }
-            return action;
-        }
-
-        private string SetControllerName(int controllerId)
-        {
-            string result = "";
-            switch (controllerId)
-            {
-                case ControllerNames.Material:
-                    result = "Material";
-                    break;
-                case ControllerNames.MaterialLog:
-                    result = "Materiallog";
-                    break;
-                case ControllerNames.Employee:
-                    result = "Employee";
-                    break;
-                case ControllerNames.Firma:
-                    result = "Firma";
-                    break;
-                case ControllerNames.CarPark:
-                    result = "Carpark";
-                    break;
-                case ControllerNames.CarMaintenance:
-                    result = "Carmaintenance";
-                    break;
-                default:
-                    throw new ArgumentOutOfRangeException($"Controller with Id: {controllerId} does not exist for user logging.");
-            }
-
-            return result;
         }
     }
 }

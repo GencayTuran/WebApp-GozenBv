@@ -1,0 +1,48 @@
+﻿@using WebApp_GozenBv.ViewModels;
+@model MaterialLogHistoryIndexViewModel
+
+@{
+    ViewData["Title"] = "Material Log History";
+}
+
+<h2>Material Log History</h2>
+
+<table class="table">
+    <thead>
+        <tr>
+            <th>ID</th>
+            <th>Log ID</th>
+            <th>Version</th>
+            <th>Edit Timestamp</th>
+            <th>Log Date</th>
+            <th>Employee ID</th>
+            <th>Employee Name</th>
+            <th>Return Date</th>
+            <th>Damaged</th>
+        </tr>
+    </thead>
+    <tbody>
+        @foreach (var log in Model.LogEditHistory)
+        {
+            <tr onclick="ToDetails(@log.Id)">
+                <td>@log.Id</td>
+                <td>@log.LogId</td>
+                <td>@log.Version</td>
+                <td>@log.EditTimestamp.ToShortDateString()</td>
+                <td>@log.LogDate.ToShortDateString()</td>
+                <td>@log.EmployeeId</td>
+                <td>@log.EmployeeName</td>
+                <td>@(log.ReturnDate.HasValue ? log.ReturnDate.Value.ToShortDateString() : "")</td>
+                <td>@log.Damaged</td>
+                <a hidden id="anchor_@log.Id" asp-action="Details" asp-route-version="@log.Version" asp-route-id="@log.LogId"></a>
+            </tr>
+        }
+    </tbody>
+</table>
+
+<script>
+    function ToDetails(id) {
+        var link = document.querySelector(`#anchor_${id}`)
+        link.click();
+    }
+</script>

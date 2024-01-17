@@ -7,9 +7,9 @@ namespace WebApp_GozenBv.DataHandlers
 {
     public interface IMaterialDataHandler
     {
-        Task<List<Material>> GetAllMaterialsAsync();
-        Task<Material> GetMaterialByIdAsync(int? id);
-        Material GetMaterialById(int? id);
+        Task<List<Material>> QueryAllMaterialsAsync();
+        Task<Material> QueryMaterialByIdAsync(int? id);
+        Material QueryMaterialById(int? id);
         Task CreateMaterialAsync(Material material);
         Task CreateMaterialsAsync(List<Material> materials);
         Task DeleteMaterialAsync(Material material);

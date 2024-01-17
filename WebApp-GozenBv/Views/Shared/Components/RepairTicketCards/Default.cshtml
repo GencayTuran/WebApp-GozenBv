@@ -1,0 +1,70 @@
+﻿@using Microsoft.AspNetCore.Html;
+@using WebApp_GozenBv.Constants;
+@using WebApp_GozenBv.ViewModels;
+@model List<RepairTicketCardViewModel>
+
+<h3 class="text-white">Repair Tickets</h3>
+
+<div>
+    @if (Model != null && Model.Count > 0)
+    {
+        <ul class="list-group">
+            @foreach (var ticket in Model)
+            {
+                <li class="list-group-item d-flex flex-row justify-content-between align-items-center">
+                    <div class="d-flex flex-row justify-content-start col-8">
+                        <p class="col-10 mb-0">@ticket.MaterialName</p>
+                        <img width="20" title="@GetIconTitle(ticket.Status)" src="@GetStatusIcon(ticket.Status)" alt="Status Icon" />
+                        @if (ticket.HasInfo)
+                        {
+                            <img width="20" src="~/resources/icons/info-circle-svgrepo-com.svg" alt="Info Icon" />
+                        }
+                    </div>
+                    <div>
+                        <a asp-action="RepairTicket" asp-route-id="@ticket.Id" class="btn btn-primary">
+                            <img width="20" src="~/resources/icons/tool-svgrepo-com-white.svg" title="Repair" alt="Repair Icon" />
+                        </a>
+                        <a asp-action="DeleteTicket" asp-route-id="@ticket.Id" class="btn btn-danger">
+                            <img width="20" src="~/resources/icons/trashcan-svgrepo-com.svg" title="Remove" alt="Remove Icon" />
+                        </a>
+                    </div>
+                </li>
+            }
+        </ul>
+    }
+    else
+    {
+        <p class="text-white">No repair tickets.</p>
+    }
+</div>
+
+@functions {
+    string GetStatusIcon(int status)
+    {
+        switch (status)
+        {
+            case RepairTicketStatus.AwaitingAction:
+                return Url.Content("~/resources/icons/clock-two-svgrepo-com.svg");
+            case RepairTicketStatus.Repaired:
+                return Url.Content("~/resources/icons/check-svgrepo-com.svg");
+            case RepairTicketStatus.Removed:
+                return Url.Content("~/resources/icons/close-bold-svgrepo-com.svg");
+            default:
+                return Url.Content("~/resources/icons/red-exclamation-mark-svgrepo-com.svg");
+        }
+    }
+    string GetIconTitle(int status)
+    {
+        switch (status)
+        {
+            case RepairTicketStatus.AwaitingAction:
+                return "Awaiting action";
+            case RepairTicketStatus.Repaired:
+                return "Item repaired";
+            case RepairTicketStatus.Removed:
+                return "Item removed";
+            default:
+                return "Error";
+        }
+    }
+}

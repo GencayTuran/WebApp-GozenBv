@@ -1,5 +1,6 @@
 ﻿using Microsoft.AspNetCore.Mvc.Rendering;
 using Microsoft.Data.SqlClient;
+using Microsoft.IdentityModel.Tokens;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -8,121 +9,139 @@ using WebApp_GozenBv.Constants;
 using WebApp_GozenBv.Helpers.Interfaces;
 using WebApp_GozenBv.Managers.Interfaces;
 using WebApp_GozenBv.Models;
-using WebApp_GozenBv.ViewModels;
+using WebApp_GozenBv.ViewData;
 
 namespace WebApp_GozenBv.Helpers
 {
     public class LogSearchHelper : ILogSearchHelper
     {
-        public List<SortViewModel> GetStatusSortList()
+        public List<MaterialLog> SortListByDefault(List<MaterialLog> logs)
         {
-            List<SortViewModel> lstStatus = new()
+            return logs.OrderByDescending(x => x.LogDate)
+                .ThenByDescending(x => x.Id)
+                .ToList();
+        }
+
+        public SelectedFilterViewData SetFilters(List<MaterialLog> logs, string searchString, int sortStatus, int sortOrder)
+        {
+            var lstStatus = GetStatusOptions();
+            var lstOrder = GetSortOrderOptions();
+            var filters = new SelectedFilterViewData();
+
+            if (IsOrderFiltered(sortOrder))
             {
-                new SortViewModel
+                var matchingStatus = lstOrder.FirstOrDefault(item => item.Id == sortOrder);
+                if (matchingStatus != null)
                 {
-                    Id = MaterialLogStatusConst.Created,
-                    Name = MaterialLogStatusConst.CreatedName
-                },
+                    filters.SortOrderId = matchingStatus.Id;
+                    filters.SortOrderName = matchingStatus.Name;
+                }
+                logs = SortListByOrder(logs, sortOrder);
+            }
 
-                new SortViewModel
+            if (IsStatusFiltered(sortStatus))
+            {
+                var matchingStatus = lstStatus.FirstOrDefault(item => item.Id == sortStatus);
+                if (matchingStatus != null)
                 {
-                    Id = MaterialLogStatusConst.Returned,
-                    Name = MaterialLogStatusConst.ReturnedName
-                },
+                    filters.StatusId = matchingStatus.Id;
+                    filters.StatusName = matchingStatus.Name;
+                }
+                logs = SortListByStatus(logs, sortStatus);
+            }
 
-                new SortViewModel
+            if (IsStringFiltered(searchString))
+            {
+                var trimmedString = searchString.Trim();
+                filters.SearchString = trimmedString;
+
+                logs = FilterListByString(logs, trimmedString);
+            }
+
+            filters.FilteredLogs = logs;
+            return filters;
+        }
+
+        public List<FilterOptionViewData> GetStatusOptions()
+        {
+            List<FilterOptionViewData> lstStatus = new()
+            {
+                new FilterOptionViewData
                 {
-                    Id = MaterialLogStatusConst.DamagedAwaitingAction,
-                    Name = MaterialLogStatusConst.DamagedAwaitingActionName
+                    Id = MaterialLogStatus.Created,
+                    Name = MaterialLogStatus.CreatedName
+                },
+                new FilterOptionViewData
+                {
+                    Id = MaterialLogStatus.Returned,
+                    Name = MaterialLogStatus.ReturnedName
                 }
             };
-
             return lstStatus;
         }
 
-        public List<SortViewModel> GetSortOrderList()
+        public List<FilterOptionViewData> GetSortOrderOptions()
         {
-            List<SortViewModel> lstSortOrder = new()
+            List<FilterOptionViewData> lstSortOrder = new()
             {
-                new SortViewModel
+                new FilterOptionViewData
                 {
                     Id = SortOrderConst.DateDescendingId,
                     Name = SortOrderConst.DateDescendingName
                 },
-
-                new SortViewModel
+                new FilterOptionViewData
                 {
                     Id = SortOrderConst.DateAscendingId,
                     Name = SortOrderConst.DateAscendingName
                 },
-
-                new SortViewModel
+                new FilterOptionViewData
                 {
                     Id = SortOrderConst.EmpAzId,
                     Name = SortOrderConst.EmpAzName
                 },
-
-                new SortViewModel
+                new FilterOptionViewData
                 {
                     Id = SortOrderConst.EmpZaId,
                     Name = SortOrderConst.EmpZaName
                 }
             };
-
-
             return lstSortOrder;
         }
 
-        public List<MaterialLog> SortListByOrder(List<MaterialLog> logs, int sortOrder)
+        private List<MaterialLog> SortListByOrder(List<MaterialLog> logs, int sortOrder)
         {
             List<MaterialLog> filteredLogs = new();
-
-            switch (sortOrder)
+            return sortOrder switch
             {
-                case SortOrderConst.DateDescendingId:
-                    filteredLogs = logs.OrderByDescending(s => s.LogDate).ToList();
-                    break;
-                case SortOrderConst.DateAscendingId:
-                    filteredLogs = logs.OrderBy(s => s.LogDate).ToList();
-                    break;
-                case SortOrderConst.EmpAzId:
-                    filteredLogs = logs.OrderBy(s => s.Employee.Name).ToList();
-                    break;
-                case SortOrderConst.EmpZaId:
-                    filteredLogs = logs.OrderByDescending(s => s.Employee.Name).ToList();
-                    break;
-                default:
-                    filteredLogs = logs.OrderByDescending(s => s.LogDate).ToList();
-                    break;
-            }
-
-            return filteredLogs;
+                SortOrderConst.DateDescendingId => logs.OrderByDescending(s => s.LogDate).ThenByDescending(x => x.Id).ToList(),
+                SortOrderConst.DateAscendingId => logs.OrderBy(s => s.LogDate).ThenBy(x => x.Id).ToList(),
+                SortOrderConst.EmpAzId => logs.OrderBy(s => s.Employee.Name).ThenBy(x => x.Id).ToList(),
+                SortOrderConst.EmpZaId => logs.OrderByDescending(s => s.Employee.Name).ThenByDescending(x => x.Id).ToList(),
+                _ => SortListByDefault(logs),
+            };
         }
-        public List<MaterialLog> SortListByStatus(List<MaterialLog> logs, int sortStatus)
+
+        private List<MaterialLog> SortListByStatus(List<MaterialLog> logs, int sortStatus)
         {
             List<MaterialLog> filteredLogs = new();
 
             switch (sortStatus)
             {
-                case MaterialLogStatusConst.Created:
-                    filteredLogs = logs.Where(s => s.Status == MaterialLogStatusConst.Created).ToList();
+                case MaterialLogStatus.Created:
+                    filteredLogs = logs.Where(s => s.Status == MaterialLogStatus.Created).ToList();
                     break;
-                case MaterialLogStatusConst.Returned:
-                    filteredLogs = logs.Where(s => s.Status == MaterialLogStatusConst.Returned).ToList();
-                    break;
-                case MaterialLogStatusConst.DamagedAwaitingAction:
-                    filteredLogs = logs.Where(s => s.Status == MaterialLogStatusConst.DamagedAwaitingAction).ToList();
+                case MaterialLogStatus.Returned:
+                    filteredLogs = logs.Where(s => s.Status == MaterialLogStatus.Returned).ToList();
                     break;
             }
-
             return filteredLogs;
         }
 
-        public List<MaterialLog> FilterListByString(List<MaterialLog> materialLogs, string searchString)
+        private List<MaterialLog> FilterListByString(List<MaterialLog> materialLogs, string searchString)
         {
             if (!String.IsNullOrEmpty(searchString))
             {
-                
+
                 var capitalizedString = (char.ToUpper(searchString[0]) + searchString.Substring(1).ToLower());
                 var lowerString = searchString.ToLower();
 
@@ -136,14 +155,15 @@ namespace WebApp_GozenBv.Helpers
                         .ToList();
 
             }
-
             return materialLogs;
         }
 
-        public List<MaterialLog> SortListByDefault(List<MaterialLog> logs)
-        {
-            return logs.OrderByDescending(x => x.LogDate).ToList();
-        }
+        public bool IsNotFiltered(string searchString, int sortStatus, int sortOrder)
+            => !IsOrderFiltered(sortOrder) && !IsStatusFiltered(sortStatus) && !IsStringFiltered(searchString);
+
+        private bool IsStringFiltered(string searchString) => !searchString.IsNullOrEmpty();
+        private bool IsStatusFiltered(int sortStatus) => sortStatus != 0;
+        private bool IsOrderFiltered(int sortOrder) => sortOrder != 0;
     }
 
 }

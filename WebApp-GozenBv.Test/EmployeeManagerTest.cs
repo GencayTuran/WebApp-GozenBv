@@ -37,10 +37,10 @@ namespace WebApp_GozenBv.Test
             // Arrange
             var expectedEmployee = new Employee { Id = 1, Name = "John", Surname = "Doe" };
             int id = 1;
-            _employeeDataHandlerMock.Setup(handler => handler.GetEmployeeById(id)).Returns(expectedEmployee);
+            _employeeDataHandlerMock.Setup(handler => handler.QueryEmployeeById(id)).Returns(expectedEmployee);
 
             // Act
-            var result = _employeeManager.MapEmployee(id);
+            var result = _employeeManager.GetEmployee(id);
 
             // Assert
             Assert.AreEqual(expectedEmployee, result);
@@ -52,10 +52,10 @@ namespace WebApp_GozenBv.Test
         {
             // Arrange
             int id = 2;
-            _employeeDataHandlerMock.Setup(handler => handler.GetEmployeeById(id)).Throws(new NullReferenceException("No Employee with id 2."));
+            _employeeDataHandlerMock.Setup(handler => handler.QueryEmployeeById(id)).Throws(new NullReferenceException("No Employee with id 2."));
 
             // Act
-            var result = _employeeManager.MapEmployee(id);
+            var result = _employeeManager.GetEmployee(id);
 
             // Exception is expected, so no assertion is needed.
         }
@@ -66,10 +66,10 @@ namespace WebApp_GozenBv.Test
             // Arrange
             var expectedEmployee = new Employee { Id = 1, Name = "John", Surname = "Doe" };
             int id = 1;
-            _employeeDataHandlerMock.Setup(handler => handler.GetEmployeeByIdAsync(id)).ReturnsAsync(expectedEmployee);
+            _employeeDataHandlerMock.Setup(handler => handler.QueryEmployeeByIdAsync(id)).ReturnsAsync(expectedEmployee);
 
             // Act
-            var result = await _employeeManager.MapEmployeeAsync(id);
+            var result = await _employeeManager.GetEmployeeAsync(id);
 
             // Assert
             Assert.AreEqual(expectedEmployee, result);
@@ -81,10 +81,10 @@ namespace WebApp_GozenBv.Test
         {
             // Arrange
             int id = 2;
-            _employeeDataHandlerMock.Setup(handler => handler.GetEmployeeByIdAsync(id)).ThrowsAsync(new NullReferenceException("No Employee with id 2."));
+            _employeeDataHandlerMock.Setup(handler => handler.QueryEmployeeByIdAsync(id)).ThrowsAsync(new NullReferenceException("No Employee with id 2."));
 
             // Act
-            var result = await _employeeManager.MapEmployeeAsync(id);
+            var result = await _employeeManager.GetEmployeeAsync(id);
 
             // Exception is expected, so no assertion is needed.
         }
@@ -98,10 +98,10 @@ namespace WebApp_GozenBv.Test
                 new Employee { Id = 1, Name = "John", Surname = "Doe" },
                 new Employee { Id = 2, Name = "Jane", Surname = "Smith" }
             };
-            _employeeDataHandlerMock.Setup(handler => handler.GetEmployeesAsync()).ReturnsAsync(expectedEmployees);
+            _employeeDataHandlerMock.Setup(handler => handler.QueryEmployeesAsync()).ReturnsAsync(expectedEmployees);
 
             // Act
-            var result = await _employeeManager.MapEmployeesAsync();
+            var result = await _employeeManager.GetEmployeesAsync();
 
             // Assert
             CollectionAssert.AreEqual(expectedEmployees, result);

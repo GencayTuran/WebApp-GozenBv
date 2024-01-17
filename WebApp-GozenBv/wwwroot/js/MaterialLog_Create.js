@@ -85,6 +85,7 @@ function PassProducts() {
 
 }
 
+//TODO: do you still need to check in the view for qty?
 function CheckQuantity()
 {
     GetElements();
@@ -124,7 +125,7 @@ function CheckQuantity()
 
 function CheckInputs() {
     GetElements();
-    let lightRed = "rgba(255,0,0,0.5)";
+    let lightRed = "rgba(255,0,0,0.8)";
     check = true;
 
     for (let i = 0; i < rows.length; i++) {
@@ -141,10 +142,10 @@ function CheckInputs() {
 }
 
 function NewRow() {
-    $(row.querySelector(".selectMaterial")).select2("destroy");
+    //$(row.querySelector(".selectMaterial")).select2("destroy");
 
     var clone = row.cloneNode(true);
-    $(clone.querySelector(".selectMaterial")).select2({width: '100%'});
+    //$(clone.querySelector(".selectMaterial")).select2({width: '100%'});
     clone.querySelector(".selectMaterial").value = "";
     clone.querySelector(".inputAmount").value = "";
     clone.querySelector(".chkUsed").checked = false;
@@ -152,12 +153,15 @@ function NewRow() {
     clone.querySelector(".labelAlert").innerHTML = "";
     parentNode.appendChild(clone);
 
-    $(row.querySelector(".selectMaterial")).select2({width: '100%'});
+    //$(row.querySelector(".selectMaterial")).select2({width: '100%'});
 }
 
 function RemoveRow(obj) {
-    element = obj.parentNode.parentNode.parentNode;
-    document.getElementById("rowCollection").removeChild(element);
+    GetElements();
+    if (rows.length != 1) {
+        element = obj.parentNode.parentNode.parentNode;
+        document.getElementById("rowCollection").removeChild(element);
+    }
 }
 
 

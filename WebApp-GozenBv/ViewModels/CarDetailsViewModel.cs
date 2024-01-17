@@ -9,7 +9,6 @@ namespace WebApp_GozenBv.ViewModels
         public CarPark Car { get; set; }
         public List<CarMaintenance> CarMaintenances { get; set; }
         public CarMaintenance CarMaintenance { get; set; }
-
     }
 }
 
